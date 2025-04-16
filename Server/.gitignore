@@ -1,0 +1,25 @@
+/node_modules
+
+.env
+
+serviceAccountKey.json
+
+.venv
+/allure-results
+config.py
+__pycache__
+.pytest_cache
+# Jest test results
+/jest-test-results.json
+# Coverage directory used by tools like istanbul
+/coverage
+# Mocha test results
+/mochawesome-report
+# Cypress test results
+/cypress/screenshots
+/cypress/videos
+# Log files
+*.log
+# Temporary files
+*.tmp
+*.temp
