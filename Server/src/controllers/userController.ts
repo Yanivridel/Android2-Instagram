@@ -18,7 +18,7 @@ export const registerUser = async (req: Request<{}, {}, IRegisterUser>, res: Res
 
         const existingUser = await userModel.findOne({ firebaseUid });
         if (existingUser) {
-            res.status(200).send({ status: "success", message: "User already exists", data: existingUser });
+            res.status(409).send({ status: "error", message: "User already exists", data: existingUser });
             return;
         }
 
@@ -26,6 +26,7 @@ export const registerUser = async (req: Request<{}, {}, IRegisterUser>, res: Res
             firebaseUid,
             email,
             username,
+            role: 'user'
         });
 
         await newUser.save();
@@ -54,14 +55,17 @@ export const registerUser = async (req: Request<{}, {}, IRegisterUser>, res: Res
 
 export const loginUser = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { uid, email } = req.user!;  // TypeScript knows `user` is defined here
+        const { uid } = req.user!;
 
         // Find the user based on the Firebase UID
         const existingUser = await userModel.findOne({ firebaseUid: uid });
 
         if (!existingUser) {
-            res.status(404).json({ message: "User not found" });
-            return;  // Ensure you return here
+            res.status(404).json({ 
+                status: "error",
+                message: "User not found in database" 
+            });
+            return;
         }
 
         res.status(200).json({

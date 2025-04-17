@@ -12,6 +12,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { I18nManager } from 'react-native';
 import { useEffect } from 'react';
 import { I18nextProvider } from 'react-i18next';
+import { FirebaseAuth } from './FirebaseConfig';
 
 export default function App() {
 
@@ -20,6 +21,20 @@ export default function App() {
       I18nManager.allowRTL(false);
       I18nManager.forceRTL(false);
     }
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = FirebaseAuth.onAuthStateChanged((user) => {
+      if (user) {
+        console.log("User is logged in:", user.email);
+        // console.log("User: ", user);
+        // maybe fetch your backend token again if needed
+      } else {
+        console.log("User not logged in");
+      }
+    });
+  
+    return () => unsubscribe();
   }, []);
 
   return (

@@ -7,6 +7,7 @@ import { useToast } from '@/components/ui/toast'
 import { FirebaseAuth } from '@/FirebaseConfig'
 import { useFormInput } from '@/hooks/useFormInput'
 import { Props } from '@/types/NavigationTypes'
+import { loginUser, registerUser } from '@/utils/api/internal/user/userApi'
 import { handleToast, showNewToast } from '@/utils/constants/Toasts'
 import { useTheme } from '@/utils/Themes/ThemeProvider'
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
@@ -51,13 +52,12 @@ const Login: React.FC<Props> = ({ navigation }) => {
             setIsLoading(true);
             try {
                 console.log({ email, password: pass });
-                const data = await signInWithEmailAndPassword(FirebaseAuth , email , pass);
-                handleToast(toast, "unique-toast-success-verification", "Success", "It Worked");
-                console.log(data);
+                const data = await loginUser({ email, pass });
+                // const data = await signInWithEmailAndPassword(FirebaseAuth , email , pass);
+                // console.log(data);
 
             } catch(err) {
                 console.log("Error: ", err);
-                handleToast(toast, "unique-toast-error-verification", "Error", "It didn't Worked");
             }
         }
     }

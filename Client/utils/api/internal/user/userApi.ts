@@ -1,74 +1,62 @@
-// signup.js
-import axios from 'axios';
-
-import { BASE_API_URL } from '@env';
+// signup.ts
 import { User } from '@/context/userStore';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { FirebaseAuth } from '@/FirebaseConfig';
+import { api } from '../apiService';
 
-const token = await FirebaseAuth.currentUser?.getIdToken();
-
-interface loginUserReq {
-    email: string,
-    password: string;
-}
-interface loginUserRes extends User {
-    token: string;
+export interface RegisterUserReq {
+    email: string;
+    pass: string;
+    username: string;
 }
 
-export const loginUser = async ({ email, password }: loginUserReq): Promise<loginUserRes | null> => {
+interface RegisterUserRes {
+    userId: string;
+    user: User;
+}
+
+export const registerUser = async ({ email, pass, username }: RegisterUserReq): Promise<RegisterUserRes | null> => {
     try {
-        const userCredential = await signInWithEmailAndPassword(FirebaseAuth, email, password);
-        const user = userCredential.user;
-
-        // Step 3: Send ID token to your backend
-        const response = await axios.get(`${BASE_API_URL}/api/users/login`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-
-        console.log("Login successful:", response.data);
+        const userCredential = await createUserWithEmailAndPassword(FirebaseAuth, email, pass);
+        const firebaseUid = userCredential.user.uid;
+        console.log("REGISTER firebaseUid", firebaseUid);
+        
+        const response = await api.post<RegisterUserRes>('api/users/register', {
+            firebaseUid,
+            email,
+            username
+        }, { skipAuth: true });
+        
+        console.log("Registration successful:", response.data);
         return response.data;
     } catch (error: any) {
-        console.error("Login error:", error?.response?.data || error.message);
+        console.error("Registration error:", error?.response?.data || error.message);
         return null;
     }
 };
 
-interface registerUserReq {
-    fName: string,
-    lName: string,
-    email: string,
-    password: string;
+interface LoginUserReq {
+    email: string;
+    pass: string;
 }
 
-interface registerUserRes {
-    userId: string;
+interface LoginUserRes extends User {
+    token: string;
 }
 
-export const registerUser = async ({ fName, lName, email, password }: registerUserReq): Promise<registerUserRes | null> => {
+export const loginUser = async ({ email, pass }: LoginUserReq): Promise<LoginUserRes | null> => {
     try {
-        const userCredential = await createUserWithEmailAndPassword(FirebaseAuth, email, password);
-        const user = userCredential.user;
-
-        const token = await user.getIdToken();
-
-        // 3. Send ID token + custom data (like name) to your server
-        const response = await axios.post(`${BASE_API_URL}/api/users/register`, {
-            fName,
-            lName,
-        }, 
-        {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-
-        console.log("Signup successful:", response.data);
+        // Firebase authentication
+        const userCredential = await signInWithEmailAndPassword(FirebaseAuth, email, pass);
+        
+        // Get user data from your server
+        // The token will be automatically added by the interceptor
+        const response = await api.get<LoginUserRes>('api/users/login');
+        
+        console.log("Login successful:", response.data);
         return response.data;
     } catch (error: any) {
-        console.error("Signup error:", error?.response?.data || error.message);
+        console.error("Login error:", error?.response?.data || error.message);
         return null;
     }
 };
