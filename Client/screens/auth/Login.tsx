@@ -53,8 +53,8 @@ const Login: React.FC<Props> = ({ navigation }) => {
             try {
                 console.log({ email, password: pass });
                 const data = await loginUser({ email, pass });
-                // const data = await signInWithEmailAndPassword(FirebaseAuth , email , pass);
-                // console.log(data);
+
+                console.log("FINISHED", data);
 
             } catch(err) {
                 console.log("Error: ", err);

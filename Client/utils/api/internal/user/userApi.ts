@@ -49,9 +49,13 @@ export const loginUser = async ({ email, pass }: LoginUserReq): Promise<LoginUse
         // Firebase authentication
         const userCredential = await signInWithEmailAndPassword(FirebaseAuth, email, pass);
         
+        // console.log("userCredential", userCredential);
+
         // Get user data from your server
         // The token will be automatically added by the interceptor
         const response = await api.get<LoginUserRes>('api/users/login');
+
+        console.log("response", response);
         
         console.log("Login successful:", response.data);
         return response.data;

@@ -27,6 +27,7 @@ apiClient.interceptors.request.use(
         if (FirebaseAuth.currentUser) {
             try {
                 const token = await FirebaseAuth.currentUser.getIdToken(true);
+                console.log("token", token)
                 config.headers.Authorization = `Bearer ${token}`;
             } catch (error) {
                 console.error('Error getting Firebase token:', error);

@@ -1,7 +1,8 @@
 import { Request } from "express";
 
 export interface AuthenticatedRequest extends Request {
-    userId: string;
+    user?: any;
+    userDb?: IUser;
 }
 
 export interface AuthenticatedRequestOptional extends Request {
@@ -9,6 +10,7 @@ export interface AuthenticatedRequestOptional extends Request {
 }
 
 import { DecodedIdToken } from "firebase-admin/auth";
+import { IUser } from "./userTypes";
 
 // Extend the express Request type
 declare global {

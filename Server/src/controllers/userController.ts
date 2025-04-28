@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { userModel } from '../models/userModel';
 import { MongoError } from 'mongodb';
+import { AuthenticatedRequest } from 'types/expressTypes';
 
 interface IRegisterUser {
     firebaseUid: string;
