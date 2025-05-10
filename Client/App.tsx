@@ -24,7 +24,7 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const unsubscribe = FirebaseAuth.onAuthStateChanged((user) => {
+    const unsubscribe = FirebaseAuth.onAuthStateChanged((user: any) => {
       if (user) {
         console.log("User is logged in:", user.email);
         // console.log("User: ", user);

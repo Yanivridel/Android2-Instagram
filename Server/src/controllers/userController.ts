@@ -57,7 +57,8 @@ export const registerUser = async (req: Request<{}, {}, IRegisterUser>, res: Res
 export const loginUser = async (req: Request, res: Response): Promise<void> => {
     try {
         const { uid } = req.user!;
-
+        console.log("Entered Login user Server Controller");
+        
         // Find the user based on the Firebase UID
         const existingUser = await userModel.findOne({ firebaseUid: uid });
 

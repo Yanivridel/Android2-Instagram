@@ -1,8 +1,8 @@
 // signup.ts
-import { User } from '@/context/userStore';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { FirebaseAuth } from '@/FirebaseConfig';
 import { api } from '../apiService';
+import { IUser } from '@/types/userTypes';
 
 export interface RegisterUserReq {
     email: string;
@@ -12,7 +12,7 @@ export interface RegisterUserReq {
 
 interface RegisterUserRes {
     userId: string;
-    user: User;
+    user: IUser;
 }
 
 export const registerUser = async ({ email, pass, username }: RegisterUserReq): Promise<RegisterUserRes | null> => {
@@ -40,7 +40,7 @@ interface LoginUserReq {
     pass: string;
 }
 
-interface LoginUserRes extends User {
+interface LoginUserRes extends IUser {
     token: string;
 }
 

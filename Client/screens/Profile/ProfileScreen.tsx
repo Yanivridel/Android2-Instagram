@@ -7,7 +7,6 @@ import { Avatar, AvatarFallbackText, AvatarImage } from '@/components/ui/avatar'
 import { Box } from '@/components/ui/box'
 import { Divider } from '@/components/ui/divider'
 import { Text } from '@/components/ui/text'
-import { useUserStore } from '@/context/userStore'
 import { Props } from '@/types/NavigationTypes'
 import {
 	IC_Bell_V2,
@@ -29,7 +28,6 @@ interface ProfileScreenProps extends Props {}
 export default function ProfileScreen({ navigation }: ProfileScreenProps) {
 	const { t } = useTranslation()
 	const { appliedTheme } = useTheme()
-	const { user } = useUserStore()
 
 	const thingToDo = [
 		{
@@ -66,13 +64,13 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
 					<BackHeader title={t('profile.header')} colorScheme="alwaysWhite" />
 					<Box className="justify-center items-center gap-2 p-2">
 						<Avatar size="xl">
-							<AvatarFallbackText>{user?.fName + ' ' + user?.lName}</AvatarFallbackText>
-							<AvatarImage source={{ uri: user?.avatar }} />
+							<AvatarFallbackText>{"Yaniv"}</AvatarFallbackText>
+							<AvatarImage source={{ uri: "Yaniv.png" }} />
 						</Avatar>
 						<Text className={`text-[24px] font-bold text-white`}>
-							{user?.fName + ' ' + user?.lName}
+							{"Yaniv"}
 						</Text>
-						<Text className={`text-[14px] text-white`}>{user?.email}</Text>
+						<Text className={`text-[14px] text-white`}>{"Yaniv@gmail"}</Text>
 						<Box className="z-10">
 							<ThingToDo thingToDo={thingToDo} />
 						</Box>

@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
-import { FirebaseAuth } from '@/FirebaseConfig';
 import { BASE_API_URL } from '@env';
+import { FirebaseAuth } from '@/FirebaseConfig';
 
 interface CustomAxiosRequestConfig extends AxiosRequestConfig {
     skipAuth?: boolean;
@@ -27,17 +27,16 @@ apiClient.interceptors.request.use(
         if (FirebaseAuth.currentUser) {
             try {
                 const token = await FirebaseAuth.currentUser.getIdToken(true);
-                console.log("token", token)
+                // console.log("token", token)
                 config.headers.Authorization = `Bearer ${token}`;
             } catch (error) {
                 console.error('Error getting Firebase token:', error);
             }
         }
+        // console.log("Axios sending request to:", config.url, config.headers);
         return config;
     },
-    (error) => {
-        return Promise.reject(error);
-    }
+    error => Promise.reject(error)
 );
 
 // Response interceptor to handle common error scenarios
@@ -48,20 +47,20 @@ apiClient.interceptors.response.use(
         
         // Handle token expiration (status code 401)
         if (error.response?.status === 401 && !originalRequest._retry) {
-        originalRequest._retry = true;
-        
-        try {
-            // Force refresh the token
-            const token = await FirebaseAuth.currentUser?.getIdToken(true);
-            if (token) {
-                // Update the auth header with new token
-                originalRequest.headers.Authorization = `Bearer ${token}`;
-                // Retry the original request
-                return apiClient(originalRequest);
+            originalRequest._retry = true;
+            
+            try {
+                // Force refresh the token
+                const token = await FirebaseAuth.currentUser?.getIdToken(true);
+                if (token) {
+                    // Update the auth header with new token
+                    originalRequest.headers.Authorization = `Bearer ${token}`;
+                    // Retry the original request
+                    return apiClient(originalRequest);
+                }
+            } catch (refreshError) {
+                console.error('Token refresh failed:', refreshError);
             }
-        } catch (refreshError) {
-            console.error('Token refresh failed:', refreshError);
-        }
         }
         
         return Promise.reject(error);

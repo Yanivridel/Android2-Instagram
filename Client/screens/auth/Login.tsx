@@ -4,14 +4,12 @@ import { Box } from '@/components/ui/box'
 import { Button, ButtonSpinner, ButtonText } from '@/components/ui/button'
 import { Text } from '@/components/ui/text'
 import { useToast } from '@/components/ui/toast'
-import { FirebaseAuth } from '@/FirebaseConfig'
 import { useFormInput } from '@/hooks/useFormInput'
 import { Props } from '@/types/NavigationTypes'
-import { loginUser, registerUser } from '@/utils/api/internal/user/userApi'
-import { handleToast, showNewToast } from '@/utils/constants/Toasts'
+import { loginUser } from '@/utils/api/internal/user/userApi'
 import { useTheme } from '@/utils/Themes/ThemeProvider'
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
-import React, { useState } from 'react'
+import axios from 'axios'
+import React, { useEffect, useState } from 'react'
 
 const Login: React.FC<Props> = ({ navigation }) => {
     const { appliedTheme } = useTheme();
@@ -23,6 +21,11 @@ const Login: React.FC<Props> = ({ navigation }) => {
     });
     const { email, pass } = values;
     const toast = useToast();
+
+    useEffect(() => {
+        axios.get("http://192.168.1.12:3000/")
+        .then(response => console.log("DATA", response.data))
+    }, []);
 
     async function handleSubmitLogin() {
         let valid = true;
@@ -59,10 +62,11 @@ const Login: React.FC<Props> = ({ navigation }) => {
             } catch(err) {
                 console.log("Error: ", err);
             }
+            finally {
+                setIsLoading(false);
+            }
         }
     }
-
-    
 
     return (
     <MyLinearGradient type='background' color={appliedTheme === "dark" ? 'dark' : 'light-blue'}>
@@ -77,14 +81,13 @@ const Login: React.FC<Props> = ({ navigation }) => {
             <Box className='gap-2'>
                 {/* Inputs */}
                 <InputAuth 
-                    icon="IC_Email" 
+                    icon="IC_Email"
                     placeholder="Email address"
                     value={email}
                     onChangeText={(val) => handleInputChange("email", val)}
                     error={errors.email}
                 />
                 <InputAuth 
-                    icon="IC_Lock" 
                     placeholder="Password"
                     type='pass'
                     value={pass}

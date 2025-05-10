@@ -3,7 +3,6 @@ import { Text, ScrollView, TouchableOpacity } from 'react-native'
 import { Box } from '@/components/ui/box'
 import { useTheme } from '@/utils/Themes/ThemeProvider'
 import { Divider } from '@/components/ui/divider'
-import { useUserStore } from '@/context/userStore'
 import {
 	IC_BTCUSDT,
 	IC_Bell_White,
@@ -34,7 +33,6 @@ type BundleItem = {
 
 const HomeScreen: React.FC<Props> = ({ navigation }) => {
 	const { appliedTheme } = useTheme()
-	const { user } = useUserStore()
 	const { t } = useTranslation()
 
 	const getBundleData = (): BundleItem[] => {
@@ -91,7 +89,6 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 					<Box className="flex flex-col gap-4 p-4">
 						<Text className="text-[17px] font-medium text-white">{t('home.safeToSpend')}</Text>
 						<Box className="flex-row items-center gap-4">
-							<Text className="text-4xl font-medium text-white">${user?.nlve || 0}</Text>
 							<IC_Info className="h-6 w-6" />
 						</Box>
 						<Text className="text-[14px] text-white">{t('home.lastUpdated')}</Text>

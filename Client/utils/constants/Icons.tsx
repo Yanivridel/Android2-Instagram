@@ -25,32 +25,20 @@ export interface IconsProps {
 export const IC_Email = ({ className, color }: IconsProps) => {
   return (
     <Box className={cn(className)}>
-      <Svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
-        <G opacity={0.401781}>
-          <Mask
-            id="a"
-            style={{
-              maskType: 'luminance',
-            }}
-            maskUnits="userSpaceOnUse"
-            x={0}
-            y={0}>
-            <Path fill={color || '#fff'} d="M0 0H24V24H0z" />
-          </Mask>
-          <G
-            mask="url(#a)"
-            stroke={color || '#000'}
-            strokeWidth={1.5}
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <Path
-              clipRule="evenodd"
-              d="M18.417 5.583c1.012 0 1.833.821 1.833 1.834v9.166c0 1.013-.82 1.834-1.833 1.834H5.583a1.833 1.833 0 01-1.833-1.834V7.418c0-1.013.82-1.833 1.833-1.833h12.834z"
-            />
-            <Path d="M3.75 7.417l8.25 5.5 8.25-5.5" />
-          </G>
-        </G>
-      </Svg>
+      <Svg
+      viewBox="0 0 28 22"
+      fill={color || "none"}
+      xmlns="http://www.w3.org/2000/svg"
+      stroke={color}
+    >
+      <Path
+        stroke={color}
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M0 3a3 3 0 013-3h22a3 3 0 013 3v16a3 3 0 01-3 3H3a3 3 0 01-3-3V3zm3-1h22a1 1 0 01.917.6l-10.832 9.008a2 2 0 01-2.584-.023L2.079 2.61A1 1 0 013 2zM2 5.181V19a1 1 0 001 1h22a1 1 0 001-1V5.132l-9.637 8.014a4 4 0 01-5.167-.045L2 5.18z"
+        fill={color || "#242729"}
+      />
+    </Svg>
     </Box>
   );
 };
