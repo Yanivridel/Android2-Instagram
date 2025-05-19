@@ -30,7 +30,7 @@ const StackNavigator = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Login"
+        initialRouteName="MainApp"
         screenOptions={{
           detachPreviousScreen: true,
           headerShown: false,
