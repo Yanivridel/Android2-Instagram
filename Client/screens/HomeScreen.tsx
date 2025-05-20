@@ -11,9 +11,9 @@ const dummyPosts: Post[] = [
     id: '1',
     user: {
       name: 'john_doe',
-      avatar: 'https://placekitten.com/50/50'
+      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8dXNlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60'
     },
-    image: 'https://placekitten.com/400/400',
+    image: 'https://images.unsplash.com/photo-1611003228941-98852ba62227?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YmFieSUyMGRvZ3xlbnwwfHwwfHx8MA%3D%3D',
     caption: 'Enjoying the sunshine! #catlife',
     likes: 128,
     timestamp: '2h ago'
@@ -22,9 +22,9 @@ const dummyPosts: Post[] = [
     id: '2',
     user: {
       name: 'jane_smith',
-      avatar: 'https://placekitten.com/51/51'
+      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80'
     },
-    image: 'https://placekitten.com/401/401',
+    image: 'https://t4.ftcdn.net/jpg/01/04/78/75/360_F_104787586_63vz1PkylLEfSfZ08dqTnqJqlqdq0eXx.jpg',
     caption: 'Delicious brunch with friends',
     likes: 256,
     timestamp: '4h ago'
@@ -36,39 +36,41 @@ const dummyPosts: Post[] = [
 // It handles layout of avatar, username, image, actions, caption, etc.
 import PostCard from '@/components/home/PostCard'
 import { Post } from '@/types/postTypes'
+import { IC_Heart, IC_Messenger } from '@/utils/constants/Icons'
+import MyLinearGradient from '@/components/gradient/MyLinearGradient'
+import { Props } from '@/types/NavigationTypes'
 
-const HomeScreen = () => {
+const HomeScreen = ({ navigation }: Props) => {
   const { appliedTheme } = useTheme()
-
+  
+  
   return (
-    <ScrollView className={`flex-1 bg-background-${appliedTheme}`}>
-      {/* Header */}
+  <>
+    {/* Header */}
+    <MyLinearGradient type="background" color="light-blue">
       <Box className={`flex-row items-center justify-between px-4 py-2 bg-card-${appliedTheme}`}>
-        <TouchableOpacity>
-          <Image
-            source={require('@/assets/favicon.png')}
-            className="h-6 w-6"
-          />
+        <TouchableOpacity
+          onPress={() => navigation.navigate("MainApp", { screen: "Notifications" })}
+        >
+          <IC_Heart className="h-6 w-6" color="" />
         </TouchableOpacity>
 
         <Image
-          source={require('@/assets/favicon.png')}
-          className="h-8 w-24"
+          source={require('@/assets/images/violet_long_logo.png')}
+          className="h-[35px] w-[80px]"
           resizeMode="contain"
+          alt="Logo"
         />
 
         <TouchableOpacity>
-          <Image
-            source={require('@/assets/favicon.png')}
-            className="h-6 w-6"
-          />
+          <IC_Messenger className="h-6 w-6" color="black" />
         </TouchableOpacity>
       </Box>
+    </MyLinearGradient>
+    <Box className={`flex-1 bg-background-${appliedTheme}`}>
 
       {/* Stories Section (optional) */}
       {/* You can add a horizontal FlashList of story circles here */}
-
-      <Divider className={`bg-divider-${appliedTheme}`} />
 
       {/* Posts Feed */}
       <FlashList
@@ -82,7 +84,8 @@ const HomeScreen = () => {
         estimatedItemSize={500}
         showsVerticalScrollIndicator={false}
       />
-    </ScrollView>
+    </Box>
+    </>
   )
 }
 

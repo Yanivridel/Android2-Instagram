@@ -1,7 +1,13 @@
-import React from 'react'
-import { Image, Text, TouchableOpacity } from 'react-native'
+import React, { useState } from 'react'
+import { TouchableOpacity } from 'react-native'
 import { Box } from '@/components/ui/box'
+import { Text } from '@/components/ui/text'
+import { Image } from '@/components/ui/image'
 import { Post } from '@/types/postTypes'
+import { IC_Comment, IC_Heart, IC_Share, IC_Bookmark, IC_3DotsOptions } from '@/utils/constants/Icons'
+import { AvatarFallbackText, AvatarImage } from '../ui/avatar'
+import { Avatar } from '../ui/avatar'
+import PostCommentSheet from './PostCommentSheet'
 
 /**
  * PostCard component to render an Instagram-style post
@@ -13,62 +19,61 @@ type PostCardProps = {
 
 const PostCard = ({ post }: PostCardProps) => {
   const { user, image, caption, likes, timestamp } = post
+  const [showCommentsSheet, setShowCommentsSheet] = useState(false);
 
   return (
-    <Box className="bg-card-light dark:bg-card-dark rounded-lg">
+    <Box className="bg-white dark:bg-card-dark rounded-lg">
       {/* Header: Avatar, Username, Menu */}
       <Box className="flex-row items-center justify-between px-4 py-2">
         <Box className="flex-row items-center">
-          <Image
-            source={{ uri: user.avatar }}
-            className="h-8 w-8 rounded-full"
-          />
+          <Avatar className="bg-indigo-600 border-[2.5px] border-indigo-400">
+            <AvatarFallbackText className="text-white">
+              {user.name}
+            </AvatarFallbackText>
+            <AvatarImage
+              source={{
+                uri: user.avatar,
+              }}
+              alt="User Avatar"
+            />
+          </Avatar>
           <Text className="ml-2 text-[15px] font-medium text-text-light dark:text-text-dark">
             {user.name}
           </Text>
         </Box>
         <TouchableOpacity>
-          <Image
-            source={require('@/assets/favicon.png')}
-            className="h-5 w-5"
-          />
+          <IC_3DotsOptions className="h-5 w-5" color="gray"/>
         </TouchableOpacity>
       </Box>
 
       {/* Post Image */}
       <Image
-        source={{ uri: image }}
-        className="w-full aspect-square"
+        source={{ uri: image}}
+        className="w-full h-fit aspect-square"
         resizeMode="cover"
+        alt="Post Image"
       />
 
       {/* Actions: Like, Comment, Share, Bookmark */}
       <Box className="flex-row items-center justify-between px-4 py-2">
-        <Box className="flex-row items-center space-x-4">
+        <Box className="flex-row gap-3">
+          {/* Like */}
           <TouchableOpacity>
-            <Image
-              source={require('@/assets/favicon.png')}
-              className="h-6 w-6"
-            />
+            <IC_Heart className="h-6 w-6" color="red"/>
           </TouchableOpacity>
-          <TouchableOpacity>
-            <Image
-              source={require('@/assets/favicon.png')}
-              className="h-6 w-6"
-            />
+          {/* Comment */}
+          <TouchableOpacity onPress={() => setShowCommentsSheet(true)}>
+            <PostCommentSheet showActionsheet={showCommentsSheet} setShowActionsheet={setShowCommentsSheet} />
+            <IC_Comment className="h-6 w-6"/>
           </TouchableOpacity>
+          {/* Share */}
           <TouchableOpacity>
-            <Image
-              source={require('@/assets/favicon.png')}
-              className="h-6 w-6"
-            />
+            <IC_Share className="h-6 w-6"/>
           </TouchableOpacity>
         </Box>
+        {/* Bookmark */}
         <TouchableOpacity>
-          <Image
-            source={require('@/assets/favicon.png')}
-            className="h-6 w-6"
-          />
+          <IC_Bookmark className="h-6 w-6"/>
         </TouchableOpacity>
       </Box>
 

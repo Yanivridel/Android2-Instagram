@@ -45,7 +45,7 @@ export default function App() {
               <GluestackUIProvider>
                 <ToastProvider>
                   <StackNavigator />
-                  <StatusBar backgroundColor="#5506FD" barStyle="light-content" />
+                  <StatusBar backgroundColor="#5506FD" barStyle="dark-content" />
                 </ToastProvider>
               </GluestackUIProvider>
             </PaperProvider>

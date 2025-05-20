@@ -7,30 +7,28 @@ import { useTheme } from "@/utils/Themes/ThemeProvider"
 import BackHeader from "@/components/BackHeader"
 import MyLinearGradient from "@/components/gradient/MyLinearGradient"
 import CardUpRounded from "@/components/CardUpRounded"
-import { useTranslation } from "react-i18next"
 
 const NotificationsScreen = () => {
 	const { appliedTheme } = useTheme()
-	const { t } = useTranslation()
 
 	const [notifications, setNotifications] = useState([
 		{
 			id: 1,
-			title: t("notifications.items.waiting.title"),
-			message: t("notifications.items.waiting.message"),
-			timeAgo: t("notifications.items.waiting.timeAgo")
+			title: "Waiting",
+			message: "Your order is waiting",
+			timeAgo: "2 hours ago"
 		},
 		{
 			id: 2,
-			title: t("notifications.items.shipped.title"),
-			message: t("notifications.items.shipped.message"),
-			timeAgo: t("notifications.items.shipped.timeAgo")
+			title: "Shipped",
+			message: "Your order has been shipped",
+			timeAgo: "1 day ago"
 		},
 		{
 			id: 3,
-			title: t("notifications.items.success.title"),
-			message: t("notifications.items.success.message"),
-			timeAgo: t("notifications.items.success.timeAgo")
+			title: "Success",
+			message: "Your order has been delivered",
+			timeAgo: "3 days ago"
 		}
 	])
 
@@ -46,7 +44,7 @@ const NotificationsScreen = () => {
 			onPress={() => handleRemoveNotification(id)}
 			className="bg-red-600 justify-center items-center w-20 rounded-lg"
 		>
-			<Text className="text-white font-semibold">{t("notifications.remove")}</Text>
+			<Text className="text-white font-semibold">Remove</Text>
 		</TouchableOpacity>
 	)
 
@@ -57,7 +55,7 @@ const NotificationsScreen = () => {
 				color={appliedTheme === "dark" ? "blue" : "purple"}
 				className="h-1/6 p-4"
 			>
-				<BackHeader title={t("notifications.title")} colorScheme="alwaysWhite" />
+				<BackHeader title="Notifications" colorScheme="alwaysWhite" />
 			</MyLinearGradient>
 
 			<CardUpRounded className={`bg-background-${appliedTheme} h-full p-4 gap-2 space-y-4`}>

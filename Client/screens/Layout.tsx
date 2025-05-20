@@ -9,14 +9,16 @@ import {
 import React from 'react'
 import { useTheme } from '@/utils/Themes/ThemeProvider'
 import {
+	IC_AddPost,
 	IC_Home,
 	IC_Invest,
 	IC_Market,
 	IC_Portfolio,
 	IC_Profile,
+	IC_Reels,
+	IC_Search,
 	IC_Tothor_Logo_Only_Bold
 } from '@/utils/constants/Icons'
-import { useTranslation } from 'react-i18next'
 
 interface LayoutProps {
 	children: React.ReactNode
@@ -25,7 +27,6 @@ interface LayoutProps {
 
 const Layout = React.memo(({ children, navigation }: LayoutProps) => {
 	const { appliedTheme } = useTheme()
-	const { t } = useTranslation()
 
 	const currentScreen = useNavigationState(state => {
 		const mainAppRoute = state.routes.find(route => route.name === 'MainApp')
@@ -69,7 +70,7 @@ const Layout = React.memo(({ children, navigation }: LayoutProps) => {
 
 						<TouchableOpacity onPress={() => navigateToScreen('Markets')}>
 							<Box className="flex-col items-center text-center">
-								<IC_Market
+								<IC_Search
 									className="w-7 h-7 mb-1"
 									color={currentScreen === 'Markets' ? '#4A3EF6' : '#B0B9C1'}
 								/>
@@ -80,7 +81,7 @@ const Layout = React.memo(({ children, navigation }: LayoutProps) => {
 											: 'text-[#5C616F]'
 									}`}
 								>
-									Markets
+									Explore
 								</Text>
 							</Box>
 						</TouchableOpacity>
@@ -92,7 +93,7 @@ const Layout = React.memo(({ children, navigation }: LayoutProps) => {
 							<Box
 								className={`bg-button-${appliedTheme} bottom-[18px] rounded-full w-16 h-16 items-center self-center justify-center`}
 							>
-								<IC_Tothor_Logo_Only_Bold className="w-10 h-10" />
+								<IC_AddPost className="w-9 h-9" color="white" />
 							</Box>
 							<Text
 								className={`text-sm bottom-4 justify-center text-center ${
@@ -101,16 +102,19 @@ const Layout = React.memo(({ children, navigation }: LayoutProps) => {
 										: 'text-[#5C616F]'
 								}`}
 							>
-								Messages
+								Post
 							</Text>
 						</TouchableOpacity>
 					</Box>
 
 					{/* Right Icons */}
 					<Box className="flex-1 flex flex-row justify-evenly">
-						<TouchableOpacity onPress={() => navigateToScreen('Investment')}>
+						<TouchableOpacity
+							onPress={() => navigateToScreen('Investment')}
+							activeOpacity={0.7}
+						>
 							<Box className="flex-col items-center text-center">
-								<IC_Invest
+								<IC_Reels
 									className="w-8 h-8"
 									color={currentScreen === 'Investment' ? '#4A3EF6' : '#B0B9C1'}
 								/>
@@ -126,7 +130,10 @@ const Layout = React.memo(({ children, navigation }: LayoutProps) => {
 							</Box>
 						</TouchableOpacity>
 
-						<TouchableOpacity onPress={() => navigateToScreen('Profile')}>
+						<TouchableOpacity 
+							onPress={() => navigateToScreen('Profile')}
+							activeOpacity={0.7}
+							>
 							<Box className="flex-col items-center text-center">
 								<IC_Profile
 									className="w-8 h-8"
