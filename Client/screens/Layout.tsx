@@ -62,7 +62,7 @@ const Layout = React.memo(({ children, navigation }: LayoutProps) => {
 											: 'text-[#5C616F]'
 									}`}
 								>
-									{t('layout.tabs.home')}
+									Home
 								</Text>
 							</Box>
 						</TouchableOpacity>
@@ -80,7 +80,7 @@ const Layout = React.memo(({ children, navigation }: LayoutProps) => {
 											: 'text-[#5C616F]'
 									}`}
 								>
-									{t('layout.tabs.markets')}
+									Markets
 								</Text>
 							</Box>
 						</TouchableOpacity>
@@ -101,7 +101,7 @@ const Layout = React.memo(({ children, navigation }: LayoutProps) => {
 										: 'text-[#5C616F]'
 								}`}
 							>
-								{t('layout.tabs.tothor')}
+								Messages
 							</Text>
 						</TouchableOpacity>
 					</Box>
@@ -121,7 +121,7 @@ const Layout = React.memo(({ children, navigation }: LayoutProps) => {
 											: 'text-[#5C616F]'
 									}`}
 								>
-									{t('layout.tabs.investment')}
+									Reels
 								</Text>
 							</Box>
 						</TouchableOpacity>
@@ -139,7 +139,7 @@ const Layout = React.memo(({ children, navigation }: LayoutProps) => {
 											: 'text-[#5C616F]'
 									}`}
 								>
-									{t('layout.tabs.profile')}
+									Profile
 								</Text>
 							</Box>
 						</TouchableOpacity>

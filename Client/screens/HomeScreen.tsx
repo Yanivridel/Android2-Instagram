@@ -1,170 +1,89 @@
 import React from 'react'
-import { Text, ScrollView, TouchableOpacity } from 'react-native'
+import { ScrollView, TouchableOpacity, Image } from 'react-native'
 import { Box } from '@/components/ui/box'
-import { useTheme } from '@/utils/Themes/ThemeProvider'
 import { Divider } from '@/components/ui/divider'
-import {
-	IC_BTCUSDT,
-	IC_Bell_White,
-	IC_Info,
-	IC_Top_Up,
-	IC_Transaction,
-	IC_History,
-	IC_Tothor,
-	IC_Tothor_Logo_Only,
-	IC_Tothor_Logo_Only_Bold,
-	IC_Gold,
-	IC_DOGEUSDT,
-	IC_PieGraph
-} from '@/utils/constants/Icons'
-import { Props } from '@/types/NavigationTypes'
-import MyLinearGradient from '@/components/gradient/MyLinearGradient'
-import OptionCard from '@/components/OptionCard'
 import { FlashList } from '@shopify/flash-list'
-import { useTranslation } from 'react-i18next'
+import { useTheme } from '@/utils/Themes/ThemeProvider'
 
-type BundleItem = {
-	id: string
-	icon: React.ReactNode
-	name: string
-	timeframe: string
-	performance: string
-}
+// Dummy data for posts
+const dummyPosts: Post[] = [
+  {
+    id: '1',
+    user: {
+      name: 'john_doe',
+      avatar: 'https://placekitten.com/50/50'
+    },
+    image: 'https://placekitten.com/400/400',
+    caption: 'Enjoying the sunshine! #catlife',
+    likes: 128,
+    timestamp: '2h ago'
+  },
+  {
+    id: '2',
+    user: {
+      name: 'jane_smith',
+      avatar: 'https://placekitten.com/51/51'
+    },
+    image: 'https://placekitten.com/401/401',
+    caption: 'Delicious brunch with friends',
+    likes: 256,
+    timestamp: '4h ago'
+  },
+  // ... more dummy posts
+]
 
-const HomeScreen: React.FC<Props> = ({ navigation }) => {
-	const { appliedTheme } = useTheme()
-	const { t } = useTranslation()
+// Placeholder PostCard component should exist in your components directory
+// It handles layout of avatar, username, image, actions, caption, etc.
+import PostCard from '@/components/home/PostCard'
+import { Post } from '@/types/postTypes'
 
-	const getBundleData = (): BundleItem[] => {
-		return [
-			{
-				id: '1',
-				icon: <IC_BTCUSDT className="h-12 w-12" />,
-				name: t('home.bundles.maga'),
-				timeframe: t('home.timeframe'),
-				performance: '+15%'
-			},
-			{
-				id: '2',
-				icon: appliedTheme === 'dark'
-					? <IC_Tothor_Logo_Only_Bold className="h-12 w-12" />
-					: <IC_Tothor_Logo_Only className="h-12 w-12" />,
-				name: t('home.bundles.tothor'),
-				timeframe: t('home.timeframe'),
-				performance: '+24%'
-			},
-			{
-				id: '3',
-				icon: <IC_Gold className="h-12 w-12" />,
-				name: t('home.bundles.earth'),
-				timeframe: t('home.timeframe'),
-				performance: '+35%'
-			},
-			{
-				id: '4',
-				icon: <IC_DOGEUSDT className="h-12 w-12" />,
-				name: t('home.bundles.doge'),
-				timeframe: t('home.timeframe'),
-				performance: '+4%'
-			}
-		]
-	}
+const HomeScreen = () => {
+  const { appliedTheme } = useTheme()
 
-	return (
-		<ScrollView>
-            <MyLinearGradient type="background" color={appliedTheme === 'dark' ? 'blue' : 'purple'}>
-				<Box className="h-[50%] p-4">
-					<Box className="flex flex-row items-center justify-between">
-						<IC_Tothor className="h-16 w-40" />
-						<Box className="flex-row gap-4">
-							<TouchableOpacity onPress={() => navigation.navigate('Portfolio')}>
-								<IC_PieGraph color="#fff" className="h-7 w-7" />
-							</TouchableOpacity>
-							<TouchableOpacity onPress={() => navigation.navigate('Notifications')}>
-								<IC_Bell_White className="h-7 w-7" />
-							</TouchableOpacity>
-						</Box>
-					</Box>
+  return (
+    <ScrollView className={`flex-1 bg-background-${appliedTheme}`}>
+      {/* Header */}
+      <Box className={`flex-row items-center justify-between px-4 py-2 bg-card-${appliedTheme}`}>
+        <TouchableOpacity>
+          <Image
+            source={require('@/assets/favicon.png')}
+            className="h-6 w-6"
+          />
+        </TouchableOpacity>
 
-					<Box className="flex flex-col gap-4 p-4">
-						<Text className="text-[17px] font-medium text-white">{t('home.safeToSpend')}</Text>
-						<Box className="flex-row items-center gap-4">
-							<IC_Info className="h-6 w-6" />
-						</Box>
-						<Text className="text-[14px] text-white">{t('home.lastUpdated')}</Text>
-					</Box>
+        <Image
+          source={require('@/assets/favicon.png')}
+          className="h-8 w-24"
+          resizeMode="contain"
+        />
 
-					<Box className={`bg-card-${appliedTheme} z-50 w-full h-[80px] rounded-full p-2 flex flex-row justify-evenly`}>
-						<Box className="flex-col items-center ">
-							<IC_Top_Up className="h-12 w-12" />
-							<Text className={`text-text-${appliedTheme} font-bold`}>
-								{t('home.actions.topup')}
-							</Text>
-						</Box>
-						<Box className="p-2">
-							<Box className={`border-s-[1px] border-divider-${appliedTheme} mx-2 h-full`} />
-						</Box>
-						<Box className="flex-col items-center text-center">
-							<IC_Transaction className="h-12 w-12" />
-							<Text className={`text-text-${appliedTheme} font-bold`}>
-								{t('home.actions.transfer')}
-							</Text>
-						</Box>
-						<Box className="p-2">
-							<Box className={`border-s-[1px] border-divider-${appliedTheme} mx-2 h-full`} />
-						</Box>
-						<Box className="flex-col items-center text-center">
-							<IC_History className="h-12 w-12" />
-							<Text className={`text-text-${appliedTheme} font-bold`}>
-								{t('home.actions.history')}
-							</Text>
-						</Box>
-					</Box>
-				</Box>
-			</MyLinearGradient>
+        <TouchableOpacity>
+          <Image
+            source={require('@/assets/favicon.png')}
+            className="h-6 w-6"
+          />
+        </TouchableOpacity>
+      </Box>
 
-            <MyLinearGradient type="background" color={appliedTheme === 'dark' ? 'dark' : 'light-blue'} className="">
-				<Box className={`p-4 bg-background-${appliedTheme} h-full`}>
-					<Box>
-						<Box className="mt-10 flex-row items-center justify-between">
-							<Text className={`text-[22px] font-semibold text-text-${appliedTheme}`}>
-								{t('home.recommended')}
-							</Text>
-						</Box>
-						<Text className={`mb-4 mt-2 font-medium text-subText-${appliedTheme}`}>
-							{t('home.bundleNote')}
-						</Text>
+      {/* Stories Section (optional) */}
+      {/* You can add a horizontal FlashList of story circles here */}
 
-						<FlashList
-							data={getBundleData()}
-							renderItem={({ item }) => (
-								<OptionCard>
-									<Box className="gap-1">
-										{item.icon}
-										<Text className={`text-text-${appliedTheme} text-[17px] font-medium`}>
-											{item.name}
-										</Text>
-										<Text className={`text-subText-${appliedTheme} text-[14px] font-medium`}>
-											{item.timeframe}
-										</Text>
-										<Text className={`text-text-${appliedTheme} text-[17px] font-medium`}>
-											{item.performance}
-										</Text>
-									</Box>
-								</OptionCard>
-							)}
-							estimatedItemSize={150}
-							horizontal={true}
-							showsHorizontalScrollIndicator={false}
-							keyExtractor={(item) => item.id}
-							ItemSeparatorComponent={() => <Box className="w-4" />}
-						/>
-					</Box>
-					<Divider className={`bg-divider-${appliedTheme} mt-4`} />
-				</Box>
-			</MyLinearGradient>
-		</ScrollView>
-	)
+      <Divider className={`bg-divider-${appliedTheme}`} />
+
+      {/* Posts Feed */}
+      <FlashList
+        data={dummyPosts}
+        keyExtractor={item => item.id}
+        renderItem={({ item }) => (
+          <Box className="mb-4">
+            <PostCard post={item} />
+          </Box>
+        )}
+        estimatedItemSize={500}
+        showsVerticalScrollIndicator={false}
+      />
+    </ScrollView>
+  )
 }
 
 export default HomeScreen
