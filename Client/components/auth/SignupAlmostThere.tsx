@@ -11,7 +11,6 @@ import { FlatList, Pressable, TouchableOpacity, TouchableWithoutFeedback } from 
 import { Address, SignupFinalDataType } from '@/types/other'
 import { IC_CurrentLocation } from '@/utils/constants/Icons'
 import { Divider } from '../ui/divider'
-import MembershipModal from './MembershipModal'
 import { useTranslation } from 'react-i18next'
 
 interface SignupPersonalInformationProps extends SignUpScreensProps {
@@ -59,7 +58,6 @@ function SignupAlmostThere({ handleScreenChange, setHeaderStep, formHook, naviga
 
     return (
     <Box className='flex-1 justify-between'>
-        <MembershipModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSuccess={() => navigation.navigate( "CreatePin")}/>
         {/* Title */}
         <Box className='mb-10 gap-7 flex-1'>
             <Box className='gap-2'>

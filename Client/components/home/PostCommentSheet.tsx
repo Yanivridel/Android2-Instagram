@@ -32,7 +32,7 @@ interface PostCommentSheetProps {
 
   // Dummy comments data
 const dummyComments: IComment[] = [
-    { id: '1', text: 'This is a great post!', user: 'user1' },
+    { id: '1', text: 'This is a great post! REALLY REALLY GREAT POST! Loved every bit of it! <3', user: 'user1' },
     { id: '2', text: 'I love this content!', user: 'user2' },
     { id: '3', text: 'Amazing work!', user: 'user3' },
     { id: '4', text: 'Keep it up!', user: 'user4' },
@@ -150,7 +150,7 @@ const PostCommentSheet = ({showActionsheet, setShowActionsheet}: PostCommentShee
                         ref={flatListRef}
                         data={dummyComments}
                         renderItem={({ item }) => <PostComment comment={item} />}
-                        keyExtractor={(item) => item.id}
+                        keyExtractor={(item) => String(Number(item.id) * Math.random())} // Change later
                         onScroll={scrollHandler}
                         scrollEventThrottle={16}
                         contentContainerStyle={{paddingBottom: 20}}

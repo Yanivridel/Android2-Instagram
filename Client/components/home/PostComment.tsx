@@ -1,16 +1,18 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import { View, Text, TouchableOpacity, Pressable } from 'react-native'
+import React, { useState } from 'react'
 import { IComment } from '@/types/postTypes';
 import { Box } from '../ui/box';
 import { Avatar, AvatarFallbackText, AvatarImage } from '../ui/avatar';
 import { IC_Heart } from '@/utils/constants/Icons';
+import { useDoublePress } from '@/hooks/useDoublePress';
 
 
 interface PostCommentProps {
     comment: IComment;
 }
 const PostComment = ({ comment }: PostCommentProps) => {
-    console.log(comment);
+    const [isLiked, setIsLiked] = useState(false);
+
     return (
     <Box className="flex-row py-2">
         <Box className="flex-row gap-4 flex-1">
@@ -27,24 +29,35 @@ const PostComment = ({ comment }: PostCommentProps) => {
             </Avatar>
             <Box className="gap-1 flex-1">
                 {/* Comment Header */}
-                <Box className="flex-row gap-2 items-center">
+                <Box className="flex-row gap-2 items-end">
                     <Text className="font-bold">{comment.user}</Text>
                     <Text className="text-sm text-gray-500">2h ago</Text>
                 </Box>
                 {/* Comment Text & Likes */}
-                <Box className="p-1 flex-1 flex-row justify-between gap-3">
-                    <Text className="text-gray-700 leading-5 flex-1">
-                    {comment.text} Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptas minus odio excepturi ullam rerum, ducimus eius illum, sequi quasi sit ad doloribus quaerat sed delectus quo aliquam nam unde repudiandae!
-                    Amet asperiores corrupti totam quaerat laudantium! Earum minus iusto provident, expedita odio minima quos molestias voluptas veniam recusandae eligendi consectetur deleniti obcaecati cupiditate illum perspiciatis eum aut dolores, magnam magni.
-                    </Text>
+                <Box className="p-1 flex-1 flex-row justify-between gap-3 ">
+                    <Pressable 
+                        className="flex-1"
+                        onPress={useDoublePress(() => setIsLiked(true))}
+                    >
+                        <Text 
+                            className="text-gray-700 leading-5 "
+                        >
+                            {comment.text}
+                        </Text>
+                    </Pressable>
 
-                    <Box>
-                        <IC_Heart className="w-5 h-5"/>
-                        <Text className="text-sm text-gray-500">302</Text>
+                    <Box className="items-center gap-1">
+                        <TouchableOpacity 
+                            onPress={() => setIsLiked(!isLiked)}
+                            activeOpacity={0.7}
+                        >
+                            <IC_Heart className={`w-4 h-4 `} color={isLiked ? '#ef4444' : ''} />
+                        </TouchableOpacity>
+                        <Text className="text-xs text-gray-500">302</Text>
                     </Box>
                 </Box>
                 {/* Actions */}
-                <Box className="flex-row gap-3 ">
+                <Box className="flex-row gap-3">
                     <Text className="text-sm text-gray-500">Replay</Text>
                     <Text className="text-sm text-gray-500">Translate</Text>
                 </Box>

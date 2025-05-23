@@ -1,5 +1,5 @@
-import React from 'react'
-import { ScrollView, TouchableOpacity, Image } from 'react-native'
+import React, { useState } from 'react'
+import { ScrollView, TouchableOpacity, Image, RefreshControl } from 'react-native'
 import { Box } from '@/components/ui/box'
 import { Divider } from '@/components/ui/divider'
 import { FlashList } from '@shopify/flash-list'
@@ -29,6 +29,72 @@ const dummyPosts: Post[] = [
     likes: 256,
     timestamp: '4h ago'
   },
+  {
+    id: '3',
+    user: {
+      name: 'john_doe',
+      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8dXNlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60'
+    },
+    image: 'https://images.unsplash.com/photo-1611003228941-98852ba62227?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YmFieSUyMGRvZ3xlbnwwfHwwfHx8MA%3D%3D',
+    caption: 'Enjoying the sunshine! #catlife',
+    likes: 128,
+    timestamp: '2h ago'
+  },
+  {
+    id: '4',
+    user: {
+      name: 'jane_smith',
+      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80'
+    },
+    image: 'https://t4.ftcdn.net/jpg/01/04/78/75/360_F_104787586_63vz1PkylLEfSfZ08dqTnqJqlqdq0eXx.jpg',
+    caption: 'Delicious brunch with friends',
+    likes: 256,
+    timestamp: '4h ago'
+  },
+  {
+    id: '5',
+    user: {
+      name: 'john_doe',
+      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8dXNlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60'
+    },
+    image: 'https://images.unsplash.com/photo-1611003228941-98852ba62227?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YmFieSUyMGRvZ3xlbnwwfHwwfHx8MA%3D%3D',
+    caption: 'Enjoying the sunshine! #catlife',
+    likes: 128,
+    timestamp: '2h ago'
+  },
+  {
+    id: '6',
+    user: {
+      name: 'jane_smith',
+      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80'
+    },
+    image: 'https://t4.ftcdn.net/jpg/01/04/78/75/360_F_104787586_63vz1PkylLEfSfZ08dqTnqJqlqdq0eXx.jpg',
+    caption: 'Delicious brunch with friends',
+    likes: 256,
+    timestamp: '4h ago'
+  },
+  {
+    id: '7',
+    user: {
+      name: 'john_doe',
+      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8dXNlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60'
+    },
+    image: 'https://images.unsplash.com/photo-1611003228941-98852ba62227?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YmFieSUyMGRvZ3xlbnwwfHwwfHx8MA%3D%3D',
+    caption: 'Enjoying the sunshine! #catlife',
+    likes: 128,
+    timestamp: '2h ago'
+  },
+  {
+    id: '8',
+    user: {
+      name: 'jane_smith',
+      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80'
+    },
+    image: 'https://t4.ftcdn.net/jpg/01/04/78/75/360_F_104787586_63vz1PkylLEfSfZ08dqTnqJqlqdq0eXx.jpg',
+    caption: 'Delicious brunch with friends',
+    likes: 256,
+    timestamp: '4h ago'
+  },
   // ... more dummy posts
 ]
 
@@ -42,7 +108,14 @@ import { Props } from '@/types/NavigationTypes'
 
 const HomeScreen = ({ navigation }: Props) => {
   const { appliedTheme } = useTheme()
-  
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  };
   
   return (
   <>
@@ -83,6 +156,9 @@ const HomeScreen = ({ navigation }: Props) => {
         )}
         estimatedItemSize={500}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl colors={['#4f46e5', '#db2777']} refreshing={refreshing} onRefresh={onRefresh} />
+        }
       />
     </Box>
     </>
