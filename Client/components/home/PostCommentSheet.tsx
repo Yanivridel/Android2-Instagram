@@ -22,6 +22,8 @@ import Animated, {
 } from "react-native-reanimated";
 import { View, Text, StyleSheet } from "react-native";
 import { Box } from "../ui/box";
+import PostComment from "./PostComment";
+import { IComment } from "@/types/postTypes";
 
 interface PostCommentSheetProps {
     showActionsheet: boolean;
@@ -29,7 +31,7 @@ interface PostCommentSheetProps {
 }
 
   // Dummy comments data
-const dummyComments = [
+const dummyComments: IComment[] = [
     { id: '1', text: 'This is a great post!', user: 'user1' },
     { id: '2', text: 'I love this content!', user: 'user2' },
     { id: '3', text: 'Amazing work!', user: 'user3' },
@@ -116,14 +118,6 @@ const PostCommentSheet = ({showActionsheet, setShowActionsheet}: PostCommentShee
         };
     });
 
-    // Render item for FlatList
-    const renderComment = ({ item }: { item: { id: string; text: string; user: string } }) => (
-        <Box className="p-4">
-            <Text className="font-bold mb-2">{item.user}</Text>
-            <Text className="text-gray-700">{item.text}</Text>
-        </Box>
-    );
-
     // Header component with drag indicator that can be used to drag down
     const HeaderComponent = () => (
         <ActionsheetDragIndicatorWrapper>
@@ -155,7 +149,7 @@ const PostCommentSheet = ({showActionsheet, setShowActionsheet}: PostCommentShee
                         className="flex-1 w-full"
                         ref={flatListRef}
                         data={dummyComments}
-                        renderItem={renderComment}
+                        renderItem={({ item }) => <PostComment comment={item} />}
                         keyExtractor={(item) => item.id}
                         onScroll={scrollHandler}
                         scrollEventThrottle={16}

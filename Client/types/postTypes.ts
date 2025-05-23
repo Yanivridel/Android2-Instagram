@@ -1,3 +1,4 @@
+import { IUser } from "./userTypes"
 
 export interface Post {
     id: string
@@ -9,4 +10,10 @@ export interface Post {
     caption: string
     likes: number
     timestamp: string // e.g. "2h ago"
+}
+
+export interface IComment {
+    id: string;
+    text: string;
+    user: string; // CHANGE LATER TO IUser
 }
