@@ -1,8 +1,4 @@
-import BackHeader from '@/components/BackHeader'
 import MyLinearGradient from '@/components/gradient/MyLinearGradient'
-import SettingItem from '@/components/SettingItems'
-import ThingToDo from '@/components/ThingToDo'
-import TothorCards from '@/components/TothorCards'
 import { Avatar, AvatarFallbackText, AvatarImage } from '@/components/ui/avatar'
 import { Box } from '@/components/ui/box'
 import { Divider } from '@/components/ui/divider'
@@ -22,6 +18,8 @@ import {
 import { useTheme } from '@/utils/Themes/ThemeProvider'
 import { ScrollView, TouchableOpacity } from 'react-native'
 import { useTranslation } from 'react-i18next'
+import CardUpRounded from '@/components/CardUpRounded'
+import ProfileTopBar from '@/components/profile/ProfileTopBar'
 
 interface ProfileScreenProps extends Props {}
 
@@ -54,86 +52,36 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
 	]
 
 	return (
-		<ScrollView>
-			<Box className="h-full">
-				<MyLinearGradient
-					type="background"
-					color={appliedTheme === 'dark' ? 'blue' : 'purple'}
-					className="h-[48%]"
-				>
-					<BackHeader title={t('profile.header')} colorScheme="alwaysWhite" />
-					<Box className="justify-center items-center gap-2 p-2">
-						<Avatar size="xl">
-							<AvatarFallbackText>{"Yaniv"}</AvatarFallbackText>
-							<AvatarImage source={{ uri: "Yaniv.png" }} />
-						</Avatar>
-						<Text className={`text-[24px] font-bold text-white`}>
-							{"Yaniv"}
-						</Text>
-						<Text className={`text-[14px] text-white`}>{"Yaniv@gmail"}</Text>
-						<Box className="z-10">
-							<ThingToDo thingToDo={thingToDo} />
-						</Box>
-					</Box>
-				</MyLinearGradient>
-
-				<MyLinearGradient
-					type="background"
-					color={appliedTheme === 'dark' ? 'dark' : 'light-blue'}
-					className="h-full"
-				>
-					<Box className="gap-4 p-4 justify-center">
-						<Box className="" />
-
-						<TothorCards>
-							<SettingItem
-								title={t('profile.settings.savingGoals')}
-								IconComponent={IC_Piggy_Bank}
-								badge={t('profile.settings.start')}
-							/>
-							<Divider />
-
-							<SettingItem
-								title={t('profile.settings.budgets')}
-								IconComponent={IC_Budget}
-							/>
-							<Divider />
-
-							<SettingItem
-								title={t('profile.settings.bundles')}
-								IconComponent={IC_Subscription}
-							/>
-						</TothorCards>
-
-						{/* Setting + Invite */}
-						<TothorCards>
-							<SettingItem
-								title={t('profile.settings.invite')}
-								IconComponent={IC_Invite}
-								badge={t('profile.settings.earn')}
-							/>
-							<Divider />
-							<TouchableOpacity
-								onPress={() =>
-									navigation.navigate('Settings', { screen: 'Settings' })
-								}
-							>
-								<SettingItem
-									title={t('profile.settings.settings')}
-									IconComponent={IC_Setting}
-								/>
-							</TouchableOpacity>
-						</TothorCards>
-
-						<TothorCards>
-							<SettingItem
-								title={t('profile.settings.logout')}
-								IconComponent={IC_Logout_V2}
-							/>
-						</TothorCards>
-					</Box>
-				</MyLinearGradient>
+	<Box className="bg-blue-500 flex-1">
+		{/* Profile Header */}
+		<MyLinearGradient
+			type="background"
+			color={appliedTheme === 'dark' ? 'blue' : 'purple'}
+			className="h-[48%]"
+		>
+			<Box className="justify-center items-center gap-2 p-2">
+			<ProfileTopBar />
+			<Avatar className="bg-indigo-600 border-[2.5px] border-indigo-400">
+				<AvatarFallbackText className="text-white">
+					{"Yaniv"}
+				</AvatarFallbackText>
+				<AvatarImage
+					source={{
+						uri: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80",
+					}}
+					alt="User Avatar"
+				/>
+			</Avatar>
 			</Box>
-		</ScrollView>
+		</MyLinearGradient>
+
+		{/* Profile Body */}
+		<CardUpRounded>
+			<Box className="flex-1">
+				<Text>HELLO</Text>
+			</Box>
+		</CardUpRounded>
+
+	</Box>
 	)
 }

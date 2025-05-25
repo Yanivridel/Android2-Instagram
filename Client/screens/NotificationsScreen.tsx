@@ -4,7 +4,6 @@ import { Swipeable } from "react-native-gesture-handler"
 import NotificationCard from "@/components/NotificationCard"
 import { Box } from "@/components/ui/box"
 import { useTheme } from "@/utils/Themes/ThemeProvider"
-import BackHeader from "@/components/BackHeader"
 import MyLinearGradient from "@/components/gradient/MyLinearGradient"
 import CardUpRounded from "@/components/CardUpRounded"
 
@@ -50,13 +49,6 @@ const NotificationsScreen = () => {
 
 	return (
 		<ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-			<MyLinearGradient
-				type="background"
-				color={appliedTheme === "dark" ? "blue" : "purple"}
-				className="h-1/6 p-4"
-			>
-				<BackHeader title="Notifications" colorScheme="alwaysWhite" />
-			</MyLinearGradient>
 
 			<CardUpRounded className={`bg-background-${appliedTheme} h-full p-4 gap-2 space-y-4`}>
 				{notifications.map(notification => (
