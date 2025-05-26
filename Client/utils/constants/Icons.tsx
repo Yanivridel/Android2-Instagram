@@ -5802,3 +5802,48 @@ export const IC_3DotsOptions = ({ className, color }: IconsProps) => {
     </Box>
   );
 };
+
+export const IC_HamburgerMenu = ({ className, color }: IconsProps) => {
+  return (
+    <Box className={cn(className)}>
+      <Svg
+        viewBox="0 0 28 20"
+        fill={color || "none"}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <Path
+          d="M0 1.5a1 1 0 011-1h26a1 1 0 110 2H1a1 1 0 01-1-1zM0 18.5a1 1 0 011-1h26a1 1 0 110 2H1a1 1 0 01-1-1zM1 9a1 1 0 100 2h26a1 1 0 100-2H1z"
+          fill={color || "#242729"}
+        />
+      </Svg>
+    </Box>
+  );
+};
+
+export const IC_AddUsers = ({ className, color }: IconsProps) => {
+  return (
+    <Box className={cn(className)}>
+      <Svg
+      viewBox="0 0 29 28"
+      fill={color || "none"}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <Path
+        d="M18.058.666a1 1 0 011.276-.608C22.586 1.21 25 4.057 25 7.5c0 3.444-2.414 6.29-5.666 7.443a1 1 0 01-.668-1.885C21.278 12.13 23 9.94 23 7.5s-1.722-4.631-4.334-5.557a1 1 0 01-.608-1.277z"
+        fill={color || "#242729"}
+      />
+      <Path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M10.636 15.273a7.636 7.636 0 100-15.273 7.636 7.636 0 000 15.273zm0-2a5.636 5.636 0 100-11.273 5.636 5.636 0 000 11.273z"
+        fill={color || "#242729"}
+      />
+      <Path
+        d="M2 24a2 2 0 012-2h13a2 2 0 012 2v3a1 1 0 102 0v-3a4 4 0 00-4-4H4a4 4 0 00-4 4v3a1 1 0 102 0v-3zM25 16a1 1 0 011 1v2h2a1 1 0 110 2h-2v2a1 1 0 11-2 0v-2h-2a1 1 0 110-2h2v-2a1 1 0 011-1z"
+        fill={color || "#242729"}
+      />
+    </Svg>
+
+    </Box>
+  );
+};

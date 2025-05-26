@@ -6,12 +6,13 @@ import { useTheme } from '@/utils/Themes/ThemeProvider';
 
 interface MyLinearGradientProps {
   type: "button" | "background" | "text";
-  color: "blue" | "purple" | "blue-purple" | "light-blue" | "disabled-button" | "dark" | "gray";
+  color?: "blue" | "purple" | "blue-purple" | "light-blue" | "disabled-button" | "dark" | "gray";
+  customColors?: string[];
   children: React.ReactNode;
   className?: string;
 }
 
-const MyLinearGradient = ({ children, type, color, className}: MyLinearGradientProps) => {
+const MyLinearGradient = ({ children, type, color, customColors, className}: MyLinearGradientProps) => {
   const { appliedTheme } = useTheme();
 
   const modifiedChildren = React.Children.map(children, (child, index) => {
@@ -53,8 +54,15 @@ const MyLinearGradient = ({ children, type, color, className}: MyLinearGradientP
         "dark": { colors: ["#090D19", "#090D19"], start: [0, 0], end: [1, 1] },
         "default": { colors: ["#0091FF", "#00C3FF"], start: [0, 0], end: [1, 1] }
     };
-    return gradientPositions[color] || gradientPositions["default"];
+    return gradientPositions[color || "default"];
   }
+
+  const baseOptions = getOptions(color);
+  const finalGradientOptions = {
+    colors: customColors ?? baseOptions.colors,
+    start: baseOptions.start,
+    end: baseOptions.end,
+  };
 
   return (
     <LinearGradient
@@ -62,7 +70,7 @@ const MyLinearGradient = ({ children, type, color, className}: MyLinearGradientP
         ${type === "button" ? "rounded-full p-2 h-fit items-center" : ""}
         ${type === "background" ? "" : ""}
         `, className)}
-        {...getOptions(color)}
+        {...finalGradientOptions}
       
     >
       {modifiedChildren}
