@@ -1,23 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
-  View, 
-  Text, 
-  Dimensions, 
-  TouchableOpacity, 
+    View, 
+    Dimensions, 
+    TouchableOpacity, 
 } from 'react-native';
 import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
-  withSpring, 
-  withTiming,
-  withSequence,
-  withDelay,
-  interpolate,
-  runOnJS,
-  useAnimatedGestureHandler,
-  interpolateColor
+    useSharedValue, 
+    useAnimatedStyle, 
+    withSpring, 
+    withTiming,
+    withSequence,
+    withDelay,
+    runOnJS,
+    useAnimatedGestureHandler,
 } from 'react-native-reanimated';
-import { cn } from './ui/cn';
 import { PanGestureHandler } from 'react-native-gesture-handler';
 import MyLinearGradient from './gradient/MyLinearGradient';
 
@@ -38,28 +34,27 @@ interface RatingPopupProps {
 
 const ratingData: Record<number, RatingData> = {
     1: {
-      gradient: ['#F3E5F5', '#E1BEE7'],  // Soft lilac
-      shadow: '#E1BEE720'
+    gradient: ['#F3E5F5', '#E1BEE7'],  // Soft lilac
+    shadow: '#E1BEE720'
     },
     2: {
-      gradient: ['#E1BEE7', '#CE93D8'],  // Light lavender
-      shadow: '#CE93D820'
+    gradient: ['#E1BEE7', '#CE93D8'],  // Light lavender
+    shadow: '#CE93D820'
     },
     3: {
-      gradient: ['#CE93D8', '#BA68C8'],  // Mid violet
-      shadow: '#BA68C820'
+    gradient: ['#CE93D8', '#BA68C8'],  // Mid violet
+    shadow: '#BA68C820'
     },
     4: {
-      gradient: ['#BA68C8', '#AB47BC'],  // Bold purple
-      shadow: '#AB47BC20'
+    gradient: ['#BA68C8', '#AB47BC'],  // Bold purple
+    shadow: '#AB47BC20'
     },
     5: {
-      gradient: ['#AB47BC', '#8E24AA'],  // Deep violet
-      shadow: '#8E24AA20'
+    gradient: ['#AB47BC', '#8E24AA'],  // Deep violet
+    shadow: '#8E24AA20'
     },
-  };
-  
-  
+};
+
 
 const STAR_SIZE = 40;
 const POPUP_HEIGHT = 55;
@@ -92,10 +87,6 @@ const RatingPopup: React.FC<RatingPopupProps> = ({
 
     const timeoutRef = useRef<NodeJS.Timeout>(null);
     const submitTimeoutRef = useRef<NodeJS.Timeout>(null);
-
-    const backdropStyle = useAnimatedStyle(() => ({
-        opacity: opacity.value * 0.3,
-    }));
 
     useEffect(() => {
         // Entry animation
@@ -139,7 +130,6 @@ const RatingPopup: React.FC<RatingPopupProps> = ({
     const handleSubmit = (rating: number): void => {
         if (rating === 0) return;
         
-        opacity.value = withTiming(0, { duration: 200 });
 
         // Use ref for timeout
         submitTimeoutRef.current = setTimeout(() => {
@@ -150,8 +140,10 @@ const RatingPopup: React.FC<RatingPopupProps> = ({
 
             // Use ref for timeout
             timeoutRef.current = setTimeout(() => {
+                opacity.value = withTiming(0, { duration: 200 });
+
                 handleClose();
-            }, 4200);
+            }, 300);
         }, 200);
     };
 
@@ -167,6 +159,7 @@ const RatingPopup: React.FC<RatingPopupProps> = ({
         opacity.value = withTiming(0, { duration: 200 });
         translateY.value = withSpring(10, { damping: 15, stiffness: 100 });
         
+        console.log('handleClose');
         setTimeout(() => {
         onClose?.();
         }, 300);
@@ -218,20 +211,6 @@ const RatingPopup: React.FC<RatingPopupProps> = ({
     });
 
     return (
-        <>
-        {/* Backdrop */}
-        {/* <Animated.View 
-            className="absolute inset-0 z-40"
-            style={backdropStyle}
-        >
-            <TouchableOpacity 
-            className="flex-1" 
-            activeOpacity={1}
-            onPress={handleClose}
-            />
-        </Animated.View> */}
-
-        {/* Popup Container */}
         <Animated.View
             className="absolute z-50"
             style={[
@@ -298,7 +277,6 @@ const RatingPopup: React.FC<RatingPopupProps> = ({
             </PanGestureHandler>
 
         </Animated.View>
-        </>
     );
 };
 

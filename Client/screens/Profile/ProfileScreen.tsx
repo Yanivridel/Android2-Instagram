@@ -1,34 +1,36 @@
 import MyLinearGradient from '@/components/gradient/MyLinearGradient'
 import { Avatar, AvatarFallbackText, AvatarImage } from '@/components/ui/avatar'
 import { Box } from '@/components/ui/box'
-import { Divider } from '@/components/ui/divider'
-import { Text } from '@/components/ui/text'
+import{ Text } from '@/components/ui/text'
 import { Props } from '@/types/NavigationTypes'
-import {
-	IC_AddUsers,
-	IC_Bell_V2,
-	IC_Budget,
-	IC_Card_V2,
-	IC_Invite,
-	IC_Logout_V2,
-	IC_Piggy_Bank,
-	IC_Profile_V2,
-	IC_Setting,
-	IC_Subscription
-} from '@/utils/constants/Icons'
+import {IC_AddUsers, IC_Grid, IC_Tag } from '@/utils/constants/Icons'
 import { useTheme } from '@/utils/Themes/ThemeProvider'
-import { ScrollView, TouchableOpacity } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import CardUpRounded from '@/components/CardUpRounded'
 import ProfileTopBar from '@/components/profile/ProfileTopBar'
 import { Button, ButtonText } from '@/components/ui/button'
 import RatingPopup from '@/components/RatingPopup'
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import { TouchableOpacity, Dimensions } from 'react-native';
+import TouchableIcon from '@/components/TouchableIcon'
+
+const { width } = Dimensions.get('window');
+const TAB_WIDTH = width / 2;
+
 
 interface ProfileScreenProps extends Props {}
 
 export default function ProfileScreen({ navigation }: ProfileScreenProps) {
-	const { t } = useTranslation()
 	const { appliedTheme } = useTheme()
+
+	const indicatorTranslateX = useSharedValue(0);
+	const indicatorStyle = useAnimatedStyle(() => ({
+		transform: [{ translateX: indicatorTranslateX.value }],
+	}));
+	const handleTabPress = (index: number) => {
+		indicatorTranslateX.value = withTiming(index * (width / 2), { duration: 300 });
+	};
+
 
 	return (
 	<Box className="bg-blue-500 flex-1">
@@ -102,17 +104,43 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
 
 		{/* Profile Body */}
 		<CardUpRounded className="-mt-5">
+			{/* Buttons Line Animation */}
+			<Box className="relative">
+				<Box className="flex-row gap-2 justify-evenly ">
+					<TouchableIcon onPress={() => handleTabPress(0)} Icon={IC_Grid} className="w-8 h-8" />
+					<TouchableIcon onPress={() => handleTabPress(1)} Icon={IC_Tag} className="w-8 h-8" />
+				</Box>
+
+				<Animated.View
+					className=""
+					style={[
+					indicatorStyle,
+					{
+						width: TAB_WIDTH,
+						height: 2,
+						backgroundColor: 'black',
+						position: 'absolute',
+						bottom: 0,
+						left: 0,
+					},
+					]}
+				/>
+			</Box>
+
+
+
 			<Box className="flex-1">
+
 				<Text>HELLO</Text>
 			</Box>
 		</CardUpRounded>
 
-		<RatingPopup 
+		{/* <RatingPopup 
 			onRate={(data) => console.log('Rating:', data)}
 			onClose={() => {}}
 			type="post"
 			targetId="123"
-		/>
+		/> */}
 
 	</Box>
 	)
