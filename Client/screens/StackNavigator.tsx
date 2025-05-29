@@ -16,6 +16,7 @@ import Login from './auth/Login';
 import Signup from './auth/Signup';
 
 import testscreen from './testscreen';
+import PostScreen from './post/PostScreen';
 
 const MemoizedLayout = React.memo(Layout);
 
@@ -34,6 +35,7 @@ const StackNavigator = () => {
         {/* 🏆 Auth Screens */}
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Signup" component={Signup} />
+        <Stack.Screen name="Post" component={PostScreen} />
 
         {/* 🏆 Main App with Layout */}
         <Stack.Screen name="MainApp" options={{ headerShown: false }}>
@@ -49,6 +51,7 @@ const StackNavigator = () => {
                 <Stack.Screen name="Home" component={HomeScreen} />
                 <Stack.Screen name="Notifications" component={NotificationsScreen} />
                 <Stack.Screen name="Profile" component={ProfileScreen} />
+                {/* <Stack.Screen name="Post" component={PostScreen} /> */}
                 <Stack.Screen name="test" component={testscreen} />
 
                 {/* 🚀 Lazy Loaded Screens (Except Settings) */}

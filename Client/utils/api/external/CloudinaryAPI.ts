@@ -1,5 +1,4 @@
 import { Cloudinary } from '@cloudinary/url-gen';
-import { AdvancedImage } from 'cloudinary-react-native';
 import * as mime from 'react-native-mime-types';
 
 import { CLOUDINARY_CLOUD_NAME, CLOUDINARY_UNSIGNED_NAME } from '@env';
@@ -35,7 +34,7 @@ export const uploadMedia = async (fileUri: string, fileName: string): Promise<st
             body: data,
         });
         const result: UploadResponse = await res.json();
-        console.log('Upload Success:', result.secure_url);
+        // console.log('Upload Success:', result.secure_url);
         return result.secure_url;
     } catch (error) {
         console.error('Upload Error:', error);

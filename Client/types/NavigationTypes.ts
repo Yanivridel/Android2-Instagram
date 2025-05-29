@@ -8,7 +8,6 @@ export type Props = {
 
 export type TNavigation = NavigationProp<ParamListBase>;
 
-
 export type signUpInputs = "fName" | "lName" | "birthday" | "ssn" | "api" |"pass" | "address" | "phoneNumber" | "phonePrefix" | "email";
 
 export type SignUpScreensProps = {

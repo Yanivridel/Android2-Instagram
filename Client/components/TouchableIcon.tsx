@@ -3,9 +3,10 @@ import { TouchableOpacity } from 'react-native';
 import { ViewStyle } from 'react-native';
 
 interface TouchableIconProps {
-    onPress: () => void;
+    onPress?: () => void;
     Icon: React.ElementType;
     className?: string;
+    IconClassName?: string;
     color?: string;
     style?: ViewStyle;
 }
@@ -15,11 +16,12 @@ const TouchableIcon: React.FC<TouchableIconProps> = ({
     Icon,
     className = '',
     color = 'black',
+    IconClassName = '',
     style = {},
 }) => {
 return (
-    <TouchableOpacity onPress={onPress} activeOpacity={0.7} style={style}>
-        <Icon className={className} color={color} />
+    <TouchableOpacity onPress={onPress} activeOpacity={0.7} style={style} className={className}>
+        <Icon className={IconClassName} color={color} />
     </TouchableOpacity>
 );
 };
