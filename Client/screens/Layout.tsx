@@ -11,6 +11,7 @@ import { useTheme } from '@/utils/Themes/ThemeProvider'
 import {
 	IC_AddPost,
 	IC_Home,
+	IC_Leaderboard,
 	IC_Profile,
 	IC_Reels,
 	IC_Search,
@@ -47,24 +48,15 @@ const Layout = React.memo(({ children, navigation }: LayoutProps) => {
 
 			{/* Bottom Navigation Bar */}
 			<Box className="relative">
-				<Box className={`flex flex-row items-center h-[62px] bg-layoutBottom-${appliedTheme} p-4`}>
+				<Box className={`flex flex-row items-center h-[50px] bg-layoutBottom-${appliedTheme} p-4`}>
 					{/* Left Icons */}
-					<Box className="flex-1 flex flex-row justify-evenly">
+					<Box className="flex-1 flex flex-row justify-around">
 						<TouchableOpacity onPress={() => navigateToScreen('Home')} activeOpacity={0.7}>
 							<Box className="flex-col items-center text-center">
 								<IC_Home
 									className="w-7 h-7 mb-1"
 									color={currentScreen === 'Home' ? '#4A3EF6' : '#B0B9C1'}
 								/>
-								<Text
-									className={`text-sm ${
-										currentScreen === 'Home'
-											? 'text-[#1761C5]'
-											: 'text-[#5C616F]'
-									}`}
-								>
-									Home
-								</Text>
 							</Box>
 						</TouchableOpacity>
 
@@ -74,15 +66,6 @@ const Layout = React.memo(({ children, navigation }: LayoutProps) => {
 									className="w-7 h-7 mb-1"
 									color={currentScreen === 'Explore' ? '#4A3EF6' : '#B0B9C1'}
 								/>
-								<Text
-									className={`text-sm ${
-										currentScreen === 'Explore'
-											? 'text-[#1761C5]'
-											: 'text-[#5C616F]'
-									}`}
-								>
-									Explore
-								</Text>
 							</Box>
 						</TouchableOpacity>
 					</Box>
@@ -95,38 +78,20 @@ const Layout = React.memo(({ children, navigation }: LayoutProps) => {
 							>
 								<IC_AddPost className="w-9 h-9" color="white" />
 							</Box>
-							<Text
-								className={`text-sm bottom-4 justify-center text-center ${
-									currentScreen === 'Post'
-										? 'text-[#1761C5]'
-										: 'text-[#5C616F]'
-								}`}
-							>
-								Post
-							</Text>
 						</TouchableOpacity>
 					</Box>
 
 					{/* Right Icons */}
-					<Box className="flex-1 flex flex-row justify-evenly">
+					<Box className="flex-1 flex flex-row justify-around">
 						<TouchableOpacity
-							onPress={() => navigateToScreen('Reels')}
+							onPress={() => navigateToScreen('Leaderboard')}
 							activeOpacity={0.7}
 						>
 							<Box className="flex-col items-center text-center">
-								<IC_Reels
+								<IC_Leaderboard
 									className="w-8 h-8"
-									color={currentScreen === 'Reels' ? '#4A3EF6' : '#B0B9C1'}
+									color={currentScreen === 'Leaderboard' ? '#4A3EF6' : '#B0B9C1'}
 								/>
-								<Text
-									className={`text-sm ${
-										currentScreen === 'Reels'
-											? 'text-[#1761C5]'
-											: 'text-[#5C616F]'
-									}`}
-								>
-									Reels
-								</Text>
 							</Box>
 						</TouchableOpacity>
 
@@ -139,15 +104,6 @@ const Layout = React.memo(({ children, navigation }: LayoutProps) => {
 									className="w-8 h-8"
 									color={currentScreen === 'Profile' ? '#4A3EF6' : '#B0B9C1'}
 								/>
-								<Text
-									className={`text-sm ${
-										currentScreen === 'Profile'
-											? 'text-[#1761C5]'
-											: 'text-[#5C616F]'
-									}`}
-								>
-									Profile
-								</Text>
 							</Box>
 						</TouchableOpacity>
 					</Box>

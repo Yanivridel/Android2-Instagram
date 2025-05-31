@@ -120,7 +120,7 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
 		</MyLinearGradient>
 
 		{/* Profile Body */}
-		<CardUpRounded className="-mt-5 px-0">
+		<CardUpRounded className="-mt-5 px-0 pb-0">
 			{/* Buttons Line Animation */}
 			<Box className="relative">
 				<Box className="flex-row gap-2 justify-evenly mb-2">
@@ -143,7 +143,7 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
 					]}
 				/>
 			</Box>
-
+			{/* Posts Grid */}
 			<Box className="flex-1 mt-1">
 				{currentTab === 'grid' && (
 					<PostsGrid posts={dummyMyPosts} onPostPress={() => {}} />

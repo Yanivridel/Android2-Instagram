@@ -118,7 +118,7 @@ const HomeScreen = ({ navigation }: Props) => {
   };
   
   return (
-  <>
+  <Box className="flex-1">
     {/* Header */}
     <MyLinearGradient type="background" color="light-blue">
       <Box className={`flex-row items-center justify-between px-4 py-2 bg-card-${appliedTheme}`}>
@@ -139,6 +139,7 @@ const HomeScreen = ({ navigation }: Props) => {
           <TouchableIcon Icon={IC_Messenger} className="h-6 w-6" color="black" />
       </Box>
     </MyLinearGradient>
+    {/* Main Content */}
     <Box className={`flex-1 bg-background-${appliedTheme}`}>
 
       {/* Stories Section (optional) */}
@@ -160,7 +161,7 @@ const HomeScreen = ({ navigation }: Props) => {
         }
       />
     </Box>
-    </>
+  </Box>
   )
 }
 
