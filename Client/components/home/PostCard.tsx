@@ -1,13 +1,15 @@
 import React, { useState } from 'react'
-import { TouchableOpacity } from 'react-native'
 import { Box } from '@/components/ui/box'
 import { Text } from '@/components/ui/text'
 import { Image } from '@/components/ui/image'
 import { Post } from '@/types/postTypes'
-import { IC_Comment, IC_Heart, IC_Share, IC_Bookmark, IC_3DotsOptions } from '@/utils/constants/Icons'
+import { IC_Comment, IC_Heart, IC_Share, IC_Bookmark, IC_3DotsOptions, IC_Plus, IC_PersonMinus, IC_Info_Circle, IC_EyeOff, IC_AccountInfo, IC_Report } from '@/utils/constants/Icons'
 import { AvatarFallbackText, AvatarImage } from '../ui/avatar'
 import { Avatar } from '../ui/avatar'
 import PostCommentSheet from './PostCommentSheet'
+import TouchableIcon from '../TouchableIcon'
+import { Menu, MenuItem, MenuItemLabel } from "@/components/ui/menu"
+import { TouchableOpacity } from 'react-native'
 
 /**
  * PostCard component to render an Instagram-style post
@@ -41,9 +43,74 @@ const PostCard = ({ post }: PostCardProps) => {
             {user.name}
           </Text>
         </Box>
-        <TouchableOpacity>
-          <IC_3DotsOptions className="h-5 w-5" color="gray"/>
-        </TouchableOpacity>
+
+        {/* Options Menu */}
+        <Menu
+          placement="bottom right"
+          offset={10}
+          trigger={({ ...triggerProps }) => {
+            return (
+              <TouchableOpacity {...triggerProps} activeOpacity={0.7}>
+                  <IC_3DotsOptions className="h-5 w-5" color="gray"/>
+              </TouchableOpacity>
+            )
+          }}
+        >
+          <MenuItem 
+            className="gap-3"
+            onPress={() => console.log("Add favorites")} 
+            key="Add favorites"
+            textValue='Add favorites'
+          >
+            <IC_Bookmark className="h-4 w-4"/>
+            <MenuItemLabel size="sm">Add to favorites</MenuItemLabel>
+          </MenuItem>
+          <MenuItem 
+            className="gap-3"
+            onPress={() => console.log("Stop following")} 
+            key="Stop following"
+            textValue='Stop following'
+          >
+            <IC_PersonMinus className="h-5 w-5"/>
+          <MenuItemLabel size="sm">Stop following</MenuItemLabel>
+          </MenuItem>
+          <MenuItem 
+            className="gap-3"
+            onPress={() => console.log("Why this post is shown")} 
+            key="Why this post is shown"
+            textValue='Why this post is shown'
+          >
+            <IC_Info_Circle className="h-5 w-5" />
+            <MenuItemLabel size="sm">Why this post is shown</MenuItemLabel>
+          </MenuItem>
+          <MenuItem 
+            className="gap-3"
+            onPress={() => console.log("Hide post")} 
+            key="Hide post"
+            textValue='Hide post'
+          >
+            <IC_EyeOff className="h-5 w-5"/>
+            <MenuItemLabel size="sm">Hide post</MenuItemLabel>
+          </MenuItem>
+          <MenuItem 
+            className="gap-3"
+            onPress={() => console.log("Account information")} 
+            key="Account information"
+            textValue='Account information'
+          >
+            <IC_AccountInfo className="h-6 w-6"/>
+            <MenuItemLabel size="sm">Account information</MenuItemLabel>
+          </MenuItem>
+          <MenuItem 
+            className="gap-3"
+            onPress={() => console.log("Report post")} 
+            key="Report post"
+            textValue='Report post'
+          >
+            <IC_Report className="h-5 w-5" color="red"/>
+            <MenuItemLabel className="text-red-500" size="sm">Report post</MenuItemLabel>
+          </MenuItem>
+        </Menu>
       </Box>
 
       {/* Post Image */}
@@ -58,23 +125,19 @@ const PostCard = ({ post }: PostCardProps) => {
       <Box className="flex-row items-center justify-between px-4 py-2">
         <Box className="flex-row gap-3">
           {/* Like */}
-          <TouchableOpacity>
-            <IC_Heart className="h-6 w-6" color="red"/>
-          </TouchableOpacity>
+          <TouchableIcon Icon={IC_Heart} className="h-6 w-6" color="red"/>
           {/* Comment */}
-          <TouchableOpacity onPress={() => setShowCommentsSheet(true)}>
-            <PostCommentSheet showActionsheet={showCommentsSheet} setShowActionsheet={setShowCommentsSheet} />
-            <IC_Comment className="h-6 w-6"/>
-          </TouchableOpacity>
+          <PostCommentSheet showActionsheet={showCommentsSheet} setShowActionsheet={setShowCommentsSheet} />
+          <TouchableIcon
+            Icon={IC_Comment}
+            className="h-6 w-6"
+            onPress={() => setShowCommentsSheet(true)}
+          />
           {/* Share */}
-          <TouchableOpacity>
-            <IC_Share className="h-6 w-6"/>
-          </TouchableOpacity>
+          <TouchableIcon Icon={IC_Share} className="h-6 w-6"/>
         </Box>
         {/* Bookmark */}
-        <TouchableOpacity>
-          <IC_Bookmark className="h-6 w-6"/>
-        </TouchableOpacity>
+        <TouchableIcon Icon={IC_Bookmark} className="h-6 w-6"/>
       </Box>
 
       {/* Likes, Caption, Timestamp */}

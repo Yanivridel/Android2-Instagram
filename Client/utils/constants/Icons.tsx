@@ -5881,3 +5881,65 @@ export const IC_Tag = ({ className, color }: IconsProps) => {
     </Box>
   );
 };
+
+export const IC_PersonMinus = ({ className, color }: IconsProps) => {
+  return (
+    <Box className={cn(className)}>
+      <Svg
+      viewBox="0 0 22 28"
+      fill={color || "none"}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <Path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M12 15.273A7.636 7.636 0 1012 0a7.636 7.636 0 000 15.273zm0-2A5.636 5.636 0 1012 2a5.636 5.636 0 000 11.273z"
+        fill={color || "#242729"}
+      />
+      <Path
+        d="M14 21a1 1 0 011-1h6a1 1 0 010 2h-6a1 1 0 01-1-1zM2 24a2 2 0 012-2h6a1 1 0 100-2H4a4 4 0 00-4 4v3a1 1 0 102 0v-3z"
+        fill={color || "#242729"}
+      />
+    </Svg>
+    </Box>
+  );
+};
+
+export const IC_AccountInfo = ({ className, color }: IconsProps) => {
+  return (
+    <Box className={cn(className)}>
+      <Svg
+      viewBox="0 0 33 38"
+      fill={color || "none"}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <G
+        filter="url(#filter0_d_2096_18245)"
+        fillRule="evenodd"
+        clipRule="evenodd"
+        fill={color || "#242729"}
+      >
+        <Path d="M16 13.273A5.636 5.636 0 1016 2a5.636 5.636 0 000 11.273zm0 2A7.636 7.636 0 1016 0a7.636 7.636 0 000 15.273zM8 22a2 2 0 00-2 2v3a1 1 0 11-2 0v-3a4 4 0 014-4h6a1 1 0 110 2H8zM23.23 24.23a1 1 0 011.415 0l3.187 3.188a1 1 0 01-1.414 1.414l-3.188-3.187a1 1 0 010-1.415z" />
+        <Path d="M21.125 24.25a2.125 2.125 0 100-4.25 2.125 2.125 0 000 4.25zm0 2a4.125 4.125 0 100-8.25 4.125 4.125 0 000 8.25z" />
+      </G>
+    </Svg>
+    </Box>
+  );
+};
+
+export const IC_Report = ({ className, color }: IconsProps) => {
+  return (
+    <Box className={cn(className)}>
+      <Svg
+      viewBox="0 0 22 22"
+      fill={color || "none"}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <Path
+        d="M17.001 0h-12a5.006 5.006 0 00-5 5v9.005a5.006 5.006 0 005 5h2.514l2.789 2.712a1 1 0 001.394 0l2.787-2.712h2.516a5.006 5.006 0 005-5V5a5.006 5.006 0 00-5-5zm3 14.005a3.003 3.003 0 01-3 3h-2.936a1 1 0 00-.79.387l-2.274 2.212-2.276-2.212a.999.999 0 00-.79-.387H5a3.003 3.003 0 01-3-3V5a3.003 3.003 0 013-3h12a3.003 3.003 0 013 3l.001 9.005zm-9-1.66a1.229 1.229 0 100 2.46A1.229 1.229 0 0011 12.344l.001.001zm0-8.117a1.274 1.274 0 00-.933.396 1.108 1.108 0 00-.3.838l.347 4.861a.891.891 0 001.77 0l.348-4.86a1.108 1.108 0 00-.3-.838A1.272 1.272 0 0011 4.228h.001z"
+        fill={color || "#262626"}
+      />
+    </Svg>
+    </Box>
+  );
+};

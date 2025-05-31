@@ -34,8 +34,8 @@ export default function PostScreen({ navigation }: PostScreenProps) {
 
     const onPhotoTaken = async (photoUri: string) => {
         console.log("photoUri", photoUri);
-        const mediaUrl = await uploadMedia(photoUri, "post");
-        console.log("mediaUrl", mediaUrl);
+        // const mediaUrl = await uploadMedia(photoUri, "post");
+        // console.log("mediaUrl", mediaUrl);
     }
 
     if (!permission) {

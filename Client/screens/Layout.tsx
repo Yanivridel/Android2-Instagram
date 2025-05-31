@@ -50,7 +50,7 @@ const Layout = React.memo(({ children, navigation }: LayoutProps) => {
 				<Box className={`flex flex-row items-center h-[62px] bg-layoutBottom-${appliedTheme} p-4`}>
 					{/* Left Icons */}
 					<Box className="flex-1 flex flex-row justify-evenly">
-						<TouchableOpacity onPress={() => navigateToScreen('Home')}>
+						<TouchableOpacity onPress={() => navigateToScreen('Home')} activeOpacity={0.7}>
 							<Box className="flex-col items-center text-center">
 								<IC_Home
 									className="w-7 h-7 mb-1"
@@ -68,7 +68,7 @@ const Layout = React.memo(({ children, navigation }: LayoutProps) => {
 							</Box>
 						</TouchableOpacity>
 
-						<TouchableOpacity onPress={() => navigateToScreen('Explore')}>
+						<TouchableOpacity onPress={() => navigateToScreen('Explore')} activeOpacity={0.7}>
 							<Box className="flex-col items-center text-center">
 								<IC_Search
 									className="w-7 h-7 mb-1"
@@ -89,7 +89,7 @@ const Layout = React.memo(({ children, navigation }: LayoutProps) => {
 
 					{/* Center Button */}
 					<Box className="w-20 relative">
-						<TouchableOpacity onPress={() => navigateToScreen('Post')}>
+						<TouchableOpacity onPress={() => navigateToScreen('Post')} activeOpacity={0.7}>
 							<Box
 								className={`bg-button-${appliedTheme} bottom-[18px] rounded-full w-16 h-16 items-center self-center justify-center`}
 							>

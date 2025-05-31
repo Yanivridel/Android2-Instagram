@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
-import { ScrollView, TouchableOpacity, Image, RefreshControl } from 'react-native'
+import { Image, RefreshControl } from 'react-native'
 import { Box } from '@/components/ui/box'
-import { Divider } from '@/components/ui/divider'
 import { FlashList } from '@shopify/flash-list'
 import { useTheme } from '@/utils/Themes/ThemeProvider'
 
@@ -11,7 +10,7 @@ const dummyPosts: Post[] = [
     id: '1',
     user: {
       name: 'john_doe',
-      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8dXNlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60'
+      avatar: 'https://res.cloudinary.com/dgn7wbfhw/image/upload/v1748545167/fi5sj6nyc5fcoi6bppxk.jpg'
     },
     image: 'https://images.unsplash.com/photo-1611003228941-98852ba62227?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YmFieSUyMGRvZ3xlbnwwfHwwfHx8MA%3D%3D',
     caption: 'Enjoying the sunshine! #catlife',
@@ -105,6 +104,7 @@ import { Post } from '@/types/postTypes'
 import { IC_Heart, IC_Messenger } from '@/utils/constants/Icons'
 import MyLinearGradient from '@/components/gradient/MyLinearGradient'
 import { Props } from '@/types/NavigationTypes'
+import TouchableIcon from '@/components/TouchableIcon'
 
 const HomeScreen = ({ navigation }: Props) => {
   const { appliedTheme } = useTheme()
@@ -122,11 +122,12 @@ const HomeScreen = ({ navigation }: Props) => {
     {/* Header */}
     <MyLinearGradient type="background" color="light-blue">
       <Box className={`flex-row items-center justify-between px-4 py-2 bg-card-${appliedTheme}`}>
-        <TouchableOpacity
+        <TouchableIcon 
+          Icon={IC_Heart} 
+          className="h-6 w-6" 
+          color="" 
           onPress={() => navigation.navigate("MainApp", { screen: "Notifications" })}
-        >
-          <IC_Heart className="h-6 w-6" color="" />
-        </TouchableOpacity>
+          />
 
         <Image
           source={require('@/assets/images/violet_long_logo.png')}
@@ -135,9 +136,7 @@ const HomeScreen = ({ navigation }: Props) => {
           alt="Logo"
         />
 
-        <TouchableOpacity>
-          <IC_Messenger className="h-6 w-6" color="black" />
-        </TouchableOpacity>
+          <TouchableIcon Icon={IC_Messenger} className="h-6 w-6" color="black" />
       </Box>
     </MyLinearGradient>
     <Box className={`flex-1 bg-background-${appliedTheme}`}>

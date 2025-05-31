@@ -5,13 +5,18 @@ import { Box } from '../ui/box';
 import { Avatar, AvatarFallbackText, AvatarImage } from '../ui/avatar';
 import { IC_Heart } from '@/utils/constants/Icons';
 import { useDoublePress } from '@/hooks/useDoublePress';
-
+import { Vibration } from 'react-native';
 
 interface PostCommentProps {
     comment: IComment;
 }
 const PostComment = ({ comment }: PostCommentProps) => {
     const [isLiked, setIsLiked] = useState(false);
+
+    const handleLike = ( vibrate=false ) => {
+        if(vibrate) Vibration.vibrate(50);
+        setIsLiked(prev => !prev);
+    }
 
     return (
     <Box className="flex-row py-2">
@@ -37,7 +42,7 @@ const PostComment = ({ comment }: PostCommentProps) => {
                 <Box className="p-1 flex-1 flex-row justify-between gap-3 ">
                     <Pressable 
                         className="flex-1"
-                        onPress={useDoublePress(() => setIsLiked(true))}
+                        onPress={useDoublePress(() => handleLike(true))}
                     >
                         <Text 
                             className="text-gray-700 leading-5 "
@@ -48,7 +53,7 @@ const PostComment = ({ comment }: PostCommentProps) => {
 
                     <Box className="items-center gap-1">
                         <TouchableOpacity 
-                            onPress={() => setIsLiked(!isLiked)}
+                            onPress={() => handleLike(false)}
                             activeOpacity={0.7}
                         >
                             <IC_Heart className={`w-4 h-4 `} color={isLiked ? '#ef4444' : ''} />
