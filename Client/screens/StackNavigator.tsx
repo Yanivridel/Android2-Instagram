@@ -33,6 +33,7 @@ const StackNavigator = () => {
           detachPreviousScreen: true,
           headerShown: false,
         }}
+      
       >
         {/* 🏆 Auth Screens */}
         <Stack.Screen name="Login" component={Login} />

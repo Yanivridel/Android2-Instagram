@@ -5685,21 +5685,18 @@ export const IC_Comment = ({ className }: IconsProps) => {
   );
 };
 
-export const IC_Bookmark = ({ className }: IconsProps) => {
+export const IC_Bookmark = ({ className, color }: IconsProps) => {
   return (
     <Box className={cn(className)}>
       <Svg
+      viewBox="0 0 24 24"
+      fill={color || "none"}
       xmlns="http://www.w3.org/2000/svg"
-      shapeRendering="geometricPrecision"
-      textRendering="geometricPrecision"
-      imageRendering="optimizeQuality"
-      fillRule="evenodd"
-      clipRule="evenodd"
-      viewBox="0 0 459 511.87"
     >
       <Path
-        fillRule="nonzero"
-        d="M32.256 0h394.488c8.895 0 16.963 3.629 22.795 9.462C455.371 15.294 459 23.394 459 32.256v455.929c0 13.074-10.611 23.685-23.686 23.685-7.022 0-13.341-3.07-17.683-7.93L230.124 330.422 39.692 505.576c-9.599 8.838-24.56 8.214-33.398-1.385a23.513 23.513 0 01-6.237-16.006L0 32.256C0 23.459 3.629 15.391 9.461 9.55l.089-.088C15.415 3.621 23.467 0 32.256 0zm379.373 47.371H47.371v386.914l166.746-153.364c8.992-8.198 22.933-8.319 32.013.089l165.499 153.146V47.371z"
+        d="M5 6a3 3 0 013-3h8a3 3 0 013 3v14.057a1 1 0 01-1.581.814l-4.838-3.456a1 1 0 00-1.162 0L6.58 20.871A1 1 0 015 20.056V6z"
+        stroke={color || "#242729"}
+        strokeWidth={2}
       />
     </Svg>
     </Box>

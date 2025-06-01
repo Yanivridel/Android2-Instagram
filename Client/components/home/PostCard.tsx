@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { Box } from '@/components/ui/box'
 import { Text } from '@/components/ui/text'
 import { Image } from '@/components/ui/image'
@@ -9,7 +9,9 @@ import { Avatar } from '../ui/avatar'
 import PostCommentSheet from './PostCommentSheet'
 import TouchableIcon from '../TouchableIcon'
 import { Menu, MenuItem, MenuItemLabel } from "@/components/ui/menu"
-import { TouchableOpacity } from 'react-native'
+import { Animated, Easing, Pressable, TouchableOpacity, Vibration } from 'react-native'
+import ShareSheet from './ShareSheet'
+import { useDoublePress } from '@/hooks/useDoublePress'
 
 /**
  * PostCard component to render an Instagram-style post
@@ -22,6 +24,48 @@ type PostCardProps = {
 const PostCard = ({ post }: PostCardProps) => {
   const { user, image, caption, likes, timestamp } = post
   const [showCommentsSheet, setShowCommentsSheet] = useState(false);
+  const [showShareSheet, setShowShareSheet] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+  const scaleAnim = useRef(new Animated.Value(0)).current;
+  const [showHeart, setShowHeart] = useState(false);
+  let animTimeout: NodeJS.Timeout | null = null;
+
+  
+  const handleLike = ( vibrate=false ) => {
+    if(vibrate) Vibration.vibrate(50);
+    setIsLiked(true);
+    triggerHeartAnimation();
+  }
+
+  const triggerHeartAnimation = () => {
+    scaleAnim.stopAnimation();
+    scaleAnim.setValue(0);
+    setShowHeart(true);
+  
+    if (animTimeout) clearTimeout(animTimeout);
+  
+    Animated.sequence([
+      Animated.timing(scaleAnim, {
+        toValue: 1,
+        duration: 200,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleAnim, {
+        toValue: 0,
+        duration: 200,
+        delay: 300,
+        easing: Easing.in(Easing.ease),
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      animTimeout = setTimeout(() => {
+        setShowHeart(false);
+      }, 50);
+    });
+  };
+
 
   return (
     <Box className="bg-white dark:bg-card-dark rounded-lg">
@@ -114,18 +158,45 @@ const PostCard = ({ post }: PostCardProps) => {
       </Box>
 
       {/* Post Image */}
-      <Image
-        source={{ uri: image}}
-        className="w-full h-fit aspect-square"
-        resizeMode="cover"
-        alt="Post Image"
-      />
+      <Pressable onPress={useDoublePress(() => handleLike(true))}>
+        <Box className="relative">
+          <Image
+            source={{ uri: image }}
+            className="w-full h-fit aspect-square"
+            resizeMode="cover"
+            alt="Post Image"
+          />
+
+          {showHeart && (
+            <Animated.View
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: [
+                  { translateX: -50 },
+                  { translateY: -50 },
+                  { scale: scaleAnim },
+                ],
+                opacity: scaleAnim,
+              }}
+            >
+              <IC_Heart color="red" className="w-32 h-32" />
+            </Animated.View>
+          )}
+        </Box>
+      </Pressable>
 
       {/* Actions: Like, Comment, Share, Bookmark */}
       <Box className="flex-row items-center justify-between px-4 py-2">
         <Box className="flex-row gap-3">
           {/* Like */}
-          <TouchableIcon Icon={IC_Heart} className="h-6 w-6" color="red"/>
+          <TouchableIcon
+            Icon={IC_Heart}
+            className="h-6 w-6" 
+            color={isLiked ? "red" : ""}
+            onPress={() => setIsLiked(!isLiked)}
+          />
           {/* Comment */}
           <PostCommentSheet showActionsheet={showCommentsSheet} setShowActionsheet={setShowCommentsSheet} />
           <TouchableIcon
@@ -134,10 +205,21 @@ const PostCard = ({ post }: PostCardProps) => {
             onPress={() => setShowCommentsSheet(true)}
           />
           {/* Share */}
-          <TouchableIcon Icon={IC_Share} className="h-6 w-6"/>
+          <ShareSheet isOpen={showShareSheet} onClose={() => setShowShareSheet(false)} />
+
+          <TouchableIcon 
+            Icon={IC_Share}
+            onPress={() => setShowShareSheet(true)}
+            className="h-6 w-6" 
+          />
         </Box>
         {/* Bookmark */}
-        <TouchableIcon Icon={IC_Bookmark} className="h-6 w-6"/>
+        <TouchableIcon 
+          Icon={IC_Bookmark} 
+          className="h-6 w-6"
+          onPress={() => setIsSaved(!isSaved)}
+          color={isSaved ? "#f6b530" : ""}
+        />
       </Box>
 
       {/* Likes, Caption, Timestamp */}
