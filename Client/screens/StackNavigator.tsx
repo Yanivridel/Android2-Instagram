@@ -19,6 +19,7 @@ import Signup from './auth/Signup';
 
 import testscreen from './testscreen';
 import PostScreen from './post/PostScreen';
+import { ReduxInitializer } from '@/store/ReduxInitializer';
 
 const MemoizedLayout = React.memo(Layout);
 
@@ -27,8 +28,9 @@ const Stack = createStackNavigator();
 const StackNavigator = () => {
   return (
     <NavigationContainer>
+      <ReduxInitializer />
       <Stack.Navigator
-        initialRouteName="MainApp"
+        initialRouteName="Login"
         screenOptions={{
           detachPreviousScreen: true,
           headerShown: false,

@@ -27,7 +27,7 @@ export const registerUser = async (req: Request<{}, {}, IRegisterUser>, res: Res
             firebaseUid,
             email,
             username,
-            role: 'user'
+            role: 'user',
         });
 
         await newUser.save();
@@ -80,5 +80,16 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
             message: "Unexpected error",
             error: error instanceof Error ? error.message : "Unknown error",
         });
+    }
+};
+
+export const getUserByEmail = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { email } = req.params;
+        const user = await userModel.findOne({ email });
+        console.log("User found:", user);
+        res.status(200).json({ user });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to get user by email" });
     }
 };

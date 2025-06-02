@@ -1,13 +1,13 @@
 import mongoose, { Schema, model } from 'mongoose';
 import { IPost } from 'types/postTypes';
 
-const postSchema = new mongoose.Schema({
+const postSchema = new mongoose.Schema<IPost>({
     content: {
         type: String,
         required: true,
     },
-        imageUrl: String,
-        createdAt: {
+    imageUrls: [{ type: String, default: [] }],
+    createdAt: {
         type: Date,
         default: Date.now,
     },
@@ -27,7 +27,25 @@ const postSchema = new mongoose.Schema({
     isPublic: {
         type: Boolean,
         default: true,
-    }
+    },
+    rating: {
+        type: Number,
+        default: 0,
+        min: 0,
+        max: 5,
+    },
+    comments: {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: 'Comment',
+        default: [],
+    },
+    likes: {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: 'User',
+        default: [],
+    },
+    locationString: { type: String, default: '' },
+
 });
 
 export const postModel = model<IPost>('Post', postSchema);

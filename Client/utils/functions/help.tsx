@@ -34,3 +34,9 @@ export const formatSymbol = (symbol: string) => {
     }
     return symbol;
 };
+
+export function formatUsername(name: string): string {
+    const trimmed = name.trim().toLowerCase().replace(/\s+/g, "");
+    if (!trimmed) return "";
+    return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
+}

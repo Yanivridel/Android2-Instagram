@@ -5,14 +5,20 @@ import { Button, ButtonSpinner, ButtonText } from '@/components/ui/button'
 import { Text } from '@/components/ui/text'
 import { useToast } from '@/components/ui/toast'
 import { useFormInput } from '@/hooks/useFormInput'
+import { setUser } from '@/store/slices/userSlices'
 import { Props } from '@/types/NavigationTypes'
-import { loginUser } from '@/utils/api/internal/user/userApi'
+import { loginUser, registerUser } from '@/utils/api/internal/user/userApi'
+import { showNewToast } from '@/utils/constants/Toasts'
 import { useTheme } from '@/utils/Themes/ThemeProvider'
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
+import { useDispatch } from 'react-redux';
 
 const Login: React.FC<Props> = ({ navigation }) => {
     const { appliedTheme } = useTheme();
+    const dispatch = useDispatch();
+
+    
     const [isLoading, setIsLoading] = useState(false);
     const { values, errors, handleInputChange, setErrorByFields } = useFormInput({
         email: '',
@@ -55,9 +61,22 @@ const Login: React.FC<Props> = ({ navigation }) => {
             setIsLoading(true);
             try {
                 console.log({ email, password: pass });
-                const data = await loginUser({ email, pass });
+                const user = await loginUser({ email, pass });
 
-                console.log("FINISHED", data);
+                if (user) {
+                    dispatch(setUser(user));
+                    console.log("User stored in Redux:", user);
+                
+                    // Optional: navigate to your app's home screen
+                    navigation.navigate("MainApp", { screen: "Home" });
+                } else {
+                    showNewToast(
+                        toast,
+                        "unique-toast-login",
+                        "Login failed",
+                        "Invalid email or password",
+                    );
+                }
 
             } catch(err) {
                 console.log("Error: ", err);

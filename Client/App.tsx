@@ -11,11 +11,11 @@ import { StatusBar } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { I18nManager } from 'react-native';
 import { useEffect } from 'react';
-import { I18nextProvider } from 'react-i18next';
-import { FirebaseAuth } from './FirebaseConfig';
+import { Provider, useDispatch } from 'react-redux';
+import store from './store';
 
 export default function App() {
-
+  
   useEffect(() => {
     if (I18nManager.isRTL) {
       I18nManager.allowRTL(false);
@@ -23,34 +23,22 @@ export default function App() {
     }
   }, []);
 
-  useEffect(() => {
-    const unsubscribe = FirebaseAuth.onAuthStateChanged((user: any) => {
-      if (user) {
-        console.log("User is logged in:", user.email);
-        // console.log("User: ", user);
-        // maybe fetch your backend token again if needed
-      } else {
-        console.log("User not logged in");
-      }
-    });
-  
-    return () => unsubscribe();
-  }, []);
-
   return (
-    <GestureHandlerRootView>
-      <SafeAreaProvider>
-          <ThemeProvider>
-            <PaperProvider>
-              <GluestackUIProvider>
-                <ToastProvider>
-                  <StackNavigator />
-                  <StatusBar backgroundColor="#5506FD" barStyle="dark-content" />
-                </ToastProvider>
-              </GluestackUIProvider>
-            </PaperProvider>
-          </ThemeProvider>
-      </SafeAreaProvider>
-    </GestureHandlerRootView>
+    <Provider store={store}>
+      <GestureHandlerRootView>
+        <SafeAreaProvider>
+            <ThemeProvider>
+              <PaperProvider>
+                <GluestackUIProvider>
+                  <ToastProvider>
+                    <StackNavigator />
+                    <StatusBar backgroundColor="#5506FD" barStyle="dark-content" />
+                  </ToastProvider>
+                </GluestackUIProvider>
+              </PaperProvider>
+            </ThemeProvider>
+        </SafeAreaProvider>
+      </GestureHandlerRootView>
+    </Provider>
   );
 }

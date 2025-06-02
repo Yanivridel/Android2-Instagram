@@ -1,5 +1,5 @@
 // signup.ts
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, sendEmailVerification, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { FirebaseAuth } from '@/FirebaseConfig';
 import { api } from '../apiService';
 import { IUser } from '@/types/userTypes';
@@ -20,6 +20,11 @@ export const registerUser = async ({ email, pass, username }: RegisterUserReq): 
         const userCredential = await createUserWithEmailAndPassword(FirebaseAuth, email, pass);
         const firebaseUid = userCredential.user.uid;
         console.log("REGISTER firebaseUid", firebaseUid);
+
+        if (userCredential.user) {
+            await sendEmailVerification(userCredential.user);
+            console.log("Verification email sent to:", email);
+        }
         
         const response = await api.post<RegisterUserRes>('api/users/register', {
             firebaseUid,
@@ -41,27 +46,41 @@ interface LoginUserReq {
 }
 
 interface LoginUserRes extends IUser {
-    token: string;
+    user: IUser;
 }
 
-export const loginUser = async ({ email, pass }: LoginUserReq): Promise<LoginUserRes | null> => {
+export const loginUser = async ({ email, pass }: LoginUserReq): Promise<IUser | null> => {
     try {
         // Firebase authentication
         const userCredential = await signInWithEmailAndPassword(FirebaseAuth, email, pass);
         
         // console.log("userCredential", userCredential);
+        if (!userCredential.user.emailVerified) {
+            console.warn("Email not verified.");
+            // You can show a toast/snackbar here
+            return null;
+        }
 
         // Get user data from your server
-        // The token will be automatically added by the interceptor
-        const response = await api.get<LoginUserRes>('api/users/login');
+        const { data } = await api.get<LoginUserRes>('api/users/login');
 
-        console.log("response", response);
+        console.log("response data", data);
         
-        console.log("Login successful:", response.data);
-        return response.data;
+        console.log("Login successful:", data.user);
+        return data.user;
     } catch (error: any) {
         console.error("Login error:", error?.response?.data || error.message);
         return null;
     }
 };
+
+export const logoutUser = async () => {
+    await signOut(FirebaseAuth);
+}
+
+
+export const getUserByEmail = async (email: string): Promise<IUser | null> => {
+    const { data } = await api.get<{user:IUser}>(`api/users/email/${email}`);
+    return data.user;
+}
 
