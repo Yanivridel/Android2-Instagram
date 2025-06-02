@@ -17,7 +17,6 @@ import { useDispatch } from 'react-redux';
 const Login: React.FC<Props> = ({ navigation }) => {
     const { appliedTheme } = useTheme();
     const dispatch = useDispatch();
-
     
     const [isLoading, setIsLoading] = useState(false);
     const { values, errors, handleInputChange, setErrorByFields } = useFormInput({
@@ -89,56 +88,56 @@ const Login: React.FC<Props> = ({ navigation }) => {
 
     return (
     <MyLinearGradient type='background' color={appliedTheme === "dark" ? 'dark' : 'light-blue'}>
-    <Box className={`h-full p-10 pt-36 justify-between`}>
-        <Box>
-            {/* Title */}
-            <Box className='my-10 gap-2'>
-                <Text className={`text-4xl text-text-${appliedTheme} font-bold`}>Welcome</Text>
-                <Text className={`text-xl text-subText-${appliedTheme}`}>Sign in to your account</Text>
-            </Box>
-            {/* Main Login */}
-            <Box className='gap-2'>
-                {/* Inputs */}
-                <InputAuth 
-                    icon="IC_Email"
-                    placeholder="Email address"
-                    value={email}
-                    onChangeText={(val) => handleInputChange("email", val)}
-                    error={errors.email}
-                />
-                <InputAuth 
-                    placeholder="Password"
-                    type='pass'
-                    value={pass}
-                    onChangeText={(val) => handleInputChange("pass", val)}
-                    error={errors.pass}
-                />
+        <Box className={`h-full p-10 pt-36 justify-between`}>
+            <Box>
+                {/* Title */}
+                <Box className='my-10 gap-2'>
+                    <Text className={`text-4xl text-text-${appliedTheme} font-bold`}>Welcome</Text>
+                    <Text className={`text-xl text-subText-${appliedTheme}`}>Sign in to your account</Text>
+                </Box>
+                {/* Main Login */}
+                <Box className='gap-2'>
+                    {/* Inputs */}
+                    <InputAuth 
+                        icon="IC_Email"
+                        placeholder="Email address"
+                        value={email}
+                        onChangeText={(val) => handleInputChange("email", val)}
+                        error={errors.email}
+                    />
+                    <InputAuth 
+                        placeholder="Password"
+                        type='pass'
+                        value={pass}
+                        onChangeText={(val) => handleInputChange("pass", val)}
+                        error={errors.pass}
+                    />
 
-                { errors.api && <Text className="text-red-500 text-sm ps-3 mb-1 -mt-1">{errors.api}</Text>}
-                {/* Login Button & Forgot Pass */}
-                <MyLinearGradient type='button' color='purple'>
-                    <Button onPress={handleSubmitLogin}>
-                        <ButtonText className="text-white">
-                        {isLoading ? <ButtonSpinner color={"white"} className="h-6" /> : "Sign in"}
-                        </ButtonText>
-                    </Button>
-                </MyLinearGradient>
-                <Text className={`text-link-${appliedTheme} my-3 mx-auto font-bold tracking-wide`}>
-                    Forgot your password?
+                    { errors.api && <Text className="text-red-500 text-sm ps-3 mb-1 -mt-1">{errors.api}</Text>}
+                    {/* Login Button & Forgot Pass */}
+                    <MyLinearGradient type='button' color='purple'>
+                        <Button onPress={handleSubmitLogin}>
+                            <ButtonText className="text-white">
+                            {isLoading ? <ButtonSpinner color={"white"} className="h-6" /> : "Sign in"}
+                            </ButtonText>
+                        </Button>
+                    </MyLinearGradient>
+                    <Text className={`text-link-${appliedTheme} my-3 mx-auto font-bold tracking-wide`}>
+                        Forgot your password?
+                    </Text>
+                </Box>
+            </Box>
+
+            {/* Sign Up Link*/}
+            <Box className='mx-auto flex-row mb-10'>
+                <Text className={`text-gray-${appliedTheme}`}>
+                    Don't have an account?
+                    <Text className={`text-link-${appliedTheme} mx-auto font-bold tracking-wide`}
+                    onPress={() => navigation.navigate("Signup")}
+                    > Sign up</Text>
                 </Text>
             </Box>
         </Box>
-
-        {/* Sign Up Link*/}
-        <Box className='mx-auto flex-row'>
-            <Text className={`text-gray-${appliedTheme}`}>
-                Don't have an account?
-                <Text className={`text-link-${appliedTheme} mx-auto font-bold tracking-wide`}
-                onPress={() => navigation.navigate("Signup")}
-                > Sign up</Text>
-            </Text>
-        </Box>
-    </Box>
     </MyLinearGradient>
     )
 }
