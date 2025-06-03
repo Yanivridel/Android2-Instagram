@@ -65,7 +65,7 @@ const OverlayLoading = () => {
 
     return (
         <Portal>
-            <Box className={`absolute inset-0 z-[1000] bg-background-dark justify-center items-center`}>
+            <Box className={`absolute inset-0 z-[1000] bg-background-${appliedTheme} justify-center items-center`}>
                 <Box className={`w-24 h-24 bg-card-${appliedTheme} rounded-full justify-center items-center relative overflow-hidden`}>   
                     <Svg width={90} height={90} viewBox='0 0 96 96' className='absolute z-50'>
                         <Circle

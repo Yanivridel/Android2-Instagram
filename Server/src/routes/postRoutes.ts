@@ -1,10 +1,12 @@
 import express from "express";
 import {
     createPost,
-    // getPosts,
-    // getPostById,
-    // updatePost,
-    // deletePost
+    getAllPosts,
+    getPostById,
+    updatePost,
+    deletePost,
+    getPostsByUser,
+    getMyPosts
 } from '../controllers/postController';
 import { authenticateToken } from "../middleware/auth.middleware";
 
@@ -12,12 +14,20 @@ const router = express.Router();
 
 router.post('/', authenticateToken, createPost);
 
-// router.get('/', authenticateToken, getPosts);
+router.get('/', authenticateToken, getAllPosts);
 
-// router.get('/:id', authenticateToken, getPostById);
+router.get('/user/:userId', authenticateToken, getPostsByUser);
 
-// router.put('/:id', authenticateToken, updatePost);
+router.get('/me', authenticateToken, getMyPosts);
 
-// router.delete('/:id', authenticateToken, deletePost);
+// Get a specific post by ID
+router.get('/:id', authenticateToken, getPostById);
+
+// Update a post by ID
+router.put('/:id', authenticateToken, updatePost);
+
+// Delete a post by ID
+router.delete('/:id', authenticateToken, deletePost);
+
 
 export default router;

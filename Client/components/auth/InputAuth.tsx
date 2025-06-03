@@ -22,6 +22,7 @@ interface InputAuthProps {
     isReadOnly?: boolean;
     onIncrement?: () => void;
     onDecrement?: () => void;
+    onFocus?: () => void;
 }
 
 function InputAuth({
@@ -39,6 +40,7 @@ function InputAuth({
     isReadOnly = false,
     onIncrement,
     onDecrement,
+    onFocus,
 }: InputAuthProps) {
     const [showPass, setShowPass] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
@@ -290,7 +292,7 @@ function InputAuth({
                     value={value}
                     onChangeText={getInputHandler()}
                     maxLength={getInputLength()}
-                    onFocus={handleFocus}
+                    onFocus={() => {handleFocus(); onFocus?.()}}
                     onBlur={handleBlur}
                     style={{
                         paddingTop: 15,
