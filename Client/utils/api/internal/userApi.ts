@@ -1,7 +1,7 @@
 // signup.ts
 import { createUserWithEmailAndPassword, sendEmailVerification, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { FirebaseAuth } from '@/FirebaseConfig';
-import { api } from '../apiService';
+import { api } from './apiService';
 import { IUser } from '@/types/userTypes';
 
 export interface RegisterUserReq {
@@ -58,7 +58,7 @@ export const loginUser = async ({ email, pass }: LoginUserReq): Promise<IUser | 
         if (!userCredential.user.emailVerified) {
             console.warn("Email not verified.");
             // You can show a toast/snackbar here
-            return null;
+            // return null; // RETURN LATER
         }
 
         // Get user data from your server

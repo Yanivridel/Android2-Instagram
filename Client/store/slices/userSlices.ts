@@ -1,5 +1,5 @@
 import { IUser } from "@/types/userTypes";
-import { logoutUser } from "@/utils/api/internal/user/userApi";
+import { logoutUser } from "@/utils/api/internal/userApi";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 const initialState: IUser = {
@@ -21,6 +21,7 @@ const initialState: IUser = {
     notifications: [],
     createdAt: "",
     updatedAt: "",
+    gender: "he/him",
     __v: 0,
 };
 

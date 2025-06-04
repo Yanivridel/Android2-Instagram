@@ -1,11 +1,21 @@
 import express, { Request, Response } from 'express';
+import http from 'http';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+import { Server } from 'socket.io';
+import registerSocketHandlers from './socket';
 
 dotenv.config();
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+    cors: {
+        origin: '*', // Replace with frontend URL in production
+        methods: ['GET', 'POST']
+    }
+});
 const PORT = Number(process.env.PORT) || 3000;
 
 app.use(cors());
@@ -30,12 +40,26 @@ app.get('/', (req: Request, res: Response): void => {
 // Routes
 import userRoutes from './routes/userRoutes'
 import postRoutes from './routes/postRoutes'
+import messageRoutes from './routes/messageRoutes';
+import chatRoutes from 'routes/chatRoutes';
+import commentRoutes from 'routes/commentRoutes';
+import ratingRoutes from 'routes/ratingRoutes';
 
 app.use('/api/users', userRoutes);
-
 app.use('/api/posts', postRoutes);
+app.use('/api/messages', messageRoutes);
+app.use('/api/comments', commentRoutes);
+app.use('/api/ratings', ratingRoutes);
+app.use('/api/chats', chatRoutes);
 
 
-app.listen(PORT, '0.0.0.0', () => {
-    console.log("Server running on 0.0.0.0:3000");
+// Socket.io
+io.on('connection', (socket) => {
+    console.log(`📡 User connected: ${socket.id}`);
+    registerSocketHandlers(socket, io);
+});
+
+// Start server
+server.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Server running on 0.0.0.0:${PORT}`);
 });

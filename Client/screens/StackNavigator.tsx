@@ -5,7 +5,7 @@ import OverlayLoading from '@/components/OverlayLoading';
 import React from 'react';
 
 // 🚀 Lazy Load Screens (Except Settings, which loads instantly)
-const ChatScreen = lazy(() => import('./ChatScreen'));
+const ChatScreen = lazy(() => import('./chat/ChatScreen'));
 
 // 📌 Regular Imports (SettingsScreen Now Loads Instantly)
 import HomeScreen from './home/HomeScreen';

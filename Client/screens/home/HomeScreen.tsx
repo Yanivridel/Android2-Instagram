@@ -4,107 +4,152 @@ import { Box } from '@/components/ui/box'
 import { FlashList } from '@shopify/flash-list'
 import { useTheme } from '@/utils/Themes/ThemeProvider'
 
-// Dummy data for posts
-const dummyPosts: Post[] = [
-  {
-    id: '1',
-    user: {
-      name: 'john_doe',
-      avatar: 'https://res.cloudinary.com/dgn7wbfhw/image/upload/v1748545167/fi5sj6nyc5fcoi6bppxk.jpg'
-    },
-    image: 'https://images.unsplash.com/photo-1611003228941-98852ba62227?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YmFieSUyMGRvZ3xlbnwwfHwwfHx8MA%3D%3D',
-    caption: 'Enjoying the sunshine! #catlife',
-    likes: 128,
-    timestamp: '2h ago'
-  },
-  {
-    id: '2',
-    user: {
-      name: 'jane_smith',
-      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80'
-    },
-    image: 'https://t4.ftcdn.net/jpg/01/04/78/75/360_F_104787586_63vz1PkylLEfSfZ08dqTnqJqlqdq0eXx.jpg',
-    caption: 'Delicious brunch with friends',
-    likes: 256,
-    timestamp: '4h ago'
-  },
-  {
-    id: '3',
-    user: {
-      name: 'john_doe',
-      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8dXNlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60'
-    },
-    image: 'https://images.unsplash.com/photo-1611003228941-98852ba62227?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YmFieSUyMGRvZ3xlbnwwfHwwfHx8MA%3D%3D',
-    caption: 'Enjoying the sunshine! #catlife',
-    likes: 128,
-    timestamp: '2h ago'
-  },
-  {
-    id: '4',
-    user: {
-      name: 'jane_smith',
-      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80'
-    },
-    image: 'https://t4.ftcdn.net/jpg/01/04/78/75/360_F_104787586_63vz1PkylLEfSfZ08dqTnqJqlqdq0eXx.jpg',
-    caption: 'Delicious brunch with friends',
-    likes: 256,
-    timestamp: '4h ago'
-  },
-  {
-    id: '5',
-    user: {
-      name: 'john_doe',
-      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8dXNlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60'
-    },
-    image: 'https://images.unsplash.com/photo-1611003228941-98852ba62227?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YmFieSUyMGRvZ3xlbnwwfHwwfHx8MA%3D%3D',
-    caption: 'Enjoying the sunshine! #catlife',
-    likes: 128,
-    timestamp: '2h ago'
-  },
-  {
-    id: '6',
-    user: {
-      name: 'jane_smith',
-      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80'
-    },
-    image: 'https://t4.ftcdn.net/jpg/01/04/78/75/360_F_104787586_63vz1PkylLEfSfZ08dqTnqJqlqdq0eXx.jpg',
-    caption: 'Delicious brunch with friends',
-    likes: 256,
-    timestamp: '4h ago'
-  },
-  {
-    id: '7',
-    user: {
-      name: 'john_doe',
-      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8dXNlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60'
-    },
-    image: 'https://images.unsplash.com/photo-1611003228941-98852ba62227?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YmFieSUyMGRvZ3xlbnwwfHwwfHx8MA%3D%3D',
-    caption: 'Enjoying the sunshine! #catlife',
-    likes: 128,
-    timestamp: '2h ago'
-  },
-  {
-    id: '8',
-    user: {
-      name: 'jane_smith',
-      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80'
-    },
-    image: 'https://t4.ftcdn.net/jpg/01/04/78/75/360_F_104787586_63vz1PkylLEfSfZ08dqTnqJqlqdq0eXx.jpg',
-    caption: 'Delicious brunch with friends',
-    likes: 256,
-    timestamp: '4h ago'
-  },
-  // ... more dummy posts
-]
-
 // Placeholder PostCard component should exist in your components directory
 // It handles layout of avatar, username, image, actions, caption, etc.
 import PostCard from '@/components/home/PostCard'
-import { Post } from '@/types/postTypes'
+import { IPost } from '@/types/postTypes'
 import { IC_Heart, IC_Messenger } from '@/utils/constants/Icons'
 import MyLinearGradient from '@/components/gradient/MyLinearGradient'
 import { Props } from '@/types/NavigationTypes'
 import TouchableIcon from '@/components/TouchableIcon'
+
+// Dummy data for posts
+const dummyPosts: IPost[] = [
+  {
+    _id: '1',
+    content: 'Enjoying the sunshine! #catlife',
+    imageUrls: [
+      'https://images.unsplash.com/photo-1611003228941-98852ba62227?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0',
+    ],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    author: {
+      _id: 'u1',
+      firebaseUid: 'firebase-uid-john',
+      username: 'john_doe',
+      email: 'john@example.com',
+      role: 'user',
+      rating: 4.7,
+      bio: 'Cat lover and sunshine addict.',
+      gender: 'male',
+      profileImage:
+        'https://res.cloudinary.com/dgn7wbfhw/image/upload/v1748545167/fi5sj6nyc5fcoi6bppxk.jpg',
+      posts: [],
+      likedPosts: [],
+      likedComments: [],
+      followers: [],
+      following: [],
+      groups: [],
+      taggedPosts: [],
+      notifications: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      __v: 0,
+    },
+    group: undefined,
+    isPublic: true,
+    rating: 0,
+    comments: {
+      content: 'So cute!',
+      post: '1',
+      author: {
+        _id: 'u2',
+        firebaseUid: 'firebase-uid-commenter',
+        username: 'cat_lover_22',
+        email: 'catlover@example.com',
+        role: 'user',
+        rating: 4.5,
+        bio: 'Professional cat cuddler',
+        gender: 'female',
+        profileImage:
+          'https://randomuser.me/api/portraits/women/44.jpg',
+        posts: [],
+        likedPosts: [],
+        likedComments: [],
+        followers: [],
+        following: [],
+        groups: [],
+        taggedPosts: [],
+        notifications: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        __v: 0,
+      },
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      likes: 3,
+    },
+    likes: 128,
+    locationString: 'Tel Aviv, Israel',
+  },
+  {
+    _id: '2',
+    content: 'Delicious brunch with friends',
+    imageUrls: [
+      'https://t4.ftcdn.net/jpg/01/04/78/75/360_F_104787586_63vz1PkylLEfSfZ08dqTnqJqlqdq0eXx.jpg',
+    ],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    author: {
+      _id: 'u2',
+      firebaseUid: 'firebase-uid-jane',
+      username: 'jane_smith',
+      email: 'jane@example.com',
+      role: 'user',
+      rating: 4.9,
+      bio: 'Food enthusiast and traveler',
+      gender: 'female',
+      profileImage:
+        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1',
+      posts: [],
+      likedPosts: [],
+      likedComments: [],
+      followers: [],
+      following: [],
+      groups: [],
+      taggedPosts: [],
+      notifications: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      __v: 0,
+    },
+    group: undefined,
+    isPublic: true,
+    rating: 0,
+    comments: {
+      content: 'Looks amazing!',
+      post: '2',
+      author: {
+        _id: 'u3',
+        firebaseUid: 'firebase-uid-commenter-2',
+        username: 'brunch_addict',
+        email: 'brunch@example.com',
+        role: 'user',
+        rating: 4.6,
+        bio: 'Always eating, always posting',
+        gender: 'female',
+        profileImage:
+          'https://randomuser.me/api/portraits/women/65.jpg',
+        posts: [],
+        likedPosts: [],
+        likedComments: [],
+        followers: [],
+        following: [],
+        groups: [],
+        taggedPosts: [],
+        notifications: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        __v: 0,
+      },
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      likes: 5,
+    },
+    likes: 256,
+    locationString: 'New York City, USA',
+  },
+];
 
 const HomeScreen = ({ navigation }: Props) => {
   const { appliedTheme } = useTheme()
@@ -136,7 +181,12 @@ const HomeScreen = ({ navigation }: Props) => {
           alt="Logo"
         />
 
-          <TouchableIcon Icon={IC_Messenger} className="h-6 w-6" color="black" />
+          <TouchableIcon 
+            Icon={IC_Messenger} 
+            className="h-6 w-6" 
+            color="black" 
+            onPress={() => navigation.navigate("MainApp", { screen: "Chat" })}
+            />
       </Box>
     </MyLinearGradient>
     {/* Main Content */}
@@ -148,7 +198,7 @@ const HomeScreen = ({ navigation }: Props) => {
       {/* Posts Feed */}
       <FlashList
         data={dummyPosts}
-        keyExtractor={item => item.id}
+        keyExtractor={item => item._id}
         renderItem={({ item }) => (
           <Box className="mb-4">
             <PostCard post={item} />

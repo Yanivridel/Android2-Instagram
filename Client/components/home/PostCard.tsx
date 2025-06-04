@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react'
 import { Box } from '@/components/ui/box'
 import { Text } from '@/components/ui/text'
 import { Image } from '@/components/ui/image'
-import { Post } from '@/types/postTypes'
+import { IPost } from '@/types/postTypes'
 import { IC_Comment, IC_Heart, IC_Share, IC_Bookmark, IC_3DotsOptions, IC_Plus, IC_PersonMinus, IC_Info_Circle, IC_EyeOff, IC_AccountInfo, IC_Report } from '@/utils/constants/Icons'
 import { AvatarFallbackText, AvatarImage } from '../ui/avatar'
 import { Avatar } from '../ui/avatar'
@@ -18,11 +18,11 @@ import { useDoublePress } from '@/hooks/useDoublePress'
  * @param {{ post: { id: string, user: { name: string, avatar: string }, image: string, caption: string, likes: number, timestamp: string } }} props
  */
 type PostCardProps = {
-    post: Post
+    post: IPost
 }
 
 const PostCard = ({ post }: PostCardProps) => {
-  const { user, image, caption, likes, timestamp } = post
+  const { author, imageUrls, content, likes, createdAt } = post
   const [showCommentsSheet, setShowCommentsSheet] = useState(false);
   const [showShareSheet, setShowShareSheet] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
@@ -74,17 +74,17 @@ const PostCard = ({ post }: PostCardProps) => {
         <Box className="flex-row items-center">
           <Avatar className="bg-indigo-600 border-[2.5px] border-indigo-400">
             <AvatarFallbackText className="text-white">
-              {user.name}
+              {author.username}
             </AvatarFallbackText>
             <AvatarImage
               source={{
-                uri: user.avatar,
+                uri: author.profileImage,
               }}
               alt="User Avatar"
             />
           </Avatar>
           <Text className="ml-2 text-[15px] font-medium text-text-light dark:text-text-dark">
-            {user.name}
+            {author.username}
           </Text>
         </Box>
 
@@ -161,7 +161,7 @@ const PostCard = ({ post }: PostCardProps) => {
       <Pressable onPress={useDoublePress(() => handleLike(true))}>
         <Box className="relative">
           <Image
-            source={{ uri: image }}
+            source={{ uri: imageUrls[0] }}
             className="w-full h-fit aspect-square"
             resizeMode="cover"
             alt="Post Image"
@@ -229,14 +229,14 @@ const PostCard = ({ post }: PostCardProps) => {
         </Text>
         <Box className="flex-row mt-1">
           <Text className="font-medium text-text-light dark:text-text-dark mr-1">
-            {user.name}
+            {author.username}
           </Text>
           <Text className="flex-shrink text-[15px] text-text-light dark:text-text-dark">
-            {caption}
+            {content}
           </Text>
         </Box>
         <Text className="mt-1 text-[12px] text-subText-light dark:text-subText-dark">
-          {timestamp}
+          {createdAt}
         </Text>
       </Box>
     </Box>

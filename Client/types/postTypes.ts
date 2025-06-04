@@ -1,23 +1,28 @@
+import { IUser } from "./userTypes";
 
-export interface IPostClient {
+export interface IPost {
     _id: string;
     content: string;
     imageUrls: string[];
     createdAt: string; // ISO date string
     updatedAt: string;
-    author: string; // User ID
+    author: IUser;
     group?: string; // Group ID
     isPublic: boolean;
     rating: number;
-    comments: string[]; // Comment IDs
-    likes: string[];    // User IDs
+    comments: IComment;
+    likes: number;    
     locationString: string;
 }
 
 
 // CHANGE LATER TO IUser
 export interface IComment {
-    id: string;
-    text: string;
-    user: string; 
+    _id?: string;
+    content: string;
+    post: string; // Post ID
+    author: IUser;
+    createdAt?: Date;
+    updatedAt?: Date;
+    likes: number;
 }

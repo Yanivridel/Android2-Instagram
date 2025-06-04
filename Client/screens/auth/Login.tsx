@@ -7,7 +7,7 @@ import { useToast } from '@/components/ui/toast'
 import { useFormInput } from '@/hooks/useFormInput'
 import { setUser } from '@/store/slices/userSlices'
 import { Props } from '@/types/NavigationTypes'
-import { loginUser, registerUser } from '@/utils/api/internal/user/userApi'
+import { loginUser, registerUser } from '@/utils/api/internal/userApi'
 import { showNewToast } from '@/utils/constants/Toasts'
 import { useTheme } from '@/utils/Themes/ThemeProvider'
 import axios from 'axios'
@@ -73,7 +73,7 @@ const Login: React.FC<Props> = ({ navigation }) => {
                         toast,
                         "unique-toast-login",
                         "Login failed",
-                        "Invalid email or password",
+                        "Invalid credentials or Email not verified",
                     );
                 }
 
