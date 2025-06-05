@@ -1,23 +1,29 @@
 import { Request, Response } from 'express';
 import { commentModel } from '../models/commentModel';
 import { AuthenticatedRequest } from 'types/expressTypes';
+import { postModel } from 'models/postModel';
 
 export const createComment = async (req: AuthenticatedRequest, res: Response) => {
     try {
-        const { content, post } = req.body;
+        const { content, postId } = req.body;
 
-        if (!content || !post) {
+        if (!content || !postId) {
             res.status(400).json({ message: 'Content and Post ID are required' });
             return;
         }
 
         const newComment = new commentModel({
             content,
-            post,
+            post: postId,
             author: req.userDb?._id,
         });
 
         await newComment.save();
+
+        await postModel.findByIdAndUpdate(postId, {
+            $push: { comments: newComment._id }
+        });
+
         res.status(201).json(newComment);
     } catch (error) {
         console.error('Error creating comment:', error);

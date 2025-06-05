@@ -65,7 +65,13 @@ export const getPostById = async (req: Request, res: Response) => {
             .findById(postId)
             .populate('author', 'username')
             // .populate('group', 'name')
-            .populate('comments');
+            .populate({
+                path: 'comments',
+                populate: {
+                    path: 'author',
+                    select: 'username profileImage ratingStats',
+                }
+            });
 
         if (!post) {
             res.status(404).json({ message: "Post not found" });
