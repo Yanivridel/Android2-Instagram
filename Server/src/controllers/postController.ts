@@ -3,6 +3,7 @@ import { userModel } from '../models/userModel';
 import { postModel } from 'models/postModel';
 import { MongoError } from 'mongodb';
 import { AuthenticatedRequest } from 'types/expressTypes';
+import { commentModel } from 'models/commentModel';
 
 export const createPost = async (req: AuthenticatedRequest, res: Response) => {
     try {
@@ -30,29 +31,11 @@ export const createPost = async (req: AuthenticatedRequest, res: Response) => {
     }
 };
 
-export const getAllPosts = async (req: Request, res: Response) => {
-    try {
-        const posts = await postModel
-            .find()
-            .populate('author', 'username')
-            .populate('group', 'name')
-            .populate('comments')
-            .sort({ createdAt: -1 });
-
-        res.status(200).json(posts);
-    } catch (error) {
-        console.error('Error fetching posts:', error);
-        res.status(500).json({ message: "Failed to fetch posts" });
-    }
-};
-
 export const getPostsByUser = async (req: AuthenticatedRequest, res: Response) => {
     try {
         const userId = req.params.userId;
 
         const posts = await postModel.find({ author: userId })
-            .populate('author', 'username email')
-            .populate('group', 'name')
             .sort({ createdAt: -1 });
 
         res.status(200).json(posts);
@@ -65,7 +48,6 @@ export const getPostsByUser = async (req: AuthenticatedRequest, res: Response) =
 export const getMyPosts = async (req: AuthenticatedRequest, res: Response) => {
     try {
         const posts = await postModel.find({ author: req.userDb?._id })
-            .populate('group', 'name')
             .sort({ createdAt: -1 });
 
         res.status(200).json(posts);
@@ -82,7 +64,7 @@ export const getPostById = async (req: Request, res: Response) => {
         const post = await postModel
             .findById(postId)
             .populate('author', 'username')
-            .populate('group', 'name')
+            // .populate('group', 'name')
             .populate('comments');
 
         if (!post) {
@@ -141,6 +123,8 @@ export const deletePost = async (req: AuthenticatedRequest, res: Response) => {
             res.status(403).json({ message: "Unauthorized to delete this post" });
             return;
         }
+
+        await commentModel.deleteMany({ _id: { $in: post.comments } });
 
         await post.deleteOne();
         res.status(200).json({ message: "Post deleted successfully" });

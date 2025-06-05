@@ -1,31 +1,120 @@
 import { Request, Response } from 'express';
 import { ratingModel } from '../models/ratingModel';
 import { AuthenticatedRequest } from 'types/expressTypes';
+import { userModel } from 'models/userModel';
+import { postModel } from 'models/postModel';
+import { commentModel } from 'models/commentModel';
+import mongoose from 'mongoose';
+
+// Help Functions
+export const recalculateUserRating = async (userId: mongoose.Types.ObjectId) => {
+    const [userRatings, postRatings, commentRatings] = await Promise.all([
+        ratingModel.find({ targetType: 'User', targetId: userId }),
+        ratingModel.find({ targetType: 'Post' }),
+        ratingModel.find({ targetType: 'Comment' }),
+    ]);
+
+    const [userPosts, userComments] = await Promise.all([
+        postModel.find({ author: userId }, '_id'),
+        commentModel.find({ author: userId }, '_id'),
+    ]);
+
+    const postIds = userPosts.map(p => p._id.toString());
+    const commentIds = userComments.map(c => c._id.toString());
+
+    const userPostRatings = postRatings.filter(r => postIds.includes(r.targetId.toString()));
+    const userCommentRatings = commentRatings.filter(r => commentIds.includes(r.targetId.toString()));
+
+    const hasUserRatings = userRatings.length > 0;
+    const hasPostRatings = userPostRatings.length > 0;
+    const hasCommentRatings = userCommentRatings.length > 0;
+
+    const totalRatings = userRatings.length + userPostRatings.length + userCommentRatings.length;
+    if (totalRatings === 0) {
+        await userModel.findByIdAndUpdate(userId, {
+            'ratingStats.averageScore': 2.5,
+            'ratingStats.totalRatings': 0,
+        });
+        return;
+    }
+
+    // 1. Define intended weights
+    const weights = {
+        user: 0.5,
+        post: 0.35,
+        comment: 0.15,
+    };
+
+    // 2. Filter only present categories
+    const presentWeights: { [key: string]: number } = {};
+    if (hasUserRatings) presentWeights.user = weights.user;
+    if (hasPostRatings) presentWeights.post = weights.post;
+    if (hasCommentRatings) presentWeights.comment = weights.comment;
+
+    // 3. Normalize the present weights
+    const totalWeight = Object.values(presentWeights).reduce((a, b) => a + b, 0);
+    for (const key in presentWeights) {
+        presentWeights[key] /= totalWeight;
+    }
+
+    // 4. Compute weighted average
+    const avg = (ratings: typeof userRatings) =>
+        ratings.reduce((sum, r) => sum + r.rating, 0) / (ratings.length || 1);
+
+    const weightedSum =
+        (hasUserRatings ? avg(userRatings) * presentWeights.user : 0) +
+        (hasPostRatings ? avg(userPostRatings) * presentWeights.post : 0) +
+        (hasCommentRatings ? avg(userCommentRatings) * presentWeights.comment : 0);
+
+    const averageScore = parseFloat(weightedSum.toFixed(2));
+
+    await userModel.findByIdAndUpdate(userId, {
+        'ratingStats.averageScore': averageScore,
+        'ratingStats.totalRatings': totalRatings,
+    });
+};
 
 // Create a new rating
 export const createRating = async (req: AuthenticatedRequest, res: Response) => {
     try {
-        const { targetType, targetId, rater, score, comment } = req.body;
+        const { targetType, targetId, rating } = req.body;
+        const rater = req.userDb?._id;
 
-        if (!targetType || !targetId || !score) {
+        if (!targetType || !targetId || !rating) {
             res.status(400).json({ message: 'targetType, targetId, and score are required.' });
             return;
         }
 
         const newRating = new ratingModel({
-        targetType,
-        targetId,
-        rater: rater || req.userDb?._id, // fallback to logged-in user
-        score,
-        comment,
+            targetType,
+            targetId,
+            rater,
+            rating,
         });
 
         await newRating.save();
 
+        // Determine the user to update
+        let userToUpdate: mongoose.Types.ObjectId | null = null;
+
+        if (targetType === 'User') {
+            userToUpdate = targetId;
+        } else if (targetType === 'Post') {
+            const post = await postModel.findById(targetId);
+            if (post) userToUpdate = post.author;
+        } else if (targetType === 'Comment') {
+            const comment = await commentModel.findById(targetId);
+            if (comment) userToUpdate = comment.author;
+        }
+
+        if (userToUpdate) {
+            await recalculateUserRating(userToUpdate);
+        }
+
         res.status(201).json(newRating);
     } catch (error) {
         console.error('Error creating rating:', error);
-        res.status(500).json({ status: 'error', message: 'Failed to create rating' });
+        res.status(500).json({ message: 'Failed to create rating' });
     }
 };
 

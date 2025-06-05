@@ -93,3 +93,22 @@ export const getUserByEmail = async (req: Request, res: Response): Promise<void>
         res.status(500).json({ error: "Failed to get user by email" });
     }
 };
+
+export const getUserById = async (req: Request, res: Response) => {
+    try {
+        const { userId } = req.params;
+
+        const user = await userModel.findById(userId)
+            .populate('posts likedPosts followers following');
+
+        if (!user) {
+            res.status(404).json({ message: 'User not found' });
+            return;
+        }
+
+        res.status(200).json(user);
+    } catch (error) {
+        console.error('Error fetching user:', error);
+        res.status(500).json({ message: 'Failed to fetch user' });
+    }
+};

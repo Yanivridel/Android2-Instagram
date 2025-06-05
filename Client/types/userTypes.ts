@@ -5,7 +5,10 @@ export interface IUser {
     username: string;
     email: string;
     role: 'user' | 'admin';
-    rating: number;
+    ratingStats: {
+        averageScore: number;
+        totalRatings: number;
+    }
     bio: string;
     gender: string;
     profileImage: string;

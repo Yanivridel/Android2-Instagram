@@ -6,7 +6,10 @@ const UserSchema = new Schema<IUser>({
     username: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     role: { type: String, enum: ['user', 'admin'], default: 'user' },
-    rating: { type: Number, default: 2.5, max: 5, min: 0 },
+    ratingStats: {
+        averageScore: { type: Number, default: 2.5, min: 0, max: 5 },
+        totalRatings: { type: Number, default: 0 }
+    },
     posts: { type: [Schema.Types.ObjectId], ref: 'Post', default: [] },
     taggedPosts: { type: [Schema.Types.ObjectId], ref: 'Post', default: [] },
     likedPosts: { type: [Schema.Types.ObjectId], ref: 'Post', default: [] },

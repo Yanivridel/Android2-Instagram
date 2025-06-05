@@ -6,7 +6,10 @@ export interface IUser extends Document {
     username: string;
     email: string;
     role: 'user' | 'admin';
-    rating: number;
+    ratingStats: {
+        averageScore: number;
+        totalRatings: number;
+    }
     gender: string;
     posts: mongoose.Schema.Types.ObjectId[];
     likedPosts: mongoose.Schema.Types.ObjectId[];

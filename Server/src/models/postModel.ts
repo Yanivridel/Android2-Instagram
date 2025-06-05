@@ -28,12 +28,6 @@ const postSchema = new mongoose.Schema<IPost>({
         type: Boolean,
         default: true,
     },
-    rating: {
-        type: Number,
-        default: 0,
-        min: 0,
-        max: 5,
-    },
     comments: {
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'Comment',
