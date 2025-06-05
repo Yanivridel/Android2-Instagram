@@ -1,3 +1,4 @@
+import { IComment } from "./commentTypes";
 import { IUser } from "./userTypes";
 
 export interface IPost {
@@ -9,20 +10,7 @@ export interface IPost {
     author: IUser;
     group?: string; // Group ID
     isPublic: boolean;
-    rating: number;
     comments: IComment;
     likes: number;    
     locationString: string;
-}
-
-
-// CHANGE LATER TO IUser
-export interface IComment {
-    _id?: string;
-    content: string;
-    post: string; // Post ID
-    author: IUser;
-    createdAt?: Date;
-    updatedAt?: Date;
-    likes: number;
 }

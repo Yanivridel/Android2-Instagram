@@ -29,6 +29,11 @@ const commentSchema = new mongoose.Schema<IComment>({
         ref: 'User',
         default: [],
     },
+    replies: {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: 'Comment',
+        default: [],
+    }
 });
 
 export const commentModel = model<IComment>('Comment', commentSchema);

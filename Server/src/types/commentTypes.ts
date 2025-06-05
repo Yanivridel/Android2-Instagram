@@ -8,4 +8,5 @@ export interface IComment {
     createdAt?: Date;
     updatedAt?: Date;
     likes?: Types.ObjectId[];
+    replies?: Types.ObjectId[];
 }

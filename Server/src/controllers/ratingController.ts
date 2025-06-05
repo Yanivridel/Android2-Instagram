@@ -85,6 +85,33 @@ export const createRating = async (req: AuthenticatedRequest, res: Response) => 
             return;
         }
 
+        const existingRating = await ratingModel.findOne({ rater, targetType, targetId });
+        if (existingRating) {
+            // Update existing rating
+            existingRating.rating = rating;
+            await existingRating.save();
+
+            // Find user to update rating for
+            let userToUpdate: mongoose.Types.ObjectId | null = null;
+
+            if (targetType === 'User') {
+                userToUpdate = targetId;
+            } else if (targetType === 'Post') {
+                const post = await postModel.findById(targetId);
+                if (post) userToUpdate = post.author;
+            } else if (targetType === 'Comment') {
+                const comment = await commentModel.findById(targetId);
+                if (comment) userToUpdate = comment.author;
+            }
+
+            if (userToUpdate) {
+                await recalculateUserRating(userToUpdate);
+            }
+
+            res.status(200).json(existingRating);
+            return;
+        }
+
         const newRating = new ratingModel({
             targetType,
             targetId,
@@ -150,9 +177,17 @@ export const getAverageRatingForTarget = async (req: AuthenticatedRequest, res: 
             return;
         }
 
+        const objectTargetId = new mongoose.Types.ObjectId(targetId as string);
+
         const result = await ratingModel.aggregate([
-        { $match: { targetType, targetId } },
-        { $group: { _id: null, averageScore: { $avg: '$score' }, count: { $sum: 1 } } }
+            { $match: { targetType, targetId: objectTargetId } },
+            {
+                $group: {
+                    _id: null,
+                    averageScore: { $avg: '$rating' },
+                    count: { $sum: 1 }
+                }
+            }
         ]);
 
         const averageScore = result[0]?.averageScore || 0;
@@ -166,86 +201,124 @@ export const getAverageRatingForTarget = async (req: AuthenticatedRequest, res: 
 };
 
 // Update a rating by ID
-export const updateRating = async (req: AuthenticatedRequest, res: Response) => {
+export const updateRatingByTarget = async (req: AuthenticatedRequest, res: Response) => {
     try {
-        const { ratingId } = req.params;
-        const { score } = req.body;
+        const rater = req.userDb?._id;
+        const { targetType, targetId, rating } = req.body;
 
-        if (!score) {
-            res.status(400).json({ message: 'At least one of score or comment must be provided to update.' });
+        // Validate required params
+        if (!targetType || !targetId || !rating) {
+            res.status(400).json({ message: 'targetType, targetId, and rating query parameters are required.' });
             return;
         }
 
-        const rating = await ratingModel.findById(ratingId);
-
-        if (!rating) {
-            res.status(404).json({ message: 'Rating not found' });
+        // rating from query is string, convert to number
+        const ratingNum = Number(rating);
+        if (isNaN(ratingNum) || ratingNum < 1 || ratingNum > 5) {
+            res.status(400).json({ message: 'Rating must be a number between 1 and 5.' });
             return;
         }
 
-        // Optionally check if current user is the rater (authorization)
-        if (rating.rater.toString() !== req.userDb?._id?.toString()) {
-            res.status(403).json({ message: 'You are not authorized to update this rating' });
-            return;
+        // Find existing rating by this rater for this target
+        let ratingDoc = await ratingModel.findOne({ rater, targetType, targetId });
+
+        if (ratingDoc) {
+            // Update rating
+            ratingDoc.rating = ratingNum;
+            await ratingDoc.save();
+        } else {
+            // Create new rating
+            ratingDoc = new ratingModel({
+                rater,
+                targetType,
+                targetId,
+                rating: ratingNum,
+            });
+            await ratingDoc.save();
         }
 
-        if (score !== undefined) rating.rating = score;
+        // Determine the user to update rating for
+        let userToUpdate: mongoose.Types.ObjectId | null = null;
 
-        await rating.save();
+        if (targetType === 'User') {
+            userToUpdate = targetId;
+        } else if (targetType === 'Post') {
+            const post = await postModel.findById(targetId);
+            if (post) userToUpdate = post.author;
+        } else if (targetType === 'Comment') {
+            const comment = await commentModel.findById(targetId);
+            if (comment) userToUpdate = comment.author;
+        }
 
-        res.status(200).json(rating);
+        if (userToUpdate) {
+            await recalculateUserRating(userToUpdate);
+        }
+
+        res.status(200).json(ratingDoc);
     } catch (error) {
         console.error('Error updating rating:', error);
-        res.status(500).json({ status: 'error', message: 'Failed to update rating' });
+        res.status(500).json({ message: 'Failed to update rating.' });
     }
 };
 
 // Delete a rating by ID
-export const deleteRating = async (req: AuthenticatedRequest, res: Response) => {
+export const deleteRatingByTarget = async (req: AuthenticatedRequest, res: Response) => {
     try {
-        const { ratingId } = req.params;
+        const rater = req.userDb?._id;
+        const { targetType, targetId } = req.query;
 
-        const rating = await ratingModel.findById(ratingId);
+        if (!targetType || !targetId) {
+            res.status(400).json({ message: 'targetType and targetId are required.' });
+            return;
+        }
+
+        // Find the rating based on user, targetType, and targetId
+        const rating = await ratingModel.findOne({ rater, targetType, targetId });
 
         if (!rating) {
-            res.status(404).json({ message: 'Rating not found' });
+            res.status(404).json({ message: 'Rating not found for this target by the current user.' });
             return;
         }
 
-        // Optionally check if current user is the rater (authorization)
-        if (rating.rater.toString() !== req.userDb?._id?.toString()) {
-            res.status(403).json({ message: 'You are not authorized to delete this rating' });
-            return;
+        // Determine the affected user
+        let userToUpdate: mongoose.Types.ObjectId | null = null;
+
+        if (targetType === 'User') {
+            userToUpdate = targetId as unknown as mongoose.Types.ObjectId;
+        } else if (targetType === 'Post') {
+            const post = await postModel.findById(targetId);
+            if (post) userToUpdate = post.author;
+        } else if (targetType === 'Comment') {
+            const comment = await commentModel.findById(targetId);
+            if (comment) userToUpdate = comment.author;
         }
 
-        await rating.deleteOne();
+        // Delete the rating
+        await ratingModel.deleteOne({ _id: rating._id });
 
-        res.status(200).json({ message: 'Rating deleted successfully' });
+        // Recalculate the affected user's rating
+        if (userToUpdate) {
+            await recalculateUserRating(userToUpdate);
+        }
+
+        res.status(200).json({ message: 'Rating deleted successfully.' });
     } catch (error) {
         console.error('Error deleting rating:', error);
-        res.status(500).json({ status: 'error', message: 'Failed to delete rating' });
+        res.status(500).json({ message: 'Failed to delete rating.' });
     }
 };
 
 // Get top 10 rated targets across the app
-    export const getTop10Ratings = async (_req: AuthenticatedRequest, res: Response) => {
+export const getTop10Ratings = async (_req: AuthenticatedRequest, res: Response) => {
     try {
-        // Aggregate average scores grouped by targetType & targetId, sorted descending
-        const topRatings = await ratingModel.aggregate([
-        {
-            $group: {
-            _id: { targetType: "$targetType", targetId: "$targetId" },
-            averageScore: { $avg: "$score" },
-            count: { $sum: 1 }
-            }
-        },
-        { $sort: { averageScore: -1, count: -1 } },
-        { $limit: 10 }
-        ]);
+        const topUsers = await userModel.find({ 'ratingStats.totalRatings': { $gt: 0 } })
+            .sort({ 'ratingStats.averageScore': -1, 'ratingStats.totalRatings': -1 })
+            .limit(10)
+            .select('username profileImage ratingStats');
 
-        res.status(200).json(topRatings);
+        res.status(200).json(topUsers);
     } catch (error) {
-        console.error('Error getting top ratings:', error);
-        res.status(500).json({ status: 'error', message: 'Failed to get top ratings' });
+        console.error('Error fetching top rated users:', error);
+        res.status(500).json({ message: 'Failed to fetch top rated users' });
     }
 };

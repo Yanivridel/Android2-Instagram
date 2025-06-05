@@ -5,7 +5,7 @@ import { postModel } from 'models/postModel';
 
 export const createComment = async (req: AuthenticatedRequest, res: Response) => {
     try {
-        const { content, postId } = req.body;
+        const { content, postId, parentCommentId } = req.body;
 
         if (!content || !postId) {
             res.status(400).json({ message: 'Content and Post ID are required' });
@@ -16,13 +16,22 @@ export const createComment = async (req: AuthenticatedRequest, res: Response) =>
             content,
             post: postId,
             author: req.userDb?._id,
+            parentComment: parentCommentId || null, // assuming you use parentComment field
         });
 
         await newComment.save();
 
-        await postModel.findByIdAndUpdate(postId, {
-            $push: { comments: newComment._id }
-        });
+        // Add to post root comments if it's a top-level comment
+        if (!parentCommentId) {
+            await postModel.findByIdAndUpdate(postId, {
+                $push: { comments: newComment._id }
+            });
+        } else {
+            // Otherwise, it's a reply to another comment
+            await commentModel.findByIdAndUpdate(parentCommentId, {
+                $push: { replies: newComment._id }
+            });
+        }
 
         res.status(201).json(newComment);
     } catch (error) {
@@ -89,6 +98,11 @@ export const deleteComment = async (req: AuthenticatedRequest, res: Response) =>
         }
 
         await commentModel.findByIdAndDelete(req.params.id);
+
+        await postModel.findByIdAndUpdate(comment.post, {
+            $pull: { comments: comment._id }
+        });
+
         res.status(200).json({ message: 'Comment deleted successfully' });
     } catch (error) {
         console.error('Error deleting comment:', error);
@@ -98,10 +112,17 @@ export const deleteComment = async (req: AuthenticatedRequest, res: Response) =>
 
 export const getCommentsByPost = async (req: Request, res: Response) => {
     try {
-        const postId = req.params.postId;
+        const { postId } = req.params;
 
         const comments = await commentModel.find({ post: postId })
-            .populate('author', 'username')
+            .populate('author', 'username profileImage')
+            .populate({
+                path: 'replies',
+                populate: {
+                    path: 'author',
+                    select: 'username profileImage'
+                }
+            })
             .sort({ createdAt: 1 });
 
         res.status(200).json(comments);

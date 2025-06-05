@@ -1,6 +1,6 @@
 import { View, Text, TouchableOpacity, Pressable } from 'react-native'
 import React, { useState } from 'react'
-import { IComment } from '@/types/postTypes';
+import { IComment } from '@/types/commentTypes';
 import { Box } from '../ui/box';
 import { Avatar, AvatarFallbackText, AvatarImage } from '../ui/avatar';
 import { IC_Heart } from '@/utils/constants/Icons';
@@ -23,7 +23,7 @@ const PostComment = ({ comment }: PostCommentProps) => {
         <Box className="flex-row gap-4 flex-1">
             <Avatar className="bg-indigo-600 border-[2.5px] border-indigo-400">
                 <AvatarFallbackText className="text-white">
-                {comment.user}
+                {comment.author.profileImage}
                 </AvatarFallbackText>
                 <AvatarImage
                 source={{
@@ -35,7 +35,7 @@ const PostComment = ({ comment }: PostCommentProps) => {
             <Box className="gap-1 flex-1">
                 {/* Comment Header */}
                 <Box className="flex-row gap-2 items-end">
-                    <Text className="font-bold">{comment.user}</Text>
+                    <Text className="font-bold">{comment.author.username}</Text>
                     <Text className="text-sm text-gray-500">2h ago</Text>
                 </Box>
                 {/* Comment Text & Likes */}
@@ -47,7 +47,7 @@ const PostComment = ({ comment }: PostCommentProps) => {
                         <Text 
                             className="text-gray-700 leading-5 "
                         >
-                            {comment.text}
+                            {comment.content}
                         </Text>
                     </Pressable>
 

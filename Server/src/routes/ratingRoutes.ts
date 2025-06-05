@@ -4,9 +4,9 @@ import {
     createRating, 
     getRatingsByTarget, 
     getAverageRatingForTarget, 
-    updateRating, 
-    deleteRating,
-    getTop10Ratings
+    updateRatingByTarget, 
+    getTop10Ratings,
+    deleteRatingByTarget
 } from '../controllers/ratingController';
 
 const router = Router();
@@ -24,9 +24,9 @@ router.get('/average', authenticateToken, getAverageRatingForTarget);
 router.get('/top', authenticateToken, getTop10Ratings);
 
 // Update a rating by rating ID
-router.put('/:ratingId', authenticateToken, updateRating);
+router.put('/', authenticateToken, updateRatingByTarget);
 
 // Delete a rating by rating ID
-router.delete('/:ratingId', authenticateToken, deleteRating);
+router.delete('/', authenticateToken, deleteRatingByTarget);
 
 export default router;

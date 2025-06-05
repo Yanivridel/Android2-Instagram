@@ -23,7 +23,7 @@ import Animated, {
 import { View, Text, StyleSheet } from "react-native";
 import { Box } from "../ui/box";
 import PostComment from "./PostComment";
-import { IComment } from "@/types/postTypes";
+import { IComment } from "@/types/commentTypes";
 
 interface PostCommentSheetProps {
     showActionsheet: boolean;
@@ -32,22 +32,22 @@ interface PostCommentSheetProps {
 
   // Dummy comments data
 const dummyComments: IComment[] = [
-    { id: '1', text: 'This is a great post! REALLY REALLY GREAT POST! Loved every bit of it! <3', user: 'user1' },
-    { id: '2', text: 'I love this content!', user: 'user2' },
-    { id: '3', text: 'Amazing work!', user: 'user3' },
-    { id: '4', text: 'Keep it up!', user: 'user4' },
-    { id: '5', text: 'This is so inspiring!', user: 'user5' },
-    { id: '6', text: 'I can relate to this!', user: 'user6' },
-    { id: '7', text: 'This is exactly what I needed!', user: 'user7' },
-    { id: '8', text: 'Great job!', user: 'user8' },
-    { id: '9', text: 'This is awesome!', user: 'user9' },
-    { id: '10', text: 'I love your style!', user: 'user10' },
-    // Add more comments to ensure scrolling
-    { id: '11', text: 'Fantastic post!', user: 'user11' },
-    { id: '12', text: 'Love this!', user: 'user12' },
-    { id: '13', text: 'Amazing content!', user: 'user13' },
-    { id: '14', text: 'Keep sharing!', user: 'user14' },
-    { id: '15', text: 'Very inspiring!', user: 'user15' },
+    // { id: '1', text: 'This is a great post! REALLY REALLY GREAT POST! Loved every bit of it! <3', user: 'user1' },
+    // { id: '2', text: 'I love this content!', user: 'user2' },
+    // { id: '3', text: 'Amazing work!', user: 'user3' },
+    // { id: '4', text: 'Keep it up!', user: 'user4' },
+    // { id: '5', text: 'This is so inspiring!', user: 'user5' },
+    // { id: '6', text: 'I can relate to this!', user: 'user6' },
+    // { id: '7', text: 'This is exactly what I needed!', user: 'user7' },
+    // { id: '8', text: 'Great job!', user: 'user8' },
+    // { id: '9', text: 'This is awesome!', user: 'user9' },
+    // { id: '10', text: 'I love your style!', user: 'user10' },
+    // // Add more comments to ensure scrolling
+    // { id: '11', text: 'Fantastic post!', user: 'user11' },
+    // { id: '12', text: 'Love this!', user: 'user12' },
+    // { id: '13', text: 'Amazing content!', user: 'user13' },
+    // { id: '14', text: 'Keep sharing!', user: 'user14' },
+    // { id: '15', text: 'Very inspiring!', user: 'user15' },
 ];
 
 type ContextType = {
@@ -150,7 +150,7 @@ const PostCommentSheet = ({showActionsheet, setShowActionsheet}: PostCommentShee
                         ref={flatListRef}
                         data={dummyComments}
                         renderItem={({ item }) => <PostComment comment={item} />}
-                        keyExtractor={(item) => String(Number(item.id) * Math.random())} // Change later
+                        keyExtractor={(item) => String(Number(item._id))} // Change later
                         onScroll={scrollHandler}
                         scrollEventThrottle={16}
                         contentContainerStyle={{paddingBottom: 20}}
