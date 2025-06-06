@@ -48,18 +48,26 @@ export const getOrCreateChatWithUser = async (req: AuthenticatedRequest, res: Re
         const { otherUserId } = req.params;
 
         if (!userId || !otherUserId) {
-            res.status(400).json({ message: "User IDs required" });
-            return;
+            return res.status(400).json({ message: "User IDs required" });
         }
 
         const [id1, id2] = [userId, otherUserId].sort();
 
         let chat = await chatModel.findOne({
             participants: { $all: [id1, id2], $size: 2 },
+        }).populate({
+            path: 'participants',
+            match: { _id: { $ne: userId } }, // Only return the other user
+            select: '_id username profileImage',
         });
 
         if (!chat) {
             chat = await chatModel.create({ participants: [id1, id2] });
+            chat = await chatModel.findById(chat._id).populate({
+                path: 'participants',
+                match: { _id: { $ne: userId } }, // Populate only the other user
+                select: '_id username profileImage',
+            });
         }
 
         res.status(200).json(chat);

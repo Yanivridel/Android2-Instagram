@@ -1,9 +1,10 @@
+import { IUser } from "./userTypes";
 
 export interface IMessage {
     _id?: string;
     content: string;
-    senderId: string;
-    recipientId: string; // user or group chat id
+    senderId: IUser;
+    recipientId: IUser | string;
     chatId: string;
     createdAt?: Date | string;
     updatedAt?: Date | string;
