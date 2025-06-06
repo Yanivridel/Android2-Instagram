@@ -9,7 +9,7 @@ type PostCubeProps = {
 const screenWidth = Dimensions.get('window').width;
 const cubeSize = screenWidth / 3;
 
-export const PostCube: React.FC<PostCubeProps> = ({ imageUrl, onPress }) => {
+export const PostCube: React.FC<PostCubeProps> = ({ imageUrl, onPress }) => {    
     return (
         <Pressable
             onPress={onPress}

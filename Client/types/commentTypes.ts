@@ -4,7 +4,7 @@ export interface IComment {
     _id?: string;
     content: string;
     post: string;
-    author: IUser;
+    author: Partial<IUser>;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     likes?: string[];

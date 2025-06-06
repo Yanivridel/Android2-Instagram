@@ -1,15 +1,12 @@
 import React from 'react';
 import { FlatList } from 'react-native';
 import { PostCube } from './PostCube';
+import { IPost } from '@/types/postTypes';
 
-type Post = {
-    id: string;
-    imageUrl: string;
-};
 
 type PostsGridProps = {
-    posts: Post[];
-    onPostPress: (post: Post) => void;
+    posts: IPost[];
+    onPostPress: (post: IPost) => void;
 };
 
 export const PostsGrid: React.FC<PostsGridProps> = ({ posts, onPostPress }) => {
@@ -17,10 +14,10 @@ export const PostsGrid: React.FC<PostsGridProps> = ({ posts, onPostPress }) => {
     <FlatList
         className="flex-1"
         data={posts}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(post) => post._id}
         numColumns={3}
         renderItem={({ item }) => (
-            <PostCube imageUrl={item.imageUrl} onPress={() => onPostPress(item)} />
+            <PostCube imageUrl={item.imageUrls[0]} onPress={() => onPostPress(item)} />
         )}
         scrollEnabled={true}
         showsVerticalScrollIndicator={false}

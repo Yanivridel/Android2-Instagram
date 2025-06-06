@@ -29,7 +29,6 @@ const dummyPosts: IPost[] = [
       username: 'john_doe',
       email: 'john@example.com',
       role: 'user',
-      rating: 4.7,
       bio: 'Cat lover and sunshine addict.',
       gender: 'male',
       profileImage:
@@ -48,7 +47,6 @@ const dummyPosts: IPost[] = [
     },
     group: undefined,
     isPublic: true,
-    rating: 0,
     comments: {
       content: 'So cute!',
       post: '1',
@@ -58,7 +56,6 @@ const dummyPosts: IPost[] = [
         username: 'cat_lover_22',
         email: 'catlover@example.com',
         role: 'user',
-        rating: 4.5,
         bio: 'Professional cat cuddler',
         gender: 'female',
         profileImage:
@@ -77,7 +74,7 @@ const dummyPosts: IPost[] = [
       },
       createdAt: new Date(),
       updatedAt: new Date(),
-      likes: 3,
+      likes: ['string1', 'string2', 'string3'],
     },
     likes: 128,
     locationString: 'Tel Aviv, Israel',
@@ -96,7 +93,6 @@ const dummyPosts: IPost[] = [
       username: 'jane_smith',
       email: 'jane@example.com',
       role: 'user',
-      rating: 4.9,
       bio: 'Food enthusiast and traveler',
       gender: 'female',
       profileImage:
@@ -115,7 +111,6 @@ const dummyPosts: IPost[] = [
     },
     group: undefined,
     isPublic: true,
-    rating: 0,
     comments: {
       content: 'Looks amazing!',
       post: '2',
@@ -125,7 +120,6 @@ const dummyPosts: IPost[] = [
         username: 'brunch_addict',
         email: 'brunch@example.com',
         role: 'user',
-        rating: 4.6,
         bio: 'Always eating, always posting',
         gender: 'female',
         profileImage:
@@ -144,7 +138,7 @@ const dummyPosts: IPost[] = [
       },
       createdAt: new Date(),
       updatedAt: new Date(),
-      likes: 5,
+      likes: ['string1', 'string2', 'string3', 'string4', 'string5'],
     },
     likes: 256,
     locationString: 'New York City, USA',
@@ -153,7 +147,7 @@ const dummyPosts: IPost[] = [
 
 const HomeScreen = ({ navigation }: Props) => {
   const { appliedTheme } = useTheme()
-  const [refreshing, setRefreshing] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);  
 
   const onRefresh = () => {
     setRefreshing(true);

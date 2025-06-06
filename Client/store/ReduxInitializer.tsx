@@ -16,7 +16,8 @@ export const ReduxInitializer = () => {
         const unsubscribe = FirebaseAuth.onAuthStateChanged(async (user: any) => {
         if (user) {
             console.log("User is logged in:", user.email);
-            const loggedUser = await getUserByEmail(user.email);            
+            const loggedUser = await getUserByEmail({ userEmail: user.email });    
+            // console.log("loggedUser", loggedUser);
             if (loggedUser) {
                 dispatch(setUser(loggedUser));
                 navigation.navigate("MainApp", { screen: "Home" });

@@ -159,7 +159,6 @@ const RatingPopup: React.FC<RatingPopupProps> = ({
         opacity.value = withTiming(0, { duration: 200 });
         translateY.value = withSpring(10, { damping: 15, stiffness: 100 });
         
-        console.log('handleClose');
         setTimeout(() => {
         onClose?.();
         }, 300);

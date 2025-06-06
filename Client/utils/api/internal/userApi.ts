@@ -78,9 +78,12 @@ export const logoutUser = async () => {
     await signOut(FirebaseAuth);
 }
 
-
-export const getUserByEmail = async (email: string): Promise<IUser | null> => {
-    const { data } = await api.get<{user:IUser}>(`api/users/email/${email}`);
-    return data.user;
+export const getUserById = async ({ userId }: { userId: string} ): Promise<IUser | null> => {
+    const { data } = await api.get<IUser>(`api/users/${userId}`);
+    return data;
 }
 
+export const getUserByEmail = async ({ userEmail }: { userEmail: string} ): Promise<IUser | null> => {
+    const { data } = await api.get<{user: IUser}>(`api/users/email/${userEmail}`);
+    return data.user;
+}

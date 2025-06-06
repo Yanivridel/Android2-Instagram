@@ -7,7 +7,7 @@ export interface IPost {
     imageUrls: string[];
     createdAt: string; // ISO date string
     updatedAt: string;
-    author: IUser;
+    author: Partial<IUser>;
     group?: string; // Group ID
     isPublic: boolean;
     comments: IComment;

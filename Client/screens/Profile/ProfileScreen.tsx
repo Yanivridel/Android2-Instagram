@@ -13,10 +13,13 @@ import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-na
 import { Dimensions } from 'react-native';
 import TouchableIcon from '@/components/TouchableIcon'
 import { PostsGrid } from '@/components/post/PostsGrid'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useSelector } from "react-redux";
 import { RootState } from '@/store'
 import { IUser } from '@/types/userTypes'
+import { getAllMyPosts } from '@/utils/api/internal/postApi'
+import { IPost } from '@/types/postTypes'
+import SpinnerLoader from '@/components/SpinnerLoader'
 
 
 const { width } = Dimensions.get('window');
@@ -45,6 +48,18 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
 		(state: RootState) => state.currentUser
 	) as unknown as IUser;
 	const [currentTab, setCurrentTab] = useState<'grid' | 'tag'>('grid');
+	const [ myPosts, setMyPosts ] = useState<IPost[] | null>(null);
+	const [ isLoadingMyPosts, setIsLoadingMyPosts ] = useState(true);
+
+	useEffect(() => {
+		getAllMyPosts()
+		.then(posts => {
+			// console.log("posts", posts);
+			setMyPosts(posts);
+			setIsLoadingMyPosts(false);
+		})
+
+	}, []);
 
 	const indicatorTranslateX = useSharedValue(0);
 	const indicatorStyle = useAnimatedStyle(() => ({
@@ -54,7 +69,6 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
 		setCurrentTab(tab);
 		indicatorTranslateX.value = withTiming(TAB_INDEX[tab] * TAB_WIDTH, { duration: 300 });
 	};
-
 
 	return (
 	<Box className="flex-1">
@@ -151,14 +165,24 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
 				/>
 			</Box>
 			{/* Posts Grid */}
-			<Box className="flex-1 mt-1">
-				{currentTab === 'grid' && (
-					<PostsGrid posts={dummyMyPosts} onPostPress={() => {}} />
-				)}
-				{currentTab === 'tag' && (
-					<PostsGrid posts={dummyMyTags} onPostPress={() => {}} />
-				)}
-			</Box>
+			{isLoadingMyPosts ? (
+				<SpinnerLoader className='mt-16'/>
+				) : myPosts?.length ? (
+				<Box className="flex-1 mt-1">
+					{currentTab === 'grid' && (
+						<PostsGrid posts={myPosts} onPostPress={() => {}} />
+					)}
+					{currentTab === 'tag' && (
+						<Box className='justify-center items-center mt-10'>
+							<Text className='p-4 color-indigo-600'>No one tagged you in a post yet</Text>
+						</Box>
+					)}
+				</Box>
+				) : (
+				<Box className='justify-center items-center mt-10'>
+					<Text className='p-4 color-indigo-600'>No Posts Found</Text>
+				</Box>
+			)}
 		</CardUpRounded>
 
 		{/* <RatingPopup 
