@@ -94,18 +94,19 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
 						/>
 					</Avatar>
 
-					<Box className="flex-row gap-5 p-4">
+					{/* Statistics */}
+					<Box className="flex-row flex-1 justify-evenly p-4">
 						<Box className="items-center">
 							<Text className="text-white text-2xl font-bold">0</Text>
 							<Text className="text-white text-sm">Posts</Text>
 						</Box>
 						<Box className="items-center">
-							<Text className="text-white text-2xl font-bold">0</Text>
-							<Text className="text-white text-sm">Followers</Text>
+							<Text className="text-white text-2xl font-bold">{currentUser.ratingStats.averageScore}</Text>
+							<Text className="text-white text-sm">Rating</Text>
 						</Box>
 						<Box className="items-center">
 							<Text className="text-white text-2xl font-bold">0</Text>
-							<Text className="text-white text-sm">Following</Text>
+							<Text className="text-white text-sm">Friends</Text>
 						</Box>
 					</Box>
 				</Box>

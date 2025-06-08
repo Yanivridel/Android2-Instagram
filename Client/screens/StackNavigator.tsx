@@ -29,7 +29,7 @@ const Stack = createStackNavigator();
 const StackNavigator = () => {
   return (
     <NavigationContainer>
-      <ReduxInitializer />
+      {/* <ReduxInitializer /> */}
       <Stack.Navigator
         initialRouteName="Login"
         screenOptions={{

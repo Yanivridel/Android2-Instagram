@@ -11,7 +11,9 @@ import { ChevronLeft } from 'lucide-react-native';
 import { IUser } from '@/types/userTypes';
 import { IMessage } from '@/types/messageTypes';
 import MyLinearGradient from '@/components/gradient/MyLinearGradient';
-import { getMessageByChatId } from '@/utils/api/internal/messageApi';
+import { createMessage, getMessageByChatId } from '@/utils/api/internal/messageApi';
+import SpinnerLoader from '@/components/SpinnerLoader';
+import { Avatar, AvatarImage, AvatarFallbackText } from '@/components/ui/avatar';
 
 const socket = io('http://192.168.1.100:3000');
 
@@ -23,13 +25,13 @@ interface messageRouteType {
 }
 
 const MessageScreen = ({ route, navigation }: Props) => {
-    const { chatId, user } = (route as messageRouteType).params;
+    const { chatId, user: otherUser } = (route as messageRouteType).params;
     const currentUser = useSelector((state: RootState) => state.currentUser);
     const [messages, setMessages] = useState<IMessage[]>([]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const flatListRef = useRef<FlatList>(null);
-    const shouldAutoScroll = useRef(true);
+    const shouldAutoScroll = useRef(true);    
 
     // Debounced scroll to end function
     const scrollToEnd = useCallback(() => {
@@ -46,7 +48,30 @@ const MessageScreen = ({ route, navigation }: Props) => {
             try {
                 setIsLoading(true);
                 const initialMessages = await getMessageByChatId({ chatId });
-                setMessages(initialMessages || []);
+
+                const normalizedMessages = (initialMessages || []).map((msg: any) => {
+                    const isSentByCurrentUser = msg.senderId === currentUser._id;
+                
+                    return {
+                        ...msg,
+                        senderId: isSentByCurrentUser
+                            ? currentUser // full object already from Redux
+                            : {
+                                _id: otherUser._id,
+                                username: otherUser.username,
+                                profileImage: otherUser.profileImage,
+                            },
+                        recipientId: isSentByCurrentUser
+                            ? {
+                                _id: otherUser._id,
+                                username: otherUser.username,
+                                profileImage: otherUser.profileImage,
+                            }
+                            : currentUser,
+                    };
+                });
+
+                setMessages(normalizedMessages || []);
                 
                 // Join socket room after messages are loaded
                 socket.emit('join', chatId);
@@ -91,18 +116,19 @@ const MessageScreen = ({ route, navigation }: Props) => {
     const sendMessage = () => {
         if (!input.trim()) return;
 
-        const message: IMessage = {
+        const message = {
             content: input,
             senderId: currentUser,
-            recipientId: user._id || "",
+            recipientId: otherUser._id || "",
             chatId,
             createdAt: new Date().toISOString(),
         };
 
-        socket.emit('send-message', { chatId, message });
+        socket.emit('send-message', { chatId, message });        
         
         // Add message optimistically
         setMessages(prev => [...prev, message]);
+        createMessage({content: message.content, recipientId: message.recipientId })
         setInput('');
         
         // Scroll after sending
@@ -130,13 +156,22 @@ const MessageScreen = ({ route, navigation }: Props) => {
                             <TouchableOpacity onPress={() => navigation.goBack()} className="mr-3">
                                 <ChevronLeft color="white" size={24} />
                             </TouchableOpacity>
-                            <Image
-                                source={{ uri: user.profileImage || `https://i.pravatar.cc/150?u=${user._id}` }}
-                                className="w-10 h-10 rounded-full mr-3"
-                            />
-                            <Text className="text-white text-base font-semibold flex-1">
-                                {user.username}
-                            </Text>
+                            <Box className='flex-row gap-2 items-center'>
+                                <Avatar className="bg-indigo-600 border-[2.5px] border-indigo-400">
+                                    <AvatarFallbackText className="text-white">
+                                    {otherUser.username}
+                                    </AvatarFallbackText>
+                                    <AvatarImage
+                                    source={{
+                                        uri: otherUser.profileImage,
+                                    }}
+                                    alt="User Avatar"
+                                    />
+                                </Avatar>
+                                <Text className="text-white text-base font-semibold flex-1">
+                                    {otherUser.username}
+                                </Text>
+                            </Box>
                         </Box>
                     </MyLinearGradient>
             
@@ -210,6 +245,7 @@ const MessageScreen = ({ route, navigation }: Props) => {
                                 minIndexForVisible: 0,
                                 autoscrollToTopThreshold: 10
                             }}
+                            ListEmptyComponent={<SpinnerLoader className='mt-10'/>}
                         />
                     </Box>
             

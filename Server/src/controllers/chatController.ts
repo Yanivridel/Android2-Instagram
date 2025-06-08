@@ -48,7 +48,8 @@ export const getOrCreateChatWithUser = async (req: AuthenticatedRequest, res: Re
         const { otherUserId } = req.params;
 
         if (!userId || !otherUserId) {
-            return res.status(400).json({ message: "User IDs required" });
+            res.status(400).json({ message: "User IDs required" });
+            return;
         }
 
         const [id1, id2] = [userId, otherUserId].sort();
