@@ -57,6 +57,28 @@ export const getMyPosts = async (req: AuthenticatedRequest, res: Response) => {
     }
 };
 
+export const getAllPostsRandomized = async (req: Request, res: Response) => {
+    try {
+        const posts = await postModel.aggregate([
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'author',
+                    foreignField: '_id',
+                    as: 'author'
+                }
+            },
+            { $unwind: '$author' },
+            { $sample: { size: 50 } } // Randomize results
+        ]);
+
+        res.status(200).json(posts);
+    } catch (error) {
+        console.error('Error fetching randomized posts:', error);
+        res.status(500).json({ status: 'error', message: 'Failed to fetch randomized posts' });
+    }
+};
+
 export const getPostById = async (req: Request, res: Response) => {
     try {
         const { postId } = req.params;

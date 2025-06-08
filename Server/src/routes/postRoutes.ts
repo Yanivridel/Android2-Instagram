@@ -5,7 +5,8 @@ import {
     updatePost,
     deletePost,
     getPostsByUser,
-    getMyPosts
+    getMyPosts,
+    getAllPostsRandomized
 } from '../controllers/postController';
 import { authenticateToken } from "../middleware/auth.middleware";
 
@@ -16,6 +17,8 @@ router.post('/', authenticateToken, createPost);
 router.get('/user/:userId', authenticateToken, getPostsByUser);
 
 router.get('/me', authenticateToken, getMyPosts);
+
+router.get('/', authenticateToken, getAllPostsRandomized);
 
 // Get a specific post by ID
 router.get('/:postId', authenticateToken, getPostById);

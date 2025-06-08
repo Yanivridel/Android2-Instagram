@@ -11,6 +11,6 @@ export interface IPost {
     group?: string; // Group ID
     isPublic: boolean;
     comments: IComment;
-    likes: number;    
+    likes: string[];
     locationString: string;
 }

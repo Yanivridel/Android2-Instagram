@@ -40,3 +40,39 @@ export function formatUsername(name: string): string {
     if (!trimmed) return "";
     return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
 }
+
+export function getTimeAgo(isoTime: string): string {
+    const now = new Date();
+    const past = new Date(isoTime);
+    const diffInSeconds = Math.floor((now.getTime() - past.getTime()) / 1000);
+
+    if (diffInSeconds < 30) {
+        return `just now`;
+    }
+
+    if (diffInSeconds < 60) {
+        return `${diffInSeconds}s ago`;
+    }
+
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    if (diffInMinutes < 60) {
+        return `${diffInMinutes}m ago`;
+    }
+
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) {
+        return `${diffInHours}h ago`;
+    }
+
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 7) {
+        return `${diffInDays}d ago`;
+    }
+
+    const diffInWeeks = Math.floor(diffInDays / 7);
+    return `${diffInWeeks}w ago`;
+}
+
+export const isVideo = (url: string): boolean => {
+    return /\.(mp4|webm|ogg)$/i.test(url) || url.includes('/video/');
+};

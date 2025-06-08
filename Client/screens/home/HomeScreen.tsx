@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Image, RefreshControl } from 'react-native'
 import { Box } from '@/components/ui/box'
 import { FlashList } from '@shopify/flash-list'
@@ -12,149 +12,56 @@ import { IC_Heart, IC_Messenger } from '@/utils/constants/Icons'
 import MyLinearGradient from '@/components/gradient/MyLinearGradient'
 import { Props } from '@/types/NavigationTypes'
 import TouchableIcon from '@/components/TouchableIcon'
+import { getAllPostsRandomized, getPostById } from '@/utils/api/internal/postApi'
+import SpinnerLoader from '@/components/SpinnerLoader'
+import { Text } from '@/components/ui/text'
 
-// Dummy data for posts
-const dummyPosts: IPost[] = [
-  {
-    _id: '1',
-    content: 'Enjoying the sunshine! #catlife',
-    imageUrls: [
-      'https://images.unsplash.com/photo-1611003228941-98852ba62227?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0',
-    ],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    author: {
-      _id: 'u1',
-      firebaseUid: 'firebase-uid-john',
-      username: 'john_doe',
-      email: 'john@example.com',
-      role: 'user',
-      bio: 'Cat lover and sunshine addict.',
-      gender: 'male',
-      profileImage:
-        'https://res.cloudinary.com/dgn7wbfhw/image/upload/v1748545167/fi5sj6nyc5fcoi6bppxk.jpg',
-      posts: [],
-      likedPosts: [],
-      likedComments: [],
-      followers: [],
-      following: [],
-      groups: [],
-      taggedPosts: [],
-      notifications: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      __v: 0,
-    },
-    group: undefined,
-    isPublic: true,
-    comments: {
-      content: 'So cute!',
-      post: '1',
-      author: {
-        _id: 'u2',
-        firebaseUid: 'firebase-uid-commenter',
-        username: 'cat_lover_22',
-        email: 'catlover@example.com',
-        role: 'user',
-        bio: 'Professional cat cuddler',
-        gender: 'female',
-        profileImage:
-          'https://randomuser.me/api/portraits/women/44.jpg',
-        posts: [],
-        likedPosts: [],
-        likedComments: [],
-        followers: [],
-        following: [],
-        groups: [],
-        taggedPosts: [],
-        notifications: [],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        __v: 0,
-      },
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      likes: ['string1', 'string2', 'string3'],
-    },
-    likes: 128,
-    locationString: 'Tel Aviv, Israel',
-  },
-  {
-    _id: '2',
-    content: 'Delicious brunch with friends',
-    imageUrls: [
-      'https://t4.ftcdn.net/jpg/01/04/78/75/360_F_104787586_63vz1PkylLEfSfZ08dqTnqJqlqdq0eXx.jpg',
-    ],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    author: {
-      _id: 'u2',
-      firebaseUid: 'firebase-uid-jane',
-      username: 'jane_smith',
-      email: 'jane@example.com',
-      role: 'user',
-      bio: 'Food enthusiast and traveler',
-      gender: 'female',
-      profileImage:
-        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1',
-      posts: [],
-      likedPosts: [],
-      likedComments: [],
-      followers: [],
-      following: [],
-      groups: [],
-      taggedPosts: [],
-      notifications: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      __v: 0,
-    },
-    group: undefined,
-    isPublic: true,
-    comments: {
-      content: 'Looks amazing!',
-      post: '2',
-      author: {
-        _id: 'u3',
-        firebaseUid: 'firebase-uid-commenter-2',
-        username: 'brunch_addict',
-        email: 'brunch@example.com',
-        role: 'user',
-        bio: 'Always eating, always posting',
-        gender: 'female',
-        profileImage:
-          'https://randomuser.me/api/portraits/women/65.jpg',
-        posts: [],
-        likedPosts: [],
-        likedComments: [],
-        followers: [],
-        following: [],
-        groups: [],
-        taggedPosts: [],
-        notifications: [],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        __v: 0,
-      },
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      likes: ['string1', 'string2', 'string3', 'string4', 'string5'],
-    },
-    likes: 256,
-    locationString: 'New York City, USA',
-  },
-];
+interface HomeRouteType {
+  params: {
+      postId: string | null;
+  };
+}
 
-const HomeScreen = ({ navigation }: Props) => {
+const HomeScreen = ({ navigation, route }: Props) => {
+  const { postId } = (route as HomeRouteType).params || { postId: null };
   const { appliedTheme } = useTheme()
   const [refreshing, setRefreshing] = useState(false);  
+  const [allPosts, setAllPosts] = useState<IPost[] | null>(null);
+  const [singlePost, setSinglePost] = useState<IPost | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const onRefresh = () => {
+  const handleGetPosts = async () => {
+    getAllPostsRandomized()
+      .then(posts => {
+        setAllPosts(posts);
+        setIsLoading(false);
+      })
+  }
+  
+  const onRefresh = async () => {
     setRefreshing(true);
-    setTimeout(() => {
+    try {
+      await handleGetPosts();
+    } catch(err) {
+      console.log("Failed to refresh");
+    }
+    finally {
       setRefreshing(false);
-    }, 2000);
+    }
   };
+
+  useEffect(() => {
+    if(postId){
+      getPostById({ postId })
+      .then(post => {
+        setSinglePost(post);
+        setIsLoading(false);
+      })
+    }
+    else {
+      handleGetPosts();
+    }
+  }, [ postId ]);
   
   return (
   <Box className="flex-1">
@@ -190,20 +97,39 @@ const HomeScreen = ({ navigation }: Props) => {
       {/* You can add a horizontal FlashList of story circles here */}
 
       {/* Posts Feed */}
-      <FlashList
-        data={dummyPosts}
-        keyExtractor={item => item._id}
-        renderItem={({ item }) => (
-          <Box className="mb-4">
-            <PostCard post={item} />
-          </Box>
-        )}
-        estimatedItemSize={500}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl colors={['#4f46e5', '#db2777']} refreshing={refreshing} onRefresh={onRefresh} />
+      { isLoading ? 
+        <SpinnerLoader className='mt-5'/>
+      :
+      <>
+      { postId ?
+        <>
+          { singlePost ?
+            <Box className="mb-4">
+              <PostCard key={`single-${singlePost._id}`} post={singlePost} />
+            </Box>
+          :
+            <Text className='p-4 color-indigo-600 mx-auto mt-5'>Post Not Found, Please try again later...</Text>
         }
-      />
+        </>
+        :
+        <FlashList
+          data={allPosts}
+          keyExtractor={item =>`feed-${item._id}`}
+          renderItem={({ item }) => (
+            <Box className="mb-4">
+              <PostCard post={item} />
+            </Box>
+          )}
+          estimatedItemSize={500}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl colors={['#4f46e5', '#db2777']} refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        />
+      }
+        </>
+      }
+      
     </Box>
   </Box>
   )

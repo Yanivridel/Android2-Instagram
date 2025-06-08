@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Box } from '@/components/ui/box'
 import { Text } from '@/components/ui/text'
 import { Image } from '@/components/ui/image'
@@ -12,6 +12,8 @@ import { Menu, MenuItem, MenuItemLabel } from "@/components/ui/menu"
 import { Animated, Easing, Pressable, TouchableOpacity, Vibration } from 'react-native'
 import ShareSheet from './ShareSheet'
 import { useDoublePress } from '@/hooks/useDoublePress'
+import { getTimeAgo, isVideo } from '@/utils/functions/help'
+import { ResizeMode, Video  } from 'expo-av'; 
 
 /**
  * PostCard component to render an Instagram-style post
@@ -29,9 +31,17 @@ const PostCard = ({ post }: PostCardProps) => {
   const [isLiked, setIsLiked] = useState(false);
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const [showHeart, setShowHeart] = useState(false);
+  const videoRef = useRef<Video>(null);
   let animTimeout: NodeJS.Timeout | null = null;
 
-  
+  useEffect(() => {
+    return () => {
+      if (videoRef.current?.unloadAsync) {
+        videoRef.current.unloadAsync().catch(() => {});
+      }
+    };
+  }, []);
+
   const handleLike = ( vibrate=false ) => {
     if(vibrate) Vibration.vibrate(50);
     setIsLiked(true);
@@ -66,7 +76,6 @@ const PostCard = ({ post }: PostCardProps) => {
     });
   };
 
-
   return (
     <Box className="bg-white dark:bg-card-dark rounded-lg">
       {/* Header: Avatar, Username, Menu */}
@@ -83,9 +92,16 @@ const PostCard = ({ post }: PostCardProps) => {
               alt="User Avatar"
             />
           </Avatar>
-          <Text className="ml-2 text-[15px] font-medium text-text-light dark:text-text-dark">
-            {author.username}
-          </Text>
+          <Box className='ml-2'>
+            <Text className="text-[15px] font-medium text-text-light dark:text-text-dark">
+              {author.username}
+            </Text>
+            {post.locationString &&
+              <Text className="text-sm text-gray-500">
+                {post.locationString}
+              </Text>
+            }
+          </Box>
         </Box>
 
         {/* Options Menu */}
@@ -159,13 +175,27 @@ const PostCard = ({ post }: PostCardProps) => {
 
       {/* Post Image */}
       <Pressable onPress={useDoublePress(() => handleLike(true))}>
-        <Box className="relative">
-          <Image
-            source={{ uri: imageUrls[0] }}
-            className="w-full h-fit aspect-square"
-            resizeMode="cover"
-            alt="Post Image"
-          />
+        <Box className="relative w-full aspect-square overflow-hidden rounded-md">
+          {isVideo(imageUrls[0]) ? (
+            <Video
+              ref={videoRef}
+              key={`post-video-${imageUrls[0]}`}
+              source={{ uri: imageUrls[0] }}
+              resizeMode={ResizeMode.COVER}
+              shouldPlay={true}
+              isLooping={true}
+              isMuted={false}
+              style={{ width: '100%', height: '100%' }}
+            />
+          ) : (
+            <Image
+              key={`post-image-${imageUrls[0]}`}
+              source={{ uri: imageUrls[0] }}
+              className="w-full h-full"
+              resizeMode="cover"
+              alt={`Post Media`}
+            />
+          )}
 
           {showHeart && (
             <Animated.View
@@ -198,7 +228,11 @@ const PostCard = ({ post }: PostCardProps) => {
             onPress={() => setIsLiked(!isLiked)}
           />
           {/* Comment */}
-          <PostCommentSheet showActionsheet={showCommentsSheet} setShowActionsheet={setShowCommentsSheet} />
+          <PostCommentSheet 
+            showActionsheet={showCommentsSheet}
+            setShowActionsheet={setShowCommentsSheet} 
+            postId={post._id}
+            />
           <TouchableIcon
             Icon={IC_Comment}
             className="h-6 w-6"
@@ -225,7 +259,7 @@ const PostCard = ({ post }: PostCardProps) => {
       {/* Likes, Caption, Timestamp */}
       <Box className="px-4 pb-3">
         <Text className="text-[15px] font-semibold text-text-light dark:text-text-dark">
-          {likes} likes
+          {likes.length} likes
         </Text>
         <Box className="flex-row mt-1">
           <Text className="font-medium text-text-light dark:text-text-dark mr-1">
@@ -236,7 +270,7 @@ const PostCard = ({ post }: PostCardProps) => {
           </Text>
         </Box>
         <Text className="mt-1 text-[12px] text-subText-light dark:text-subText-dark">
-          {createdAt}
+          {`Posted ${getTimeAgo(createdAt)}`}
         </Text>
       </Box>
     </Box>

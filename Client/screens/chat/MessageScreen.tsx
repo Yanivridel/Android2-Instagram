@@ -14,6 +14,7 @@ import MyLinearGradient from '@/components/gradient/MyLinearGradient';
 import { createMessage, getMessageByChatId } from '@/utils/api/internal/messageApi';
 import SpinnerLoader from '@/components/SpinnerLoader';
 import { Avatar, AvatarImage, AvatarFallbackText } from '@/components/ui/avatar';
+import UserAvatar from '@/components/UserAvatar';
 
 const socket = io('http://192.168.1.100:3000');
 
@@ -157,17 +158,12 @@ const MessageScreen = ({ route, navigation }: Props) => {
                                 <ChevronLeft color="white" size={24} />
                             </TouchableOpacity>
                             <Box className='flex-row gap-2 items-center'>
-                                <Avatar className="bg-indigo-600 border-[2.5px] border-indigo-400">
-                                    <AvatarFallbackText className="text-white">
-                                    {otherUser.username}
-                                    </AvatarFallbackText>
-                                    <AvatarImage
-                                    source={{
-                                        uri: otherUser.profileImage,
-                                    }}
-                                    alt="User Avatar"
-                                    />
-                                </Avatar>
+                                <UserAvatar
+                                    rating={otherUser.ratingStats?.averageScore || 3}
+                                    username={otherUser.username || ""}
+                                    profileImage={otherUser.profileImage}
+                                    sizePercent={12}
+                                />
                                 <Text className="text-white text-base font-semibold flex-1">
                                     {otherUser.username}
                                 </Text>
@@ -194,12 +190,21 @@ const MessageScreen = ({ route, navigation }: Props) => {
                                     >
                                         {/* Avatar (only for received messages and if needed) */}
                                         {!isSentByCurrentUser && showAvatar && (
-                                            <Image
-                                                source={{
-                                                    uri: item.senderId.profileImage || `https://i.pravatar.cc/150?u=${item.senderId._id}`,
-                                                }}
-                                                className="w-8 h-8 rounded-full mr-2 mt-auto"
+                                            <UserAvatar
+                                                rating={otherUser.ratingStats?.averageScore || 3}
+                                                username={otherUser.username || ""}
+                                                profileImage={otherUser.profileImage}
+                                                sizePercent={8}
+                                                hasBorder={false}
+                                                className='mr-2'
                                             />
+                                            
+                                            // <Image
+                                            //     source={{
+                                            //         uri: item.senderId.profileImage || `https://i.pravatar.cc/150?u=${item.senderId._id}`,
+                                            //     }}
+                                            //     className="w-8 h-8 rounded-full mr-2 mt-auto"
+                                            // />
                                         )}
                         
                                         {/* Empty space if no avatar but align with message bubble */}
@@ -222,11 +227,13 @@ const MessageScreen = ({ route, navigation }: Props) => {
                         
                                         {/* Avatar for current user */}
                                         {isSentByCurrentUser && showAvatar && (
-                                            <Image
-                                                source={{
-                                                    uri: currentUser.profileImage || `https://i.pravatar.cc/150?u=${currentUser._id}`,
-                                                }}
-                                                className="w-8 h-8 rounded-full ml-2 mt-auto"
+                                            <UserAvatar
+                                                rating={currentUser.ratingStats?.averageScore || 3}
+                                                username={currentUser.username || ""}
+                                                profileImage={currentUser.profileImage}
+                                                sizePercent={8}
+                                                hasBorder={false}
+                                                className='ml-2'
                                             />
                                         )}
                                         {isSentByCurrentUser && !showAvatar && (

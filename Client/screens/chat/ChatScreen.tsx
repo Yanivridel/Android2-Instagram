@@ -8,6 +8,7 @@ import { Props } from '@/types/NavigationTypes';
 import { IChat } from '@/types/chatTypes';
 import { getAllChats } from '@/utils/api/internal/chatApi';
 import SpinnerLoader from '@/components/SpinnerLoader';
+import UserAvatar from '@/components/UserAvatar';
 
 
 const ChatScreen: React.FC<Props> = () => {
@@ -40,17 +41,12 @@ const ChatScreen: React.FC<Props> = () => {
                 className="flex-row items-center px-4 py-3"
                 activeOpacity={0.8}
             >
-            <Avatar className="bg-indigo-600 border-[2.5px] border-indigo-400">
-                <AvatarFallbackText className="text-white">
-                {chat.participants[0].username}
-                </AvatarFallbackText>
-                <AvatarImage
-                source={{
-                    uri: chat.participants[0].profileImage,
-                }}
-                alt="User Avatar"
-                />
-        </Avatar>
+            <UserAvatar 
+                rating={chat.participants[0].ratingStats.averageScore || 3}
+                username={chat.participants[0].username}
+                profileImage={chat.participants[0].profileImage}
+                sizePercent={15}
+            />
             <Box className="ml-4 flex-1 border-b border-gray-200 pb-3">
                 <Text className="text-base font-semibold">{chat.participants[0].username}</Text>
                 { chat.lastMessage ?

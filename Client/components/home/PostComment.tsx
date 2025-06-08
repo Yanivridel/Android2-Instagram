@@ -6,6 +6,8 @@ import { Avatar, AvatarFallbackText, AvatarImage } from '../ui/avatar';
 import { IC_Heart } from '@/utils/constants/Icons';
 import { useDoublePress } from '@/hooks/useDoublePress';
 import { Vibration } from 'react-native';
+import UserAvatar from '../UserAvatar';
+import { getTimeAgo } from '@/utils/functions/help';
 
 interface PostCommentProps {
     comment: IComment;
@@ -21,22 +23,17 @@ const PostComment = ({ comment }: PostCommentProps) => {
     return (
     <Box className="flex-row py-2">
         <Box className="flex-row gap-4 flex-1">
-            <Avatar className="bg-indigo-600 border-[2.5px] border-indigo-400">
-                <AvatarFallbackText className="text-white">
-                {comment.author.profileImage}
-                </AvatarFallbackText>
-                <AvatarImage
-                source={{
-                    uri: "https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8dXNlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60",
-                }}
-                alt="User Avatar"
-                />
-            </Avatar>
+            <UserAvatar 
+                rating={comment.author.ratingStats?.averageScore || 3}
+                username={comment.author.username || ""}
+                profileImage={comment.author.profileImage}
+                sizePercent={12}
+            />
             <Box className="gap-1 flex-1">
                 {/* Comment Header */}
                 <Box className="flex-row gap-2 items-end">
                     <Text className="font-bold">{comment.author.username}</Text>
-                    <Text className="text-sm text-gray-500">2h ago</Text>
+                    <Text className="text-sm text-gray-500">{getTimeAgo(String(comment.createdAt))}</Text>
                 </Box>
                 {/* Comment Text & Likes */}
                 <Box className="p-1 flex-1 flex-row justify-between gap-3 ">

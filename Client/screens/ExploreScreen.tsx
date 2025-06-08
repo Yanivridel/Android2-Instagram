@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FlatList, TextInput, TouchableOpacity } from 'react-native';
 import { Box } from '@/components/ui/box';
 import { PostsGrid } from '@/components/post/PostsGrid';
 import { Text } from '@/components/ui/text';
+import { getAllMyPosts, getAllPostsRandomized } from '@/utils/api/internal/postApi';
+import { IPost } from '@/types/postTypes';
+import SpinnerLoader from '@/components/SpinnerLoader';
+import { Props } from '@/types/NavigationTypes';
 
 const dummyExplorePosts = Array.from({ length: 21 }).map((_, i) => ({
 	id: `${i + 1}`,
@@ -35,10 +39,20 @@ const dummySearchResults = [
     // ...more results
 ]
 
-const ExploreScreen = () => {
+const ExploreScreen = ({ navigation }: Props) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState(dummySearchResults);
     const filteredResults = searchResults.filter((item) => item.username.toLowerCase().includes(searchQuery.toLowerCase()));
+    const [ posts, setPosts ] = useState<IPost[] | null>(null);
+    const [ isLoadingPosts, setIsLoadingPosts ] = useState(true);
+    
+    useEffect(() => {
+		getAllPostsRandomized() // CHANGE LATER to all posts
+		.then(posts => {
+			setPosts(posts);
+			setIsLoadingPosts(false);
+		})
+	}, []);
 
     const handleResultPress = (item: any) => {
         console.log('Result pressed:', item);
@@ -79,7 +93,28 @@ const ExploreScreen = () => {
 
         {/* 🖼️ Posts Grid */}
         <Box className="flex-1">
-            <PostsGrid posts={dummyExplorePosts} onPostPress={() => {}} />
+            { isLoadingPosts ? 
+            <SpinnerLoader />
+            :
+            <>
+            { posts ? 
+                <PostsGrid 
+                    posts={posts} 
+                    onPostPress={( post ) => 
+                        navigation.navigate("MainApp", {
+                            screen: "Home",
+                            params: {
+                                postId: post._id,
+                            },
+                    })}
+                />
+                :
+                <Box className='justify-center items-center mt-5'>
+                    <Text className='p-4 color-indigo-600'>No Posts Found</Text>
+                </Box>
+            }
+            </>
+            }
         </Box>
         </Box>
     );

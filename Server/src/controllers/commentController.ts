@@ -115,12 +115,12 @@ export const getCommentsByPost = async (req: Request, res: Response) => {
         const { postId } = req.params;
 
         const comments = await commentModel.find({ post: postId })
-            .populate('author', 'username profileImage')
+            .populate('author', 'username profileImage ratingStats')
             .populate({
                 path: 'replies',
                 populate: {
                     path: 'author',
-                    select: 'username profileImage'
+                    select: 'username profileImage ratingStats'
                 }
             })
             .sort({ createdAt: 1 });

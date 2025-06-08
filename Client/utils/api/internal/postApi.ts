@@ -12,6 +12,16 @@ export const getAllMyPosts = async (): Promise<IPost[] | null> => {
     }
 };
 
+export const getAllPostsRandomized = async (): Promise<IPost[] | null> => {
+    try {
+        const { data } = await api.get<IPost[]>(`api/posts/`);
+        return data;
+    } catch (error: any) {
+        console.error("Create chat error:", error?.response?.data || error.message);
+        return null;
+    }
+};
+
 export const getPostsByUserId = async ({ userId }: { userId: string}): Promise<IPost[] | null> => {
     try {
         const { data } = await api.get<IPost[]>(`api/posts/${userId}`);

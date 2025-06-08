@@ -18,7 +18,7 @@ export const getUserChats = async (req: AuthenticatedRequest, res: Response) => 
             .populate({
                 path: 'participants',
                 match: { _id: { $ne: userId } }, // Only populate the OTHER user
-                select: '_id username profileImage', // Optional: choose what fields to send
+                select: '_id username profileImage ratingStats', // Optional: choose what fields to send
             })
             .lean(); // Convert to plain JS object
 

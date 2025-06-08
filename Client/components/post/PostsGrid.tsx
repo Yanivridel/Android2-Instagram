@@ -16,8 +16,8 @@ export const PostsGrid: React.FC<PostsGridProps> = ({ posts, onPostPress }) => {
         data={posts}
         keyExtractor={(post) => post._id}
         numColumns={3}
-        renderItem={({ item }) => (
-            <PostCube imageUrl={item.imageUrls[0]} onPress={() => onPostPress(item)} />
+        renderItem={({ item: post }) => (
+            <PostCube imageUrl={post.imageUrls[0]} onPress={() => onPostPress(post)} />
         )}
         scrollEnabled={true}
         showsVerticalScrollIndicator={false}

@@ -20,6 +20,7 @@ import { IUser } from '@/types/userTypes'
 import { getAllMyPosts } from '@/utils/api/internal/postApi'
 import { IPost } from '@/types/postTypes'
 import SpinnerLoader from '@/components/SpinnerLoader'
+import UserAvatar from '@/components/UserAvatar'
 
 
 const { width } = Dimensions.get('window');
@@ -82,27 +83,22 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
 			<Box className="gap-2 p-4">
 				{/* avatar & name */}
 				<Box className="flex-row w-full justify-between items-center">
-					<Avatar className="bg-indigo-600 border-[2.5px] border-indigo-400 w-[30%] aspect-square">
-						<AvatarFallbackText className="text-white">
-							{currentUser.username}
-						</AvatarFallbackText>
-						<AvatarImage
-							source={{
-								uri: currentUser.profileImage,
-							}}
-							alt="User Avatar"
-						/>
-					</Avatar>
+					<UserAvatar 
+						rating={currentUser.ratingStats.averageScore}
+						username={currentUser.username}
+						profileImage={currentUser.profileImage}
+						sizePercent={30}
+					/>
 
 					{/* Statistics */}
 					<Box className="flex-row flex-1 justify-evenly p-4">
 						<Box className="items-center">
-							<Text className="text-white text-2xl font-bold">0</Text>
+							<Text className="text-white text-2xl font-bold">{myPosts?.length}</Text>
 							<Text className="text-white text-sm">Posts</Text>
 						</Box>
 						<Box className="items-center">
-							<Text className="text-white text-2xl font-bold">{currentUser.ratingStats.averageScore}</Text>
-							<Text className="text-white text-sm">Rating</Text>
+							<Text className="text-[#FFD700] text-2xl font-bold">{currentUser.ratingStats.averageScore}</Text>
+							<Text className="text-[#FFD700] text-sm">Rating</Text>
 						</Box>
 						<Box className="items-center">
 							<Text className="text-white text-2xl font-bold">0</Text>
@@ -171,7 +167,15 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
 				) : myPosts?.length ? (
 				<Box className="flex-1 mt-1">
 					{currentTab === 'grid' && (
-						<PostsGrid posts={myPosts} onPostPress={() => {}} />
+						<PostsGrid 
+							posts={myPosts} 
+							onPostPress={( post ) => 
+								navigation.navigate("MainApp", {
+									screen: "Home",
+									params: {
+										postId: post._id,
+									},
+							})} />
 					)}
 					{currentTab === 'tag' && (
 						<Box className='justify-center items-center mt-10'>
