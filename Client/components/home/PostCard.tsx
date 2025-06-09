@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { Box } from '@/components/ui/box'
 import { Text } from '@/components/ui/text'
 import { Image } from '@/components/ui/image'
@@ -13,7 +13,8 @@ import { Animated, Easing, Pressable, TouchableOpacity, Vibration } from 'react-
 import ShareSheet from './ShareSheet'
 import { useDoublePress } from '@/hooks/useDoublePress'
 import { getTimeAgo, isVideo } from '@/utils/functions/help'
-import { ResizeMode, Video  } from 'expo-av'; 
+import { ResizeMode, Video, AVPlaybackStatus } from 'expo-av'
+import { useFocusEffect } from '@react-navigation/native'
 
 /**
  * PostCard component to render an Instagram-style post
@@ -29,26 +30,83 @@ const PostCard = ({ post }: PostCardProps) => {
   const [showShareSheet, setShowShareSheet] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
+  const [videoError, setVideoError] = useState(false);
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+  const [shouldPlay, setShouldPlay] = useState(false);
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const [showHeart, setShowHeart] = useState(false);
   const videoRef = useRef<Video>(null);
   let animTimeout: NodeJS.Timeout | null = null;
 
+  // Cleanup video and animations on unmount
   useEffect(() => {
     return () => {
-      if (videoRef.current?.unloadAsync) {
-        videoRef.current.unloadAsync().catch(() => {});
+      if (animTimeout) {
+        clearTimeout(animTimeout);
+      }
+      if (videoRef.current) {
+        videoRef.current.unloadAsync().catch(() => {
+          // Silent cleanup
+        });
       }
     };
   }, []);
+  
 
-  const handleLike = ( vibrate=false ) => {
-    if(vibrate) Vibration.vibrate(50);
+  // Handle screen focus/blur for video playback
+  useFocusEffect(
+    useCallback(() => {
+      // When screen comes into focus
+      if (isVideo(imageUrls[0]) && !videoError) {
+        setShouldPlay(true);
+      }
+      
+      return () => {
+        // When screen loses focus, pause video
+        setShouldPlay(false);
+        if (videoRef.current) {
+          videoRef.current.pauseAsync().catch(() => {});
+        }
+      };
+    }, [imageUrls, videoError])
+  );
+
+  // Reset video state when post changes
+  useEffect(() => {
+    setVideoError(false);
+    setIsVideoLoaded(false);
+    setShouldPlay(false);
+  }, [post._id]);
+
+  const handleVideoLoad = useCallback(() => {
+    setIsVideoLoaded(true);
+    if (isVideo(imageUrls[0])) {
+      setShouldPlay(true);
+    }
+  }, [imageUrls]);
+
+  const handleVideoError = useCallback(() => {
+    console.warn('Video failed to load:', imageUrls[0]);
+    setVideoError(true);
+    setShouldPlay(false);
+  }, [imageUrls]);
+
+  const handlePlaybackStatusUpdate = useCallback((status: AVPlaybackStatus) => {
+    if (status.isLoaded && status.didJustFinish) {
+      // Restart video when it finishes (for looping)
+      if (videoRef.current) {
+        videoRef.current.replayAsync().catch(() => {});
+      }
+    }
+  }, []);
+
+  const handleLike = useCallback((vibrate = false) => {
+    if (vibrate) Vibration.vibrate(50);
     setIsLiked(true);
     triggerHeartAnimation();
-  }
+  }, []);
 
-  const triggerHeartAnimation = () => {
+  const triggerHeartAnimation = useCallback(() => {
     scaleAnim.stopAnimation();
     scaleAnim.setValue(0);
     setShowHeart(true);
@@ -74,7 +132,9 @@ const PostCard = ({ post }: PostCardProps) => {
         setShowHeart(false);
       }, 50);
     });
-  };
+  }, [scaleAnim]);
+
+  const handleDoublePress = useDoublePress(() => handleLike(true));
 
   return (
     <Box className="bg-white dark:bg-card-dark rounded-lg">
@@ -173,23 +233,33 @@ const PostCard = ({ post }: PostCardProps) => {
         </Menu>
       </Box>
 
-      {/* Post Image */}
-      <Pressable onPress={useDoublePress(() => handleLike(true))}>
-        <Box className="relative w-full aspect-square overflow-hidden rounded-md">
-          {isVideo(imageUrls[0]) ? (
+      {/* Post Image/Video */}
+      <Pressable onPress={handleDoublePress}>
+        <Box className="relative w-full aspect-square overflow-hidden">
+          {isVideo(imageUrls[0]) && !videoError ? (
             <Video
               ref={videoRef}
-              key={`post-video-${imageUrls[0]}`}
+              key={`post-video-${post._id}-${imageUrls[0]}`}
               source={{ uri: imageUrls[0] }}
               resizeMode={ResizeMode.COVER}
-              shouldPlay={true}
-              isLooping={true}
+              shouldPlay={shouldPlay}
+              isLooping={false} // Handle looping manually for better control
               isMuted={false}
-              style={{ width: '100%', height: '100%' }}
+              volume={0.8}
+              style={{ 
+                width: '100%', 
+                height: '100%',
+                backgroundColor: '#f0f0f0'
+              }}
+              onLoad={handleVideoLoad}
+              onError={handleVideoError}
+              onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
+              useNativeControls={false}
+              progressUpdateIntervalMillis={1000}
             />
           ) : (
             <Image
-              key={`post-image-${imageUrls[0]}`}
+              key={`post-image-${post._id}-${imageUrls[0]}`}
               source={{ uri: imageUrls[0] }}
               className="w-full h-full"
               resizeMode="cover"
@@ -261,11 +331,11 @@ const PostCard = ({ post }: PostCardProps) => {
         <Text className="text-[15px] font-semibold text-text-light dark:text-text-dark">
           {likes.length} likes
         </Text>
-        <Box className="flex-row mt-1">
-          <Text className="font-medium text-text-light dark:text-text-dark mr-1">
+        <Box className="flex-row mt-1 items-center gap-2">
+          <Text className="font-medium text-text-light dark:text-text-dark">
             {author.username}
           </Text>
-          <Text className="flex-shrink text-[15px] text-text-light dark:text-text-dark">
+          <Text className="flex-shrink text-[13px] text-text-light dark:text-text-dark">
             {content}
           </Text>
         </Box>

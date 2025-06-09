@@ -59,18 +59,19 @@ const StackNavigator = () => {
                 <Stack.Screen name="Notifications" component={NotificationsScreen} />
                 <Stack.Screen name="Profile" component={ProfileScreen} />
                 <Stack.Screen name="Leaderboard" component={LeaderboardScreen} />
+                <Stack.Screen name="Chat" component={ChatScreen} />
                 <Stack.Screen name="MessageScreen" component={MessageScreen} />
                 {/* <Stack.Screen name="Post" component={PostScreen} /> */}
                 <Stack.Screen name="test" component={testscreen} />
 
                 {/* 🚀 Lazy Loaded Screens (Except Settings) */}
-                <Stack.Screen name="Chat">
+                {/* <Stack.Screen name="Chat">
                   {() => (
                     <Suspense fallback={<OverlayLoading />}>
                       <ChatScreen navigation={navigation} />
                     </Suspense>
                   )}
-                </Stack.Screen>
+                </Stack.Screen> */}
 
               </Stack.Navigator>
             </MemoizedLayout>

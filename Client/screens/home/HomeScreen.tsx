@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { Image, RefreshControl } from 'react-native'
 import { Box } from '@/components/ui/box'
 import { FlashList } from '@shopify/flash-list'
 import { useTheme } from '@/utils/Themes/ThemeProvider'
+import { useFocusEffect } from '@react-navigation/native' // Add this import
 
 // Placeholder PostCard component should exist in your components directory
 // It handles layout of avatar, username, image, actions, caption, etc.
@@ -19,23 +20,27 @@ import { Text } from '@/components/ui/text'
 interface HomeRouteType {
   params: {
       postId: string | null;
+      post: IPost | null;
   };
 }
 
 const HomeScreen = ({ navigation, route }: Props) => {
-  const { postId } = (route as HomeRouteType).params || { postId: null };
+  const { postId, post } = (route as HomeRouteType).params || { postId: null };
   const { appliedTheme } = useTheme()
   const [refreshing, setRefreshing] = useState(false);  
   const [allPosts, setAllPosts] = useState<IPost[] | null>(null);
-  const [singlePost, setSinglePost] = useState<IPost | null>(null);
+  const [singlePost, setSinglePost] = useState<IPost | null>(post);
   const [isLoading, setIsLoading] = useState(true);
 
   const handleGetPosts = async () => {
-    getAllPostsRandomized()
-      .then(posts => {
-        setAllPosts(posts);
-        setIsLoading(false);
-      })
+    try {
+      const posts = await getAllPostsRandomized();
+      setAllPosts(posts);
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Failed to get posts:", error);
+      setIsLoading(false);
+    }
   }
   
   const onRefresh = async () => {
@@ -50,18 +55,50 @@ const HomeScreen = ({ navigation, route }: Props) => {
     }
   };
 
+  // Clean up when navigating away from screen
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        // Clean up single post when navigating away
+        if (postId && singlePost) {
+          setSinglePost(null);
+        }
+      };
+    }, [postId, singlePost])
+  );
+
   useEffect(() => {
-    if(postId){
+    if(post) {
+      setIsLoading(false);
+    }
+    else if(postId){
+      setIsLoading(true);
       getPostById({ postId })
       .then(post => {
         setSinglePost(post);
-        setIsLoading(false);
       })
+      .catch(error => {
+        console.error("Failed to get post by ID:", error);
+        setSinglePost(null);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
     }
-    else {
+    else {      
+      setSinglePost(null);
       handleGetPosts();
     }
   }, [ postId ]);
+
+  // Memoize render item to prevent unnecessary re-renders
+  const renderPostItem = useCallback(({ item }: { item: IPost }) => (
+    <Box className="mb-4">
+      <PostCard post={item} />
+    </Box>
+  ), []);
+
+  const keyExtractor = useCallback((item: IPost) => `feed-${item._id}`, []);
   
   return (
   <Box className="flex-1">
@@ -114,17 +151,15 @@ const HomeScreen = ({ navigation, route }: Props) => {
         :
         <FlashList
           data={allPosts}
-          keyExtractor={item =>`feed-${item._id}`}
-          renderItem={({ item }) => (
-            <Box className="mb-4">
-              <PostCard post={item} />
-            </Box>
-          )}
+          keyExtractor={keyExtractor}
+          renderItem={renderPostItem}
           estimatedItemSize={500}
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl colors={['#4f46e5', '#db2777']} refreshing={refreshing} onRefresh={onRefresh} />
           }
+          // Performance optimizations for video content
+          drawDistance={2000} // Smaller draw distance for better memory management
         />
       }
         </>

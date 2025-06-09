@@ -85,15 +85,15 @@ export const getPostById = async (req: Request, res: Response) => {
 
         const post = await postModel
             .findById(postId)
-            .populate('author', 'username')
+            .populate('author', "username profileImage ratingStats")
             // .populate('group', 'name')
-            .populate({
-                path: 'comments',
-                populate: {
-                    path: 'author',
-                    select: 'username profileImage ratingStats',
-                }
-            });
+            // .populate({
+            //     path: 'comments',
+            //     populate: {
+            //         path: 'author',
+            //         select: 'username profileImage ratingStats',
+            //     }
+            // });
 
         if (!post) {
             res.status(404).json({ message: "Post not found" });

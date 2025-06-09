@@ -105,6 +105,7 @@ const ExploreScreen = ({ navigation }: Props) => {
                             screen: "Home",
                             params: {
                                 postId: post._id,
+                                post: post
                             },
                     })}
                 />
