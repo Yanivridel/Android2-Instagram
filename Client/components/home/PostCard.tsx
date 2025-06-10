@@ -3,18 +3,25 @@ import { Box } from '@/components/ui/box'
 import { Text } from '@/components/ui/text'
 import { Image } from '@/components/ui/image'
 import { IPost } from '@/types/postTypes'
-import { IC_Comment, IC_Heart, IC_Share, IC_Bookmark, IC_3DotsOptions, IC_Plus, IC_PersonMinus, IC_Info_Circle, IC_EyeOff, IC_AccountInfo, IC_Report } from '@/utils/constants/Icons'
+import { IC_Comment, IC_Heart, IC_Share, IC_Bookmark, IC_3DotsOptions, IC_Plus, IC_PersonMinus, IC_Info_Circle, IC_EyeOff, IC_AccountInfo, IC_Report, IC_Vi } from '@/utils/constants/Icons'
 import { AvatarFallbackText, AvatarImage } from '../ui/avatar'
 import { Avatar } from '../ui/avatar'
 import PostCommentSheet from './PostCommentSheet'
 import TouchableIcon from '../TouchableIcon'
 import { Menu, MenuItem, MenuItemLabel } from "@/components/ui/menu"
-import { Animated, Easing, Pressable, TouchableOpacity, Vibration } from 'react-native'
+import { Animated, Easing, Pressable, TextInput, TouchableOpacity, Vibration } from 'react-native'
 import ShareSheet from './ShareSheet'
 import { useDoublePress } from '@/hooks/useDoublePress'
 import { getTimeAgo, isVideo } from '@/utils/functions/help'
 import { ResizeMode, Video, AVPlaybackStatus } from 'expo-av'
-import { useFocusEffect } from '@react-navigation/native'
+import { NavigationProp, ParamListBase, useFocusEffect, useNavigation } from '@react-navigation/native'
+import { RootState } from '@/store'
+import { useSelector } from 'react-redux'
+import { deletePost, updatePost } from '@/utils/api/internal/postApi'
+import { Modal, ModalBackdrop, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/modal';
+import { Button, ButtonText } from '../ui/button'
+import MyModal from '../MyModal'
+import { TextareaInput } from '../ui/textarea'
 
 /**
  * PostCard component to render an Instagram-style post
@@ -30,6 +37,9 @@ const PostCard = ({ post }: PostCardProps) => {
   const [showShareSheet, setShowShareSheet] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [postEdit, setPostEdit] = useState(false);
+  const [editContent, setEditContent] = useState<string | null>(null);
   const [videoError, setVideoError] = useState(false);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const [shouldPlay, setShouldPlay] = useState(false);
@@ -37,6 +47,10 @@ const PostCard = ({ post }: PostCardProps) => {
   const [showHeart, setShowHeart] = useState(false);
   const videoRef = useRef<Video>(null);
   let animTimeout: NodeJS.Timeout | null = null;
+  const currentUser = useSelector((state: RootState) => state.currentUser);
+  const isMyPost = post.author._id === currentUser._id;
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
+
 
   // Cleanup video and animations on unmount
   useEffect(() => {
@@ -136,8 +150,29 @@ const PostCard = ({ post }: PostCardProps) => {
 
   const handleDoublePress = useDoublePress(() => handleLike(true));
 
+  const handleDeletePost = async () => {
+    await deletePost({ postId: post._id });
+    setModalOpen(true);
+  }
+
+  const handleEditPost = async () => {
+    if(!editContent) return;
+    await updatePost({ postId: post._id, content: editContent });
+    setModalOpen(true);
+  }
+
   return (
     <Box className="bg-white dark:bg-card-dark rounded-lg">
+      {/* Deleted Post Modal */}
+      <MyModal
+        isOpen={modalOpen}
+        onClose={() => navigation.navigate("MainApp", { screen: "Profile"})}
+        onButtonPress={() => navigation.navigate("MainApp", { screen: "Profile"})}
+        title="Success"
+        message={`Post was ${editContent ? "edited" : "deleted"} successfully.`}
+        buttonText="OK"
+      />
+
       {/* Header: Avatar, Username, Menu */}
       <Box className="flex-row items-center justify-between px-4 py-2">
         <Box className="flex-row items-center">
@@ -205,12 +240,18 @@ const PostCard = ({ post }: PostCardProps) => {
           </MenuItem>
           <MenuItem 
             className="gap-3"
-            onPress={() => console.log("Hide post")} 
+            onPress={() => isMyPost ? setPostEdit(true) : console.log("Hide post")} 
             key="Hide post"
             textValue='Hide post'
           >
             <IC_EyeOff className="h-5 w-5"/>
-            <MenuItemLabel size="sm">Hide post</MenuItemLabel>
+            <MenuItemLabel size="sm">
+              {isMyPost ? 
+              "Edit Post"
+              :
+              "Hide Post"
+              }
+            </MenuItemLabel>
           </MenuItem>
           <MenuItem 
             className="gap-3"
@@ -223,12 +264,18 @@ const PostCard = ({ post }: PostCardProps) => {
           </MenuItem>
           <MenuItem 
             className="gap-3"
-            onPress={() => console.log("Report post")} 
+            onPress={() => isMyPost ? handleDeletePost() : console.log("Report post")} 
             key="Report post"
             textValue='Report post'
           >
             <IC_Report className="h-5 w-5" color="red"/>
-            <MenuItemLabel className="text-red-500" size="sm">Report post</MenuItemLabel>
+            <MenuItemLabel className="text-red-500" size="sm">
+              {isMyPost ? 
+              "Delete Post"
+              :
+              "Report post"
+              }
+            </MenuItemLabel>
           </MenuItem>
         </Menu>
       </Box>
@@ -328,16 +375,38 @@ const PostCard = ({ post }: PostCardProps) => {
 
       {/* Likes, Caption, Timestamp */}
       <Box className="px-4 pb-3">
-        <Text className="text-[15px] font-semibold text-text-light dark:text-text-dark">
+        <Text className="text-[15px] font-semibold">
           {likes.length} likes
         </Text>
         <Box className="flex-row mt-1 items-center gap-2">
-          <Text className="font-medium text-text-light dark:text-text-dark">
+          <Text className="font-medium ">
             {author.username}
           </Text>
-          <Text className="flex-shrink text-[13px] text-text-light dark:text-text-dark">
+          { !postEdit ?
+          <Text className="flex-shrink text-[13px] ">
             {content}
           </Text>
+          :
+          <Box className='flex-row gap-3 items-center'>
+            <TextInput
+              placeholder="Write a caption..."
+              multiline
+              value={editContent || ""}
+              onChangeText={setEditContent}
+              className="border border-gray-300 rounded-lg text-base w-[70%]"
+            />
+            <TouchableIcon
+              Icon={IC_Vi}
+              onPress={() => handleEditPost()}
+              IconClassName='h-5 w-5'
+              color='#818cf8'
+
+            >
+              
+            </TouchableIcon>
+          </Box>
+          }
+          
         </Box>
         <Text className="mt-1 text-[12px] text-subText-light dark:text-subText-dark">
           {`Posted ${getTimeAgo(createdAt)}`}

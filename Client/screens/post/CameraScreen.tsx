@@ -7,10 +7,11 @@ import { IC_Camera_Flip, IC_Flash, IC_NoFlash, IC_Vi } from "@/utils/constants/I
 import { Props } from "@/types/NavigationTypes";
 import { uploadMedia } from "@/utils/api/external/CloudinaryAPI";
 import { Audio } from 'expo-av';
+import OverlayLoading from "@/components/OverlayLoading";
 
-interface PostScreenProps extends Props {}
+interface CameraScreenProps extends Props {}
 
-export default function PostScreen({ navigation }: PostScreenProps) {
+export default function CameraScreen({ navigation }: CameraScreenProps) {
     const [permission, requestPermission] = useCameraPermissions();
     const [cameraDirection, setCameraDirection] = useState<CameraType>("back");
     const [isFlashOn, setIsFlashOn] = useState(false);
@@ -18,6 +19,7 @@ export default function PostScreen({ navigation }: PostScreenProps) {
     const [isRecording, setIsRecording] = useState(false);
     const [camMode, setCamMode] = useState<'picture' | 'video'>('picture');
     const [isCameraReady, setIsCameraReady] = useState(false);
+    const [isLoadingResult, setIsLoadingResult] = useState(false);
 
     // Camera Permissions
     useEffect(() => {
@@ -30,10 +32,7 @@ export default function PostScreen({ navigation }: PostScreenProps) {
         })();
     }, [permission]);
 
-    const onCameraReady = () => {
-        console.log("Camera is ready");
-        setIsCameraReady(true);
-    };
+    const onCameraReady = () => setIsCameraReady(true);;
 
     if (!permission) {
         return (
@@ -59,19 +58,22 @@ export default function PostScreen({ navigation }: PostScreenProps) {
         try {
             const photo = await cameraRef.current.takePictureAsync();
             console.log("Photo taken:", photo.uri);
-            await onPhotoTaken(photo.uri);
+            await onPhotoOrVideoTaken(photo.uri);
         } catch (error) {
             console.error("Failed to take photo:", error);
         }
     };
 
-    const onPhotoTaken = async (photoUri: string) => {
+    const onPhotoOrVideoTaken = async (photoUri: string) => {
         console.log("photoUri", photoUri);
-        // const mediaUrl = await uploadMedia(photoUri, "post");
-        // console.log("mediaUrl", mediaUrl);
+        setIsLoadingResult(true);
+        const mediaUrl = await uploadMedia(photoUri, "post");
+        setIsLoadingResult(false);
+        navigation.navigate('PostComposer', {
+            mediaUri: mediaUrl,
+        });
     };
 
-    // Video Recording
     const startRecording = async () => {
         if (!isCameraReady || isRecording || !cameraRef.current) return;
         try {
@@ -82,7 +84,7 @@ export default function PostScreen({ navigation }: PostScreenProps) {
                 maxDuration: 60, // 60 seconds max
             });
             console.log("Video recorded:", video.uri);
-            await onVideoRecorded(video.uri);
+            await onPhotoOrVideoTaken(video.uri);
         } catch (error) {
             console.error("Failed to record video:", error);
         } finally {
@@ -99,12 +101,6 @@ export default function PostScreen({ navigation }: PostScreenProps) {
                 console.error("Failed to stop recording:", error);
             }
         }
-    };
-    
-    const onVideoRecorded = async (videoUri: string) => {
-        console.log("videoUri", videoUri);
-        // const mediaUrl = await uploadMedia(videoUri, "video");
-        // console.log("mediaUrl", mediaUrl);
     };
 
     // Handle tap for photo, long press for video
@@ -127,6 +123,9 @@ export default function PostScreen({ navigation }: PostScreenProps) {
             stopRecording();
         }
     };
+
+    if(isLoadingResult)
+        return <OverlayLoading />
 
     return (
         <Box className="flex-1 bg-black">

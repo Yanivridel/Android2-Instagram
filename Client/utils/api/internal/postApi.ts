@@ -24,7 +24,7 @@ export const getAllPostsRandomized = async (): Promise<IPost[] | null> => {
 
 export const getPostsByUserId = async ({ userId }: { userId: string}): Promise<IPost[] | null> => {
     try {
-        const { data } = await api.get<IPost[]>(`api/posts/${userId}`);
+        const { data } = await api.get<IPost[]>(`api/posts/user/${userId}`);
         return data;
     } catch (error: any) {
         console.error("Create chat error:", error?.response?.data || error.message);
@@ -42,12 +42,12 @@ export const getPostById = async ({ postId }: { postId: string}): Promise<IPost 
     }
 };
 
-interface createPostReq {
+export interface createPostReq {
     content: string,
     imageUrls: string[],
-    group: string,
+    group: string | null,
     isPublic: boolean,
-    locationString: string
+    locationString: string | null
 }
 export const createPost = async ({ content, imageUrls, group, isPublic, locationString}: createPostReq): Promise<IPost | null> => {
     try {
@@ -59,3 +59,22 @@ export const createPost = async ({ content, imageUrls, group, isPublic, location
     }
 };
 
+export const deletePost = async ({ postId }: { postId: string}): Promise<string | null> => {
+    try {
+        const { data } = await api.delete<string>(`api/posts/${postId}`);
+        return data;
+    } catch (error: any) {
+        console.error("Create chat error:", error?.response?.data || error.message);
+        return null;
+    }
+};
+
+export const updatePost = async ({ postId, content }: { postId: string, content: string}): Promise<string | null> => {
+    try {
+        const { data } = await api.put<string>(`api/posts/${postId}`, { content });
+        return data;
+    } catch (error: any) {
+        console.error("Create chat error:", error?.response?.data || error.message);
+        return null;
+    }
+};

@@ -22,14 +22,12 @@ import { debounce } from '@/utils/functions/help';
 import { useTranslation } from 'react-i18next';
 
 interface AddressSearchProps {
-isOpen: boolean;
-onClose: () => void;
-setAddress: React.Dispatch<React.SetStateAction<Address | null>>;
+    isOpen: boolean;
+    onClose: () => void;
+    onSetAddress: (addr: Address | null) => void;
 }
 
-const dummyData = {"description": "Nestroyplatz, Vienna, Austria", "matched_substrings": [{"length": 3, "offset": 0}], "place_id": "Eh1OZXN0cm95cGxhdHosIFZpZW5uYSwgQXVzdHJpYSIuKiwKFAoSCfHc0pAJB21HEQb8AFO9-yd-EhQKEgmfyjZRngdtRxFGW6JRiuXC_Q", "reference": "Eh1OZXN0cm95cGxhdHosIFZpZW5uYSwgQXVzdHJpYSIuKiwKFAoSCfHc0pAJB21HEQb8AFO9-yd-EhQKEgmfyjZRngdtRxFGW6JRiuXC_Q", "structured_formatting": {"main_text": "Nestroyplatz", "main_text_matched_substrings": [[Object]], "secondary_text": "Vienna, Austria"}, "terms": [{"offset": 0, "value": "Nestroyplatz"}, {"offset": 14, "value": "Vienna"}, {"offset": 22, "value": "Austria"}], "types": ["route", "geocode"]}
-
-const AddressSearch = ({ isOpen, onClose, setAddress }: AddressSearchProps) => {
+const AddressSearch = ({ isOpen, onClose, onSetAddress }: AddressSearchProps) => {
     const { appliedTheme } = useTheme();
     const { t } = useTranslation();
     const [query, setQuery] = useState('');
@@ -188,7 +186,7 @@ const AddressSearch = ({ isOpen, onClose, setAddress }: AddressSearchProps) => {
     // handle submit
     const handleSubmit = () => {
         setSelectedAddress(null);
-        setAddress(selectedAddress);
+        onSetAddress(selectedAddress);
         onClose();
     }
 
@@ -213,14 +211,14 @@ const AddressSearch = ({ isOpen, onClose, setAddress }: AddressSearchProps) => {
                     <>
                         {/* Title */}
                         <Text className={`text-text-${appliedTheme} font-bold my-2 text-lg`}>
-                            {t('addressSearch.searchAddress')}
+                            Search Location
                         </Text>
                         <Box className="w-full flex-1 pb-10 gap-2">
                             {/* Search Input */}
                             <InputAuth
                                 value={query}
                                 onChangeText={handleChange}
-                                placeholder={t('addressSearch.streetNameOnly')} // Translate "Street name only (no city or country)"
+                                placeholder={"Street Name Only"} // Translate "Street name only (no city or country)"
                                 className="px-6"
                                 classNameInput={`bg-buttonDisable-${appliedTheme}`}
                             />
@@ -231,7 +229,7 @@ const AddressSearch = ({ isOpen, onClose, setAddress }: AddressSearchProps) => {
                                     activeOpacity={0.6}
                                 >
                                     <IC_CurrentLocation className="w-5 h-5" />
-                                    <Text className="text-lg font-semibold text-purple-500">{t('addressSearch.currentLocation')}</Text>
+                                    <Text className="text-lg font-semibold text-purple-500">{"Current Location"}</Text>
                                 </TouchableOpacity>
                             </Box>
                             {/* Map + Marker */}
@@ -246,7 +244,7 @@ const AddressSearch = ({ isOpen, onClose, setAddress }: AddressSearchProps) => {
                             {/* Result list */}
                             <Box className="flex-1 py-4 px-6">
                                 <Text className={`text-2xl font-bold text-text-${appliedTheme} mb-1`}>Address</Text>
-                                {isListLoading && <Text>{t('addressSearch.loading')}</Text>}
+                                {isListLoading && <Text>{"Loading"}</Text>}
                                 <FlatList
                                     data={results}
                                     keyExtractor={(item, idx) => item.place_id + idx}
@@ -269,8 +267,8 @@ const AddressSearch = ({ isOpen, onClose, setAddress }: AddressSearchProps) => {
                                         </TouchableOpacity>
                                     )}
                                     ListEmptyComponent={
-                                        !query ? <Text>{t('addressSearch.startSearching')}</Text> :
-                                        !isListLoading ? <Text>{t('addressSearch.noResultsFound')}</Text> : null
+                                        !query ? <Text>{"Start Searching..."}</Text> :
+                                        !isListLoading ? <Text>{"No Results Found..."}</Text> : null
                                     }
                                     ItemSeparatorComponent={() => <Divider className="mx-2" />}
                                     showsVerticalScrollIndicator={false}
@@ -299,9 +297,9 @@ const AddressSearch = ({ isOpen, onClose, setAddress }: AddressSearchProps) => {
                         </Box>
                         <CardUpRounded className="gap-2">
                             <Box className="gap-2">
-                                <Text className={`text-3xl text-text-${appliedTheme} font-bold`}>{t('addressSearch.addressDetail')}</Text>
+                                <Text className={`text-3xl text-text-${appliedTheme} font-bold`}>{"Address Details"}</Text>
                                 <Text className={`text-subText-${appliedTheme} text-lg`}>
-                                    {t('addressSearch.aptSuiteNumber')}
+                                    Apt/Suit Number
                                 </Text>
                             </Box>
                             {/* Inputs */}
@@ -309,14 +307,14 @@ const AddressSearch = ({ isOpen, onClose, setAddress }: AddressSearchProps) => {
                                 classNameInput={`border border-inputPlaceholderText-${appliedTheme}`}
                                 value={[selectedAddress.street, selectedAddress.city, selectedAddress.country].join(", ")}
                                 onChangeText={() => {}}
-                                placeholder={t('addressSearch.streetAddress')}
+                                placeholder={"Street Address"}
                                 isReadOnly={true}
                             />
                             <InputAuth
                                 classNameInput={`border border-inputPlaceholderText-${appliedTheme}`}
                                 value={selectedAddress.subpremise || ""}
                                 onChangeText={(val) => setSelectedAddress((prev) => ({ ...prev!, subpremise: val }))}
-                                placeholder={t('addressSearch.aptSuiteNumberPlaceholder')}
+                                placeholder={"Apt/Suit Number"}
                             />
                             {/* Submit Button */}
                             <MyLinearGradient type="button" color={isActive ? "purple" : "disabled-button"}>
@@ -326,7 +324,7 @@ const AddressSearch = ({ isOpen, onClose, setAddress }: AddressSearchProps) => {
                                     style={{ backgroundColor: "initial" }}
                                 >
                                     <ButtonText className={isActive ? `text-buttonText-${appliedTheme}` : `text-buttonDisableText-${appliedTheme}`}>
-                                        {t('addressSearch.continueButton')}
+                                        Continue
                                     </ButtonText>
                                 </Button>
                             </MyLinearGradient>

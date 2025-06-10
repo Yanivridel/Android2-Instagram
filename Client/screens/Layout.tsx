@@ -34,8 +34,8 @@ const Layout = React.memo(({ children, navigation }: LayoutProps) => {
 	})
 
 	function navigateToScreen(screen: string) {
-		if (screen === 'Post') {
-			navigation.navigate('Post')
+		if (screen === 'Camera') {
+			navigation.navigate('Camera')
 		} else {
 			navigation.navigate('MainApp', { screen })
 		}
@@ -72,7 +72,7 @@ const Layout = React.memo(({ children, navigation }: LayoutProps) => {
 
 					{/* Center Button */}
 					<Box className="w-20 relative">
-						<TouchableOpacity onPress={() => navigateToScreen('Post')} activeOpacity={0.7}>
+						<TouchableOpacity onPress={() => navigateToScreen('Camera')} activeOpacity={0.7}>
 							<Box
 								className={`bg-button-${appliedTheme} bottom-[18px] rounded-full w-16 h-16 items-center self-center justify-center`}
 							>

@@ -14,7 +14,7 @@ export const getCommentsByPostId = async ({ postId }: { postId: string}): Promis
 interface createCommentReq {
     content: string,
     postId: string,
-    parentCommentId: string
+    parentCommentId: string  | null
 }
 export const createComment = async ({ content, postId, parentCommentId}: createCommentReq): Promise<IComment | null> => {
     try {

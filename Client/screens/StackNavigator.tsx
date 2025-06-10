@@ -18,9 +18,10 @@ import Login from './auth/Login';
 import Signup from './auth/Signup';
 
 import testscreen from './testscreen';
-import PostScreen from './post/PostScreen';
+import CameraScreen from './post/CameraScreen';
 import { ReduxInitializer } from '@/store/ReduxInitializer';
 import MessageScreen from './chat/MessageScreen';
+import PostComposerScreen from './post/PostComposerScreen';
 
 const MemoizedLayout = React.memo(Layout);
 
@@ -41,7 +42,8 @@ const StackNavigator = () => {
         {/* 🏆 Auth Screens */}
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Signup" component={Signup} />
-        <Stack.Screen name="Post" component={PostScreen} />
+        <Stack.Screen name="Camera" component={CameraScreen} />
+        <Stack.Screen name="PostComposer" component={PostComposerScreen} />
 
         {/* 🏆 Main App with Layout */}
         <Stack.Screen name="MainApp" options={{ headerShown: false }}>
@@ -63,15 +65,6 @@ const StackNavigator = () => {
                 <Stack.Screen name="MessageScreen" component={MessageScreen} />
                 {/* <Stack.Screen name="Post" component={PostScreen} /> */}
                 <Stack.Screen name="test" component={testscreen} />
-
-                {/* 🚀 Lazy Loaded Screens (Except Settings) */}
-                {/* <Stack.Screen name="Chat">
-                  {() => (
-                    <Suspense fallback={<OverlayLoading />}>
-                      <ChatScreen navigation={navigation} />
-                    </Suspense>
-                  )}
-                </Stack.Screen> */}
 
               </Stack.Navigator>
             </MemoizedLayout>

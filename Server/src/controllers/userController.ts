@@ -112,3 +112,25 @@ export const getUserById = async (req: Request, res: Response) => {
         res.status(500).json({ message: 'Failed to fetch user' });
     }
 };
+
+export const getAutocompletePrefix = async (req: Request, res: Response) => {
+    try {
+        const { prefix } = req.params;
+
+        if (!prefix || typeof prefix !== 'string') {
+            res.status(400).json({ message: 'Query string is required' });
+            return;
+        }
+
+        const users = await userModel.find({
+            username: { $regex: prefix, $options: 'i' }
+        })
+        .limit(5)
+        .select('username profileImage ratingStats');
+
+        res.status(200).json(users);
+    } catch (error) {
+        console.error('Error searching users:', error);
+        res.status(500).json({ message: 'Failed to search users' });
+    }
+};

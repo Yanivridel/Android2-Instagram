@@ -87,3 +87,8 @@ export const getUserByEmail = async ({ userEmail }: { userEmail: string} ): Prom
     const { data } = await api.get<{user: IUser}>(`api/users/email/${userEmail}`);
     return data.user;
 }
+
+export const getAutocompletePrefix = async ({ prefix }: { prefix: string} ): Promise<IUser[] | null> => {
+    const { data } = await api.get<IUser[]>(`api/users/autocomplete/${prefix}`);
+    return data;
+}

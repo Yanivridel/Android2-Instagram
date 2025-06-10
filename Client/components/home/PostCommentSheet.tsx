@@ -20,12 +20,15 @@ import Animated, {
     useAnimatedScrollHandler,
     useAnimatedRef
 } from "react-native-reanimated";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TextInput, KeyboardAvoidingView, Platform } from "react-native";
 import { Box } from "../ui/box";
 import PostComment from "./PostComment";
 import { IComment } from "@/types/commentTypes";
-import { getCommentsByPostId } from "@/utils/api/internal/commentApi";
+import { createComment, getCommentsByPostId } from "@/utils/api/internal/commentApi";
 import SpinnerLoader from "../SpinnerLoader";
+import MyLinearGradient from "../gradient/MyLinearGradient";
+import { ButtonText, Button } from "../ui/button";
+import { Divider } from "../ui/divider";
 
 interface PostCommentSheetProps {
     showActionsheet: boolean;
@@ -42,6 +45,7 @@ const PostCommentSheet = ({showActionsheet, setShowActionsheet, postId}: PostCom
     const handleClose = () => setShowActionsheet(false);
     const [ comments, setComments ] = useState<IComment[] | null>(null);
     const [ isLoadingComments, setIsLoadingComments ] = useState(true);
+    const [ input, setInput ] = useState('');
 
     // Create shared values for tracking the gesture and scroll state
     const translateY = useSharedValue(0);
@@ -119,6 +123,18 @@ const PostCommentSheet = ({showActionsheet, setShowActionsheet, postId}: PostCom
         </ActionsheetDragIndicatorWrapper>
     );
 
+    const sendComment = async () => {
+        const commentPayload = {
+            content: input, 
+            postId, 
+            parentCommentId: null
+        }
+        const newComment = await createComment(commentPayload);
+        if(newComment)
+            setComments(comments => comments ? [newComment, ...comments ] : [newComment])
+        setInput('');
+    }
+
     return (
         <>
         <Actionsheet snapPoints={[90]} isOpen={showActionsheet} onClose={handleClose}>
@@ -132,34 +148,57 @@ const PostCommentSheet = ({showActionsheet, setShowActionsheet, postId}: PostCom
                 className="flex-1 "
                 style={animatedStyle}>
                 <ActionsheetContent>
-                <HeaderComponent />
-                <Text className="font-bold">Comments</Text>
-                
-                <NativeViewGestureHandler
-                    ref={nativeViewRef}
-                    simultaneousHandlers={panRef}
-                >
-                    <Animated.FlatList
-                        className="flex-1 w-full"
-                        ref={flatListRef}
-                        data={comments}
-                        renderItem={({ item }) => <PostComment comment={item} />}
-                        keyExtractor={(item) => String(item._id)} // Change later
-                        onScroll={scrollHandler}
-                        scrollEventThrottle={16}
-                        contentContainerStyle={{paddingBottom: 20}}
-                        bounces={true}
-                        showsVerticalScrollIndicator={false}
-                        ListEmptyComponent={
-                            isLoadingComments ? 
-                                <SpinnerLoader className='mt-10'/> : 
-                                <Text className='p-4 color-indigo-600 mx-auto mt-5'>Be the first to comment</Text>
-                        }
-                    />
-                </NativeViewGestureHandler>
+                    <HeaderComponent />
+                    <Text className="font-bold">Comments</Text>
+                    
+                    <NativeViewGestureHandler
+                        ref={nativeViewRef}
+                        simultaneousHandlers={panRef}
+                    >
+                        <Animated.FlatList
+                            className="flex-1 w-full"
+                            ref={flatListRef}
+                            data={comments}
+                            renderItem={({ item }) => <PostComment comment={item} />}
+                            keyExtractor={(item) => String(item._id)} // Change later
+                            onScroll={scrollHandler}
+                            scrollEventThrottle={16}
+                            contentContainerStyle={{paddingBottom: 20}}
+                            bounces={true}
+                            showsVerticalScrollIndicator={false}
+                            ListEmptyComponent={
+                                isLoadingComments ? 
+                                    <SpinnerLoader className='mt-10'/> : 
+                                    <Text className='p-4 color-indigo-600 mx-auto mt-5'>Be the first to comment</Text>
+                            }
+                        />
+                    </NativeViewGestureHandler>
+                    
+                    <Divider />
+                    <KeyboardAvoidingView
+                        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 35}
+                    >
+                    <Box className="flex-row w-full items-center px-4 py-2 gap-2 mb-10">
+                        <TextInput
+                            className="flex-1 bg-white rounded-full px-4 py-2"
+                            placeholder="Message..."
+                            placeholderTextColor="#aaa"
+                            value={input}
+                            onChangeText={setInput}
+                        />
+                        <MyLinearGradient type='button' color='purple' className='w-[100px]'>
+                            <Button onPress={sendComment} className="h-fit rounded-full">
+                                <ButtonText className="text-white">Send</ButtonText>
+                            </Button>
+                        </MyLinearGradient>
+                    </Box>
+                    </KeyboardAvoidingView>
                 </ActionsheetContent>
             </Animated.View>
+
             </PanGestureHandler>
+            
         </Actionsheet>
         </>
     );

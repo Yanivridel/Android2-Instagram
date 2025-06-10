@@ -4,6 +4,7 @@ import {
     loginUser,
     getUserByEmail,
     getUserById,
+    getAutocompletePrefix
 } from '../controllers/userController';
 import { authenticateToken } from "../middleware/auth.middleware";
 
@@ -16,6 +17,8 @@ router.get('/login', authenticateToken, loginUser);
 router.get('/email/:email', getUserByEmail);
 
 router.get('/:userId', getUserById);
+
+router.get('/autocomplete/:prefix', getAutocompletePrefix);
 
 
 export default router;

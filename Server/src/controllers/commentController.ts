@@ -16,7 +16,7 @@ export const createComment = async (req: AuthenticatedRequest, res: Response) =>
             content,
             post: postId,
             author: req.userDb?._id,
-            parentComment: parentCommentId || null, // assuming you use parentComment field
+            parentComment: parentCommentId || null,
         });
 
         await newComment.save();
@@ -33,7 +33,11 @@ export const createComment = async (req: AuthenticatedRequest, res: Response) =>
             });
         }
 
-        res.status(201).json(newComment);
+        const newPopulatedComment = await commentModel
+            .findById(newComment._id)
+            .populate('author', 'username profileImage ratingStats');
+
+        res.status(201).json(newPopulatedComment);
     } catch (error) {
         console.error('Error creating comment:', error);
         res.status(500).json({ message: 'Failed to create comment' });

@@ -110,7 +110,7 @@ export const getPostById = async (req: Request, res: Response) => {
 export const updatePost = async (req: AuthenticatedRequest, res: Response) => {
     try {
         const { postId } = req.params;
-        const { content, imageUrls, isPublic, locationString } = req.body;
+        const { content } = req.body;
 
         const post = await postModel.findById(postId);
         if (!post) {
@@ -124,9 +124,6 @@ export const updatePost = async (req: AuthenticatedRequest, res: Response) => {
         }
 
         post.content = content ?? post.content;
-        post.imageUrls = imageUrls ?? post.imageUrls;
-        post.isPublic = isPublic ?? post.isPublic;
-        post.locationString = locationString ?? post.locationString;
         post.updatedAt = new Date();
 
         await post.save();
