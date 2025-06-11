@@ -1,6 +1,12 @@
-import React from 'react';
-import { FlatList, Image, Text } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { FlatList, Image, Pressable, Text } from 'react-native';
 import { Box } from '@/components/ui/box';
+import { Props } from '@/types/NavigationTypes';
+import { IUser } from '@/types/userTypes';
+import { getTop10Ratings } from '@/utils/api/internal/ratingApi';
+import SpinnerLoader from '@/components/SpinnerLoader';
+import UserAvatar from '@/components/UserAvatar';
+import { cn } from '@/components/ui/cn';
 
 const dummyLeaderboard = [
     { id: '1', username: 'champion01', avatar: 'https://i.pravatar.cc/150?img=1', score: 3200 },
@@ -15,12 +21,27 @@ const dummyLeaderboard = [
     { id: '10', username: 'last_hope', avatar: 'https://i.pravatar.cc/150?img=10', score: 2000 },
 ];
 
-const LeaderboardScreen = () => {
+const LeaderboardScreen = ({ navigation }: Props) => {
+    const [ Leaderboard, setLeaderboard] = useState<IUser[] | null>(null);
+    const [ isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        setIsLoading(true);
+        getTop10Ratings()
+        .then(Leaderboard => {
+            setLeaderboard(Leaderboard);
+        })
+        .finally(() => setIsLoading(false));
+    }, []);
+
+    if(isLoading)
+        return <SpinnerLoader />
+
     return (
         <Box className="flex-1 bg-white pt-10 px-4">
         <FlatList
-            data={dummyLeaderboard}
-            keyExtractor={(item) => item.id}
+            data={Leaderboard}
+            keyExtractor={(item) => item._id}
             renderItem={({ item, index }) => {
             const isFirst = index === 0;
             const isSecond = index === 1;
@@ -38,18 +59,22 @@ const LeaderboardScreen = () => {
                 : 'text-base';
 
             return (
-                <Box className={baseStyle}>
-                <Image
-                    source={{ uri: item.avatar }}
-                    className={`w-${isFirst ? '16' : isSecond ? '14' : '10'} h-${isFirst ? '16' : isSecond ? '14' : '10'} rounded-full mr-4`}
+                <Pressable className={cn("gap-3",baseStyle)}
+                    onPress={() => navigation.navigate("MainApp", { screen: "Profile", params: { userId: item._id }})}
+                >
+                <UserAvatar
+                    rating={item.ratingStats?.averageScore || 3}
+                    username={item.username || ""}
+                    profileImage={item.profileImage}
+                    sizePercent={15}
                 />
                 <Box className="flex-1">
                     <Text className={`${textSize} font-semibold text-black`}>
-                    #{index + 1} {item.username}
+                    {index + 1}. {item.username}
                     </Text>
-                    <Text className="text-gray-500">{item.score} points</Text>
+                    <Text className="text-gray-500">{item.ratingStats.averageScore} ⭐</Text>
                 </Box>
-                </Box>
+                </Pressable>
             );
             }}
             showsVerticalScrollIndicator={false}

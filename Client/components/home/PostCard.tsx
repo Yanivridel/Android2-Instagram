@@ -218,7 +218,7 @@ const PostCard = ({ post }: PostCardProps) => {
               {author.username}
             </Text>
             {post.locationString &&
-              <Text className="text-sm text-gray-500">
+              <Text className="text-sm text-gray-500 max-w-[85%]">
                 {post.locationString}
               </Text>
             }
@@ -437,9 +437,7 @@ const PostCard = ({ post }: PostCardProps) => {
               onPress={() => handleEditPost()}
               IconClassName='h-5 w-5'
               color='#818cf8'
-
             >
-              
             </TouchableIcon>
           </Box>
           }

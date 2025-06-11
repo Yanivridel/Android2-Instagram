@@ -16,6 +16,7 @@ import TouchableIcon from '@/components/TouchableIcon'
 import { getAllPostsRandomized, getPostById } from '@/utils/api/internal/postApi'
 import SpinnerLoader from '@/components/SpinnerLoader'
 import { Text } from '@/components/ui/text'
+import { IM_America, IM_LogoCircle, IM_LogoString } from '@/utils/constants/Images'
 
 interface HomeRouteType {
   params: {
@@ -112,12 +113,7 @@ const HomeScreen = ({ navigation, route }: Props) => {
           onPress={() => navigation.navigate("MainApp", { screen: "Notifications" })}
           />
 
-        <Image
-          source={require('@/assets/images/violet_long_logo.png')}
-          className="h-[35px] w-[80px]"
-          resizeMode="contain"
-          alt="Logo"
-        />
+          <IM_LogoString className='h-[40px] w-[80px]' />
 
           <TouchableIcon 
             Icon={IC_Messenger} 

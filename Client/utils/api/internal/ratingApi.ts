@@ -36,9 +36,9 @@ export const getAvgRatingsByTarget = async ({ targetType, targetId}: getRatingsB
     }
 };
 
-export const getTop10Ratings = async ({ userId }: { userId: string}): Promise<Partial<IRating>[] | null> => {
+export const getTop10Ratings = async (): Promise<IUser[] | null> => {
     try {
-        const { data } = await api.get<Partial<IRating>[]>(`api/ratings/top`);
+        const { data } = await api.get<IUser[]>(`api/ratings/top`);
         return data;
     } catch (error: any) {
         console.error("Create chat error:", error?.response?.data || error.message);

@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { Box } from "@/components/ui/box";
 import { cn } from "@/components/ui/cn";
-import Svg, { Path, G, Mask, Rect, Defs, ClipPath, LinearGradient, Stop, Circle, Ellipse } from "react-native-svg";
+import Svg, { Path, G, Mask, Rect, Defs, ClipPath, LinearGradient, Stop, Circle, Ellipse, Text } from "react-native-svg";
 
 interface ImageProps {
     className?: string;
@@ -1650,3 +1650,70 @@ export const IM_FaceScan = ({ className }: ImageProps) => {
       </Box>
   );
 };
+
+export const IM_LogoString = ({ className }: ImageProps) => {
+  return (
+      <Box className={cn(className)}>
+        <Svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg" >
+      <Defs>
+        <LinearGradient id="a" x1="0%" y1="0%" x2="100%" y2="0%">
+          <Stop offset="0%" stopColor="#c44cc4" stopOpacity={1} />
+          <Stop offset="100%" stopColor="#6f86ff" stopOpacity={1} />
+        </LinearGradient>
+      </Defs>
+      <Rect
+        x={20}
+        y={20}
+        width={360}
+        height={160}
+        rx={80}
+        ry={80}
+        fill="url(#a)"
+      />
+      <Text
+        x={200}
+        y={120}
+        fontFamily="Trebuchet MS, sans-serif"
+        fontSize={66}
+        fontWeight={500}
+        textAnchor="middle"
+        fill="#fff"
+      >
+        {"Nosedive"}
+      </Text>
+    </Svg>
+
+      </Box>
+  );
+};
+
+export const IM_LogoCircle = ({ className }: ImageProps) => {
+  return (
+      <Box className={cn(className)}>
+        <Svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <Defs>
+        <LinearGradient id="a" x1="0%" y1="0%" x2="100%" y2="100%">
+          <Stop offset="0%" stopColor="#c44cc4" stopOpacity={1} />
+          <Stop offset="100%" stopColor="#6f86ff" stopOpacity={1} />
+        </LinearGradient>
+        <LinearGradient id="b" x1="100%" y1="0%" x2="0%" y2="100%">
+          <Stop offset="0%" stopColor="#6f86ff" stopOpacity={1} />
+          <Stop offset="100%" stopColor="#c44cc4" stopOpacity={1} />
+        </LinearGradient>
+      </Defs>
+      <Path
+        d="M100 20c40 10 70 40 80 80-10 40-40 70-80 80-20-20-30-50-20-80s20-80 20-80z"
+        fill="url(#a)"
+        opacity={0.9}
+      />
+      <Path
+        d="M100 180c-40-10-70-40-80-80 10-40 40-70 80-80 20 20 30 50 20 80s-20 80-20 80z"
+        fill="url(#b)"
+        opacity={0.7}
+      />
+      <Circle cx={100} cy={100} r={15} fill="#fff" opacity={0.3} />
+    </Svg>
+      </Box>
+  );
+};
+

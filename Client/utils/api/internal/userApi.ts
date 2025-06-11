@@ -92,3 +92,9 @@ export const getAutocompletePrefix = async ({ prefix }: { prefix: string} ): Pro
     const { data } = await api.get<IUser[]>(`api/users/autocomplete/${prefix}`);
     return data;
 }
+
+export const updateUserBio = async ({ bio }: { bio: string} ): Promise<IUser | null> => {
+    const { data } = await api.put<IUser>(`api/users/bio`, { bio });
+    return data;
+}
+

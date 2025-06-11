@@ -3,14 +3,14 @@ import { Avatar, AvatarFallbackText, AvatarImage } from '@/components/ui/avatar'
 import { Box } from '@/components/ui/box'
 import{ Text } from '@/components/ui/text'
 import { Props } from '@/types/NavigationTypes'
-import {IC_AddUsers, IC_Grid, IC_Tag } from '@/utils/constants/Icons'
+import {IC_AddUsers, IC_Grid, IC_Tag, IC_Vi } from '@/utils/constants/Icons'
 import { useTheme } from '@/utils/Themes/ThemeProvider'
 import CardUpRounded from '@/components/CardUpRounded'
 import ProfileTopBar from '@/components/profile/ProfileTopBar'
 import { Button, ButtonText } from '@/components/ui/button'
 import RatingPopup from '@/components/RatingPopup'
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
-import { Dimensions } from 'react-native';
+import { Dimensions, TextInput } from 'react-native';
 import TouchableIcon from '@/components/TouchableIcon'
 import { PostsGrid } from '@/components/post/PostsGrid'
 import { useEffect, useState } from 'react'
@@ -21,9 +21,9 @@ import { getAllMyPosts, getPostsByUserId } from '@/utils/api/internal/postApi'
 import { IPost } from '@/types/postTypes'
 import SpinnerLoader from '@/components/SpinnerLoader'
 import UserAvatar from '@/components/UserAvatar'
-import { getUserById } from '@/utils/api/internal/userApi'
+import { getUserById, updateUserBio } from '@/utils/api/internal/userApi'
 import { getMyRatings } from '@/utils/api/internal/ratingApi'
-import { updateRatingStats } from '@/store/slices/userSlices'
+import { updateBio, updateRatingStats } from '@/store/slices/userSlices'
 
 
 const { width } = Dimensions.get('window');
@@ -54,6 +54,9 @@ export default function ProfileScreen({ route, navigation }: ProfileScreenProps)
 	const [posts, setPosts] = useState<IPost[] | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const isOwnProfile = !userId;
+	const [profileEdit, setProfileEdit] = useState(false);
+	const [editContent, setEditContent] = useState<string | null>(null);
+
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -64,7 +67,10 @@ export default function ProfileScreen({ route, navigation }: ProfileScreenProps)
 						getUserById({ userId }),
 						getPostsByUserId({ userId }),
 					]);
-					setProfileUser(userDetails);
+					if(userDetails){
+						setProfileUser(userDetails);
+						setEditContent(userDetails.bio);
+					}
 					setPosts(userPosts);
 				} else {
 					const ratings = await getMyRatings();					
@@ -72,6 +78,7 @@ export default function ProfileScreen({ route, navigation }: ProfileScreenProps)
 						dispatch(updateRatingStats(ratings.ratingStats));
 					if (currentUser) {
 						setProfileUser(currentUser);
+						setEditContent(currentUser.bio);
 					}
 					const myPosts = await getAllMyPosts();
 					setPosts(myPosts);
@@ -94,14 +101,21 @@ export default function ProfileScreen({ route, navigation }: ProfileScreenProps)
 		indicatorTranslateX.value = withTiming(TAB_INDEX[tab] * TAB_WIDTH, { duration: 300 });
 	};
 
+	const handleEditProfile = async () => {
+		if(!editContent) return;
+		await updateUserBio({ bio: editContent });
+		dispatch(updateBio(editContent));
+		setProfileEdit(false);
+	}
+
 	if (isLoading || !profileUser) {
-		return <SpinnerLoader className='mt-16' />;
+		return <SpinnerLoader />;
 	}
 
 	return (
 		<Box className="flex-1">
 		<MyLinearGradient type="background" color={appliedTheme === 'dark' ? 'blue' : 'purple'}>
-			<ProfileTopBar />
+			<ProfileTopBar username={profileUser.username}/>
 			<Box className="gap-2 p-4">
 				{/* Avatar & Stats */}
 				<Box className="flex-row w-full justify-between items-center">
@@ -134,14 +148,36 @@ export default function ProfileScreen({ route, navigation }: ProfileScreenProps)
 						<Text className="text-white font-bold">{profileUser.username}</Text>
 						<Text className="text-gray-300 text-sm">{profileUser.gender}</Text>
 					</Box>
-					<Text className="text-white text-[13px] leading-5">{profileUser.bio}</Text>
+					{ !profileEdit ?
+						<Text className="text-white text-[13px] leading-5">{editContent}</Text>
+						:
+						<Box className='flex-row gap-3 items-center'>
+							<TextInput
+								placeholder="Write a caption..."
+								multiline
+								value={editContent || ""}
+								onChangeText={setEditContent}
+								className="border border-gray-300 rounded-lg text-base w-[70%] text-white"
+							/>
+							<TouchableIcon
+								Icon={IC_Vi}
+								onPress={() => handleEditProfile()}
+								IconClassName='h-5 w-5'
+								color='#818cf8'
+							>
+							</TouchableIcon>
+						</Box>
+						}
+					
 				</Box>
 
 				{/* Buttons (only on own profile) */}
 				{isOwnProfile && (
 					<Box className="flex-row gap-2 px-1">
 						<MyLinearGradient type='button' color='light-blue' className='flex-1'>
-							<Button className="h-fit">
+							<Button className="h-fit"
+							onPress={() => setProfileEdit(true)} 
+							>
 								<ButtonText className="text-black">Edit Profile</ButtonText>
 							</Button>
 						</MyLinearGradient>

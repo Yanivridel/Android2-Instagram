@@ -5,6 +5,7 @@ import { Box } from './ui/box';
 import { useTheme } from '@/utils/Themes/ThemeProvider';
 import { IC_Tothor_Logo_Only, IC_Tothor_Logo_Only_Bold } from '@/utils/constants/Icons';
 import { Svg, Circle } from 'react-native-svg';
+import { IM_LogoCircle } from '@/utils/constants/Images';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
@@ -89,7 +90,8 @@ const OverlayLoading = () => {
                         />
                     </Svg>
                     <Animated.View className="w-[70%] h-[70%] absolute z-20" style={{ transform: [{ rotate: spin }] }}>
-                        <IC_Tothor_Logo_Only className='w-full h-full' color={appliedTheme==="dark" ? "white":"black"}/>
+                        {/* <IC_Tothor_Logo_Only className='w-full h-full' color={appliedTheme==="dark" ? "white":"black"}/> */}
+                        <IM_LogoCircle className='w-full h-full'/>
                     </Animated.View>
                 </Box>
             </Box>

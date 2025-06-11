@@ -6,16 +6,18 @@ import TouchableIcon from '../TouchableIcon'
 import { RootState } from '@/store'
 import { useSelector } from 'react-redux'
 import { formatUsername } from '@/utils/functions/help'
+import { IUser } from '@/types/userTypes'
 
-
-const ProfileTopBar = () => {
-    const currentUser = useSelector((state: RootState) => state.currentUser);
+interface ProfileTopBarProps {
+    username: string;
+}
+const ProfileTopBar = ({ username }: ProfileTopBarProps) => {
 
     return (
     <Box className='flex-row w-full justify-between items-center px-5 pt-5'>
         {/* Name & Arrow Down */}
         <Box className="flex-row gap-2 items-center">
-            <Text className='text-white text-2xl font-bold'>{formatUsername(currentUser.username)}</Text>
+            <Text className='text-white text-2xl font-bold'>{formatUsername(username)}</Text>
             <TouchableIcon Icon={IC_Arrow_Down} IconClassName="w-5 h-5" color='white'/>
         </Box>
         {/* Post & Settings */}
