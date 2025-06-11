@@ -3,6 +3,9 @@ import * as mime from 'react-native-mime-types';
 
 import { CLOUDINARY_CLOUD_NAME, CLOUDINARY_UNSIGNED_NAME } from '@env';
 
+console.log("CLOUDINARY_CLOUD_NAME", CLOUDINARY_CLOUD_NAME);
+console.log("CLOUDINARY_UNSIGNED_NAME", CLOUDINARY_UNSIGNED_NAME);
+
 export const cld = new Cloudinary({
     cloud: {
         cloudName: CLOUDINARY_CLOUD_NAME,

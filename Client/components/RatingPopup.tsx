@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
     View, 
     Dimensions, 
-    TouchableOpacity, 
+    TouchableOpacity,
+    Pressable, 
 } from 'react-native';
 import Animated, { 
     useSharedValue, 
@@ -25,9 +26,9 @@ interface RatingData {
 }
 
 interface RatingPopupProps {
-    onRate: (data: { value: number; type: string; targetId: string }) => void;
+    onRate: (value: number, type: "Post" | "Comment" | "User", targetId: string) => void;
     onClose?: () => void;
-    type?: string;
+    type: "Post" | "Comment" | "User";
     targetId: string;
     position?: { x: number; y: number };
 }
@@ -62,7 +63,7 @@ const SWIPE_THRESHOLD = 30;
 
 const RatingPopup: React.FC<RatingPopupProps> = ({ 
     onRate, 
-    type = 'post', 
+    type = 'Post', 
     targetId, 
     onClose,
     position = { x: width / 2, y: 400 }
@@ -128,7 +129,11 @@ const RatingPopup: React.FC<RatingPopupProps> = ({
     };
 
     const handleSubmit = (rating: number): void => {
-        if (rating === 0) return;
+        if (rating === 0) {
+            onRate(0, type, targetId);
+            handleClose();
+            return;
+        }
         
 
         // Use ref for timeout
@@ -136,7 +141,7 @@ const RatingPopup: React.FC<RatingPopupProps> = ({
             successScale.value = withSpring(1, { damping: 15, stiffness: 120 });
             confettiOpacity.value = withTiming(1, { duration: 400 });
             
-            onRate({ value: rating, type, targetId });
+            onRate(rating, type, targetId );
 
             // Use ref for timeout
             timeoutRef.current = setTimeout(() => {
@@ -210,6 +215,12 @@ const RatingPopup: React.FC<RatingPopupProps> = ({
     });
 
     return (
+        <View className="absolute inset-0 z-50">
+        {/* Full-screen backdrop */}
+        <Pressable
+            style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
+            onPress={() => handleSubmit(0)}
+        />
         <Animated.View
             className="absolute z-50"
             style={[
@@ -276,6 +287,7 @@ const RatingPopup: React.FC<RatingPopupProps> = ({
             </PanGestureHandler>
 
         </Animated.View>
+        </View>
     );
 };
 

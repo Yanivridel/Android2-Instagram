@@ -4,7 +4,8 @@ import { AuthenticatedRequest } from 'types/expressTypes';
 import { userModel } from 'models/userModel';
 import { postModel } from 'models/postModel';
 import { commentModel } from 'models/commentModel';
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
+import { IUser } from 'types/userTypes';
 
 // Help Functions
 export const recalculateUserRating = async (userId: mongoose.Types.ObjectId) => {
@@ -78,72 +79,96 @@ export const recalculateUserRating = async (userId: mongoose.Types.ObjectId) => 
 export const createRating = async (req: AuthenticatedRequest, res: Response) => {
     try {
         const { targetType, targetId, rating } = req.body;
-        const rater = req.userDb?._id;
+        const userDb = (req.userDb)
+
+        if(!userDb){
+            res.status(401).json({ message: 'User unauthorized' });
+            return
+        }
+
+        const rater = new Types.ObjectId(String(userDb._id));
 
         if (!targetType || !targetId || !rating) {
-            res.status(400).json({ message: 'targetType, targetId, and score are required.' });
+            res.status(400).json({ message: 'targetType, targetId, and rating are required.' });
             return;
         }
 
-        const existingRating = await ratingModel.findOne({ rater, targetType, targetId });
-        if (existingRating) {
-            // Update existing rating
-            existingRating.rating = rating;
-            await existingRating.save();
+        let ratingDoc = await ratingModel.findOne({ rater, targetType, targetId });
+        const isNew = !ratingDoc;
 
-            // Find user to update rating for
-            let userToUpdate: mongoose.Types.ObjectId | null = null;
-
-            if (targetType === 'User') {
-                userToUpdate = targetId;
-            } else if (targetType === 'Post') {
-                const post = await postModel.findById(targetId);
-                if (post) userToUpdate = post.author;
-            } else if (targetType === 'Comment') {
-                const comment = await commentModel.findById(targetId);
-                if (comment) userToUpdate = comment.author;
-            }
-
-            if (userToUpdate) {
-                await recalculateUserRating(userToUpdate);
-            }
-
-            res.status(200).json(existingRating);
-            return;
+        if (!ratingDoc) {
+            ratingDoc = new ratingModel({ rater, targetType, targetId, rating });
+        } else {
+            ratingDoc.rating = rating;
         }
 
-        const newRating = new ratingModel({
-            targetType,
-            targetId,
-            rater,
-            rating,
-        });
+        await ratingDoc.save();
 
-        await newRating.save();
-
-        // Determine the user to update
         let userToUpdate: mongoose.Types.ObjectId | null = null;
 
-        if (targetType === 'User') {
-            userToUpdate = targetId;
-        } else if (targetType === 'Post') {
+        if (targetType === 'Post') {
             const post = await postModel.findById(targetId);
-            if (post) userToUpdate = post.author;
+            if (post) {
+                userToUpdate = post.author;
+
+                // Update post.likes - ensure likes array exists and handle ObjectId comparison properly
+                if (!post.likes) {
+                    post.likes = [];
+                }
+                if (!post.likes.some(id => id.toString() === rater.toString())) {
+                    post.likes.push(rater);
+                    await post.save();
+                }
+
+                // Update user's likedPosts - ensure likedPosts array exists
+                if (!userDb.likedPosts) {
+                    userDb.likedPosts = [];
+                }
+                if (!userDb.likedPosts.some(id => id.toString() === post._id.toString())) {
+                    userDb.likedPosts.push(post.id);
+                    await userDb.save();
+                }
+            }
         } else if (targetType === 'Comment') {
             const comment = await commentModel.findById(targetId);
-            if (comment) userToUpdate = comment.author;
+            if (comment) {
+                userToUpdate = comment.author;
+
+                // Update comment.likes - ensure likes array exists
+                if (!comment.likes) {
+                    comment.likes = [];
+                }
+                if (!comment.likes.some(id => id.toString() === rater.toString())) {
+                    comment.likes.push(rater);
+                    await comment.save();
+                }
+
+                // Update user's likedComments - ensure likedComments array exists
+                if (!req.userDb!.likedComments) {
+                    req.userDb!.likedComments = [];
+                }
+                if (!req.userDb!.likedComments.some(id => id.toString() === comment._id.toString())) {
+                    req.userDb!.likedComments.push(comment.id);
+                    await userDb.save();
+                }
+            }
+        } else if (targetType === 'User') {
+            // Convert targetId to ObjectId if it's a string
+            userToUpdate = typeof targetId === 'string' ? new Types.ObjectId(targetId) : targetId;
+            // As requested — no "like" fields updates for users
         }
 
         if (userToUpdate) {
             await recalculateUserRating(userToUpdate);
         }
 
-        res.status(201).json(newRating);
+        res.status(isNew ? 201 : 200).json(ratingDoc);
     } catch (error) {
         console.error('Error creating rating:', error);
         res.status(500).json({ message: 'Failed to create rating' });
     }
 };
+
 
 // Get all ratings for a specific target (user/post/comment)
 export const getRatingsByTarget = async (req: AuthenticatedRequest, res: Response) => {
@@ -159,6 +184,20 @@ export const getRatingsByTarget = async (req: AuthenticatedRequest, res: Respons
         targetType,
         targetId,
         }).populate('rater', 'username'); // populate rater username (optional)
+
+        res.status(200).json(ratings);
+    } catch (error) {
+        console.error('Error fetching ratings:', error);
+        res.status(500).json({ status: 'error', message: 'Failed to fetch ratings' });
+    }
+};
+
+export const getMyRating = async (req: AuthenticatedRequest, res: Response) => {
+    try {
+        const userId = req.userDb?._id;
+
+        const ratings = await userModel.findById(userId)
+        .select("ratingStats")
 
         res.status(200).json(ratings);
     } catch (error) {
@@ -264,39 +303,67 @@ export const updateRatingByTarget = async (req: AuthenticatedRequest, res: Respo
 // Delete a rating by ID
 export const deleteRatingByTarget = async (req: AuthenticatedRequest, res: Response) => {
     try {
-        const rater = req.userDb?._id;
+        const userDb = req.userDb;
+        if (!userDb) {
+            res.status(401).json({ message: 'User unauthorized' });
+            return;
+        }
+
+        const rater = new Types.ObjectId(String(userDb._id));
         const { targetType, targetId } = req.query;
 
-        if (!targetType || !targetId) {
+        if (!targetType || !targetId || typeof targetType !== 'string' || typeof targetId !== 'string') {
             res.status(400).json({ message: 'targetType and targetId are required.' });
-            return;
+            return
         }
 
-        // Find the rating based on user, targetType, and targetId
-        const rating = await ratingModel.findOne({ rater, targetType, targetId });
-
+        // Find and delete the rating
+        const rating = await ratingModel.findOneAndDelete({ rater, targetType, targetId });
         if (!rating) {
             res.status(404).json({ message: 'Rating not found for this target by the current user.' });
-            return;
+            return
         }
 
-        // Determine the affected user
-        let userToUpdate: mongoose.Types.ObjectId | null = null;
+        let userToUpdate: Types.ObjectId | null = null;
 
-        if (targetType === 'User') {
-            userToUpdate = targetId as unknown as mongoose.Types.ObjectId;
-        } else if (targetType === 'Post') {
+        if (targetType === 'Post') {
             const post = await postModel.findById(targetId);
-            if (post) userToUpdate = post.author;
+            if (post) {
+                userToUpdate = post.author;
+
+                // Remove rater from post.likes
+                if (post.likes) {
+                    post.likes = post.likes.filter(id => id.toString() !== rater.toString());
+                    await post.save();
+                }
+
+                // Remove post ID from user's likedPosts
+                if (userDb.likedPosts) {
+                    userDb.likedPosts = userDb.likedPosts.filter(id => id.toString() !== post._id.toString());
+                    await userDb.save();
+                }
+            }
         } else if (targetType === 'Comment') {
             const comment = await commentModel.findById(targetId);
-            if (comment) userToUpdate = comment.author;
+            if (comment) {
+                userToUpdate = comment.author;
+
+                // Remove rater from comment.likes
+                if (comment.likes) {
+                    comment.likes = comment.likes.filter(id => id.toString() !== rater.toString());
+                    await comment.save();
+                }
+
+                // Remove comment ID from user's likedComments
+                if (userDb.likedComments) {
+                    userDb.likedComments = userDb.likedComments.filter(id => id.toString() !== comment._id.toString());
+                    await userDb.save();
+                }
+            }
+        } else if (targetType === 'User') {
+            userToUpdate = new Types.ObjectId(targetId); // no like fields to update
         }
 
-        // Delete the rating
-        await ratingModel.deleteOne({ _id: rating._id });
-
-        // Recalculate the affected user's rating
         if (userToUpdate) {
             await recalculateUserRating(userToUpdate);
         }
@@ -307,6 +374,7 @@ export const deleteRatingByTarget = async (req: AuthenticatedRequest, res: Respo
         res.status(500).json({ message: 'Failed to delete rating.' });
     }
 };
+
 
 // Get top 10 rated targets across the app
 export const getTop10Ratings = async (_req: AuthenticatedRequest, res: Response) => {
@@ -322,3 +390,5 @@ export const getTop10Ratings = async (_req: AuthenticatedRequest, res: Response)
         res.status(500).json({ message: 'Failed to fetch top rated users' });
     }
 };
+
+

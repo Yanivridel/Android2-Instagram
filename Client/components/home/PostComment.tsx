@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, Pressable } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { IComment } from '@/types/commentTypes';
 import { Box } from '../ui/box';
 import { Avatar, AvatarFallbackText, AvatarImage } from '../ui/avatar';
@@ -8,18 +8,52 @@ import { useDoublePress } from '@/hooks/useDoublePress';
 import { Vibration } from 'react-native';
 import UserAvatar from '../UserAvatar';
 import { getTimeAgo } from '@/utils/functions/help';
+import { createRating, deleteRating } from '@/utils/api/internal/ratingApi';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store';
+import RatingPopup from '../RatingPopup';
 
 interface PostCommentProps {
     comment: IComment;
 }
 const PostComment = ({ comment }: PostCommentProps) => {
+    const currentUser = useSelector((state: RootState) => state.currentUser);
     const [isLiked, setIsLiked] = useState(false);
+    const likes = comment.likes;
+    const [showRatingPopup, setShowRatingPopup] = useState(false);
+    const likeCount = isLiked ? likes.length + (!likes.includes(currentUser._id) ? 1 : 0) 
+                            : likes.length - (likes.includes(currentUser._id) ? 1 : 0);
 
-    const handleLike = ( vibrate=false ) => {
-        if(vibrate) Vibration.vibrate(50);
-        setIsLiked(prev => !prev);
+    useEffect(() => {
+        setIsLiked(comment.likes.includes(currentUser._id));
+    }, [comment.likes, currentUser._id]);
+
+    const handleLike = (vibrate = false) => {
+        if (vibrate) Vibration.vibrate(50);
+    
+        if(isLiked){
+            setIsLiked(false);
+            removeRating();
+        } else {
+            setIsLiked(true);
+            setShowRatingPopup(true);
+        }
+    };
+
+    const handleRating = async (value: number, type: "Post" | "Comment" | "User", targetId: string) => {
+        console.log(value, type, targetId);
+        if(value === 0) {
+            if(!comment.likes.includes(currentUser._id)) 
+                setIsLiked(false);
+            return;
+        }
+        await createRating({ rating: value, targetType: type, targetId});
     }
 
+    const removeRating = async () => {
+        await deleteRating({targetType: "Comment", targetId: comment._id })
+    }
+    
     return (
     <Box className="flex-row py-2">
         <Box className="flex-row gap-4 flex-1">
@@ -55,7 +89,7 @@ const PostComment = ({ comment }: PostCommentProps) => {
                         >
                             <IC_Heart className={`w-4 h-4 `} color={isLiked ? '#ef4444' : ''} />
                         </TouchableOpacity>
-                        <Text className="text-xs text-gray-500">302</Text>
+                        <Text className="text-xs text-gray-500">{likeCount}</Text>
                     </Box>
                 </Box>
                 {/* Actions */}
@@ -65,6 +99,15 @@ const PostComment = ({ comment }: PostCommentProps) => {
                 </Box>
             </Box>
         </Box>
+        {showRatingPopup &&
+            <RatingPopup 
+            onRate={handleRating}
+            targetId={comment._id}
+            onClose={() => setShowRatingPopup(false)}
+            type='Comment'
+            />
+        }
+
     </Box>
     )
 }

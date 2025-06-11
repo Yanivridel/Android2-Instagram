@@ -6,7 +6,8 @@ import {
     getAverageRatingForTarget, 
     updateRatingByTarget, 
     getTop10Ratings,
-    deleteRatingByTarget
+    deleteRatingByTarget,
+    getMyRating
 } from '../controllers/ratingController';
 
 const router = Router();
@@ -17,6 +18,8 @@ router.post('/', authenticateToken, createRating);
 // Get all ratings for a specific target (user/post/comment)
 // Pass targetType and targetId as query params
 router.get('/', authenticateToken, getRatingsByTarget);
+
+router.get('/me', authenticateToken, getMyRating);
 
 // Get average rating for a specific target
 router.get('/average', authenticateToken, getAverageRatingForTarget);

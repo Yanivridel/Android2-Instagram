@@ -18,10 +18,9 @@ import { NavigationProp, ParamListBase, useFocusEffect, useNavigation } from '@r
 import { RootState } from '@/store'
 import { useSelector } from 'react-redux'
 import { deletePost, updatePost } from '@/utils/api/internal/postApi'
-import { Modal, ModalBackdrop, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/modal';
-import { Button, ButtonText } from '../ui/button'
 import MyModal from '../MyModal'
-import { TextareaInput } from '../ui/textarea'
+import RatingPopup from '../RatingPopup'
+import { createRating, deleteRating } from '@/utils/api/internal/ratingApi'
 
 /**
  * PostCard component to render an Instagram-style post
@@ -32,6 +31,7 @@ type PostCardProps = {
 }
 
 const PostCard = ({ post }: PostCardProps) => {
+  const currentUser = useSelector((state: RootState) => state.currentUser);
   const { author, imageUrls, content, likes, createdAt } = post
   const [showCommentsSheet, setShowCommentsSheet] = useState(false);
   const [showShareSheet, setShowShareSheet] = useState(false);
@@ -47,10 +47,12 @@ const PostCard = ({ post }: PostCardProps) => {
   const [showHeart, setShowHeart] = useState(false);
   const videoRef = useRef<Video>(null);
   let animTimeout: NodeJS.Timeout | null = null;
-  const currentUser = useSelector((state: RootState) => state.currentUser);
   const isMyPost = post.author._id === currentUser._id;
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
 
+  const [showRatingPopup, setShowRatingPopup] = useState(false);
+  const likeCount = isLiked ? likes.length + (!post.likes.includes(currentUser._id) ? 1 : 0) 
+                          : likes.length - (post.likes.includes(currentUser._id) ? 1 : 0);
 
   // Cleanup video and animations on unmount
   useEffect(() => {
@@ -65,7 +67,10 @@ const PostCard = ({ post }: PostCardProps) => {
       }
     };
   }, []);
-  
+
+  useEffect(() => {
+    setIsLiked(post.likes.includes(currentUser._id));
+  }, [post.likes, currentUser._id]);
 
   // Handle screen focus/blur for video playback
   useFocusEffect(
@@ -114,11 +119,18 @@ const PostCard = ({ post }: PostCardProps) => {
     }
   }, []);
 
-  const handleLike = useCallback((vibrate = false) => {
+  const handleLike = (vibrate = false) => {
     if (vibrate) Vibration.vibrate(50);
-    setIsLiked(true);
-    triggerHeartAnimation();
-  }, []);
+
+    if(isLiked){
+      setIsLiked(false);
+      removeRating();
+    } else {
+      setIsLiked(true);
+      triggerHeartAnimation();
+      setShowRatingPopup(true);
+    }
+  };
 
   const triggerHeartAnimation = useCallback(() => {
     scaleAnim.stopAnimation();
@@ -153,6 +165,20 @@ const PostCard = ({ post }: PostCardProps) => {
   const handleDeletePost = async () => {
     await deletePost({ postId: post._id });
     setModalOpen(true);
+  }
+
+  const handleRating = async (value: number, type: "Post" | "Comment" | "User", targetId: string) => {
+    console.log(value, type, targetId);
+    if(value === 0) {
+      if(!post.likes.includes(currentUser._id)) 
+        setIsLiked(false);
+      return;
+    }
+    await createRating({ rating: value, targetType: type, targetId});
+  }
+
+  const removeRating = async () => {
+    await deleteRating({targetType: "Post", targetId: post._id })
   }
 
   const handleEditPost = async () => {
@@ -334,6 +360,15 @@ const PostCard = ({ post }: PostCardProps) => {
         </Box>
       </Pressable>
 
+      {showRatingPopup &&
+        <RatingPopup 
+          onRate={handleRating}
+          targetId={post._id}
+          onClose={() => setShowRatingPopup(false)}
+          type='Post'
+        />
+      }
+
       {/* Actions: Like, Comment, Share, Bookmark */}
       <Box className="flex-row items-center justify-between px-4 py-2">
         <Box className="flex-row gap-3">
@@ -342,7 +377,9 @@ const PostCard = ({ post }: PostCardProps) => {
             Icon={IC_Heart}
             className="h-6 w-6" 
             color={isLiked ? "red" : ""}
-            onPress={() => setIsLiked(!isLiked)}
+            onPress={() => {
+              handleLike(false);
+            }}
           />
           {/* Comment */}
           <PostCommentSheet 
@@ -376,7 +413,7 @@ const PostCard = ({ post }: PostCardProps) => {
       {/* Likes, Caption, Timestamp */}
       <Box className="px-4 pb-3">
         <Text className="text-[15px] font-semibold">
-          {likes.length} likes
+          {likeCount} likes
         </Text>
         <Box className="flex-row mt-1 items-center gap-2">
           <Text className="font-medium ">

@@ -57,7 +57,7 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
         if (!isCameraReady || !cameraRef.current) return;
         try {
             const photo = await cameraRef.current.takePictureAsync();
-            console.log("Photo taken:", photo.uri);
+            // console.log("Photo taken:", photo.uri);
             await onPhotoOrVideoTaken(photo.uri);
         } catch (error) {
             console.error("Failed to take photo:", error);
@@ -65,7 +65,7 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
     };
 
     const onPhotoOrVideoTaken = async (photoUri: string) => {
-        console.log("photoUri", photoUri);
+        // console.log("photoUri", photoUri);
         setIsLoadingResult(true);
         const mediaUrl = await uploadMedia(photoUri, "post");
         setIsLoadingResult(false);
@@ -77,13 +77,13 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
     const startRecording = async () => {
         if (!isCameraReady || isRecording || !cameraRef.current) return;
         try {
-            console.log("Starting video recording...");
+            // console.log("Starting video recording...");
             setIsRecording(true);
             const video = await cameraRef.current.recordAsync({
                 quality: '720p',
                 maxDuration: 60, // 60 seconds max
             });
-            console.log("Video recorded:", video.uri);
+            // console.log("Video recorded:", video.uri);
             await onPhotoOrVideoTaken(video.uri);
         } catch (error) {
             console.error("Failed to record video:", error);
@@ -95,7 +95,7 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
     const stopRecording = async () => {
         if (isRecording && cameraRef.current) {
             try {
-                console.log("Stopping video recording...");
+                // console.log("Stopping video recording...");
                 cameraRef.current.stopRecording();
             } catch (error) {
                 console.error("Failed to stop recording:", error);

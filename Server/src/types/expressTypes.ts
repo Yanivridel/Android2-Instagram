@@ -2,7 +2,7 @@ import { Request } from "express";
 
 export interface AuthenticatedRequest extends Request {
     user?: any;
-    userDb?: IUser;
+    userDb?: Document<unknown, {}, IUser> & IUser & Required<{ _id: Schema.Types.ObjectId }> & { __v: number };
 }
 
 export interface AuthenticatedRequestOptional extends Request {
@@ -11,6 +11,7 @@ export interface AuthenticatedRequestOptional extends Request {
 
 import { DecodedIdToken } from "firebase-admin/auth";
 import { IUser } from "./userTypes";
+import { Document, Schema } from "mongoose";
 
 // Extend the express Request type
 declare global {

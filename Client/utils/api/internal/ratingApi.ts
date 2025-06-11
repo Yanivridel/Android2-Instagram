@@ -1,13 +1,14 @@
-import { IRating as IUser } from '@/types/ratingTypes';
+import { IRating } from '@/types/ratingTypes';
 import { api } from './apiService';
+import { IUser } from '@/types/userTypes';
 
 interface getRatingsByTargetReq {
     targetType: "Post" | "Comment" | "User",
     targetId: string,
 }
-export const getAllRatingsByTarget = async ({ targetType, targetId}: getRatingsByTargetReq): Promise<IUser[] | null> => {
+export const getAllRatingsByTarget = async ({ targetType, targetId}: getRatingsByTargetReq): Promise<IRating[] | null> => {
     try {
-        const { data } = await api.get<IUser[]>(`api/ratings?targetType=${targetType}&targetId=${targetId}`);
+        const { data } = await api.get<IRating[]>(`api/ratings?targetType=${targetType}&targetId=${targetId}`);
         return data;
     } catch (error: any) {
         console.error("Create chat error:", error?.response?.data || error.message);
@@ -15,9 +16,9 @@ export const getAllRatingsByTarget = async ({ targetType, targetId}: getRatingsB
     }
 };
 
-export const getAvgRatingsByTarget = async ({ targetType, targetId}: getRatingsByTargetReq): Promise<IUser[] | null> => {
+export const getMyRatings = async (): Promise<{ratingStats: IUser["ratingStats"]} | null> => {
     try {
-        const { data } = await api.get<IUser[]>(`api/ratings/average?targetType=${targetType}&targetId=${targetId}`);
+        const { data } = await api.get<{ratingStats: IUser["ratingStats"]}>(`api/ratings/me`);
         return data;
     } catch (error: any) {
         console.error("Create chat error:", error?.response?.data || error.message);
@@ -25,9 +26,19 @@ export const getAvgRatingsByTarget = async ({ targetType, targetId}: getRatingsB
     }
 };
 
-export const getTop10Ratings = async ({ userId }: { userId: string}): Promise<Partial<IUser>[] | null> => {
+export const getAvgRatingsByTarget = async ({ targetType, targetId}: getRatingsByTargetReq): Promise<IRating[] | null> => {
     try {
-        const { data } = await api.get<Partial<IUser>[]>(`api/ratings/top`);
+        const { data } = await api.get<IRating[]>(`api/ratings/average?targetType=${targetType}&targetId=${targetId}`);
+        return data;
+    } catch (error: any) {
+        console.error("Create chat error:", error?.response?.data || error.message);
+        return null;
+    }
+};
+
+export const getTop10Ratings = async ({ userId }: { userId: string}): Promise<Partial<IRating>[] | null> => {
+    try {
+        const { data } = await api.get<Partial<IRating>[]>(`api/ratings/top`);
         return data;
     } catch (error: any) {
         console.error("Create chat error:", error?.response?.data || error.message);
@@ -40,9 +51,9 @@ interface createRatingReq {
     targetId: string,
     rating: number
 }
-export const createRating = async ({ targetType, targetId, rating}: createRatingReq): Promise<IUser | null> => {
+export const createRating = async ({ targetType, targetId, rating}: createRatingReq): Promise<IRating | null> => {
     try {
-        const { data } = await api.post<IUser>(`api/ratings/`,  { targetType, targetId, rating});
+        const { data } = await api.post<IRating>(`api/ratings/`,  { targetType, targetId, rating});
         return data;
     } catch (error: any) {
         console.error("Create chat error:", error?.response?.data || error.message);

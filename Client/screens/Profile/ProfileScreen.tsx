@@ -14,7 +14,7 @@ import { Dimensions } from 'react-native';
 import TouchableIcon from '@/components/TouchableIcon'
 import { PostsGrid } from '@/components/post/PostsGrid'
 import { useEffect, useState } from 'react'
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from '@/store'
 import { IUser } from '@/types/userTypes'
 import { getAllMyPosts, getPostsByUserId } from '@/utils/api/internal/postApi'
@@ -22,6 +22,8 @@ import { IPost } from '@/types/postTypes'
 import SpinnerLoader from '@/components/SpinnerLoader'
 import UserAvatar from '@/components/UserAvatar'
 import { getUserById } from '@/utils/api/internal/userApi'
+import { getMyRatings } from '@/utils/api/internal/ratingApi'
+import { updateRatingStats } from '@/store/slices/userSlices'
 
 
 const { width } = Dimensions.get('window');
@@ -42,14 +44,12 @@ interface ProfileScreenProps extends Props {}
 export default function ProfileScreen({ route, navigation }: ProfileScreenProps) {
 	const { appliedTheme } = useTheme()
 	const { userId } = (route as ProfileRoute).params || {};
-	console.log("userId", userId);
 	
 	const currentUser = useSelector(
 		(state: RootState) => state.currentUser
 	) as unknown as IUser;
+	const dispatch = useDispatch()
 	const [currentTab, setCurrentTab] = useState<'grid' | 'tag'>('grid');
-	const [ myPosts, setMyPosts ] = useState<IPost[] | null>(null);
-	const [ isLoadingMyPosts, setIsLoadingMyPosts ] = useState(true);
 	const [profileUser, setProfileUser] = useState<IUser | null>(null);
 	const [posts, setPosts] = useState<IPost[] | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
@@ -67,7 +67,12 @@ export default function ProfileScreen({ route, navigation }: ProfileScreenProps)
 					setProfileUser(userDetails);
 					setPosts(userPosts);
 				} else {
-					setProfileUser(currentUser);
+					const ratings = await getMyRatings();					
+					if(ratings && ratings.ratingStats)
+						dispatch(updateRatingStats(ratings.ratingStats));
+					if (currentUser) {
+						setProfileUser(currentUser);
+					}
 					const myPosts = await getAllMyPosts();
 					setPosts(myPosts);
 				}

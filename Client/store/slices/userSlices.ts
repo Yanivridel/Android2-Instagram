@@ -8,7 +8,7 @@ const initialState: IUser = {
     username: "",
     email: "",
     role: "user",
-    rating: 2.5,
+    ratingStats: { averageScore: 0, totalRatings: 0},
     bio: "",
     profileImage: "",
     posts: [],
@@ -48,6 +48,11 @@ const userSlice = createSlice({
         updateFollowing: (state, action: PayloadAction<string[]>) => {
             state.following = action.payload;
         },
+        updateRatingStats: (state, action: PayloadAction<any>) => {
+			if (state) {
+				state.ratingStats = action.payload;
+			}
+		}
     },
 });
 
@@ -58,6 +63,7 @@ export const {
     updateBio,
     updateFollowers,
     updateFollowing,
+    updateRatingStats,
 } = userSlice.actions;
 
 export default userSlice.reducer;
