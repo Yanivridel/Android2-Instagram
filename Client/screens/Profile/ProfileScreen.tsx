@@ -24,6 +24,7 @@ import UserAvatar from '@/components/UserAvatar'
 import { getUserById, updateUserBio } from '@/utils/api/internal/userApi'
 import { getMyRatings } from '@/utils/api/internal/ratingApi'
 import { updateBio, updateRatingStats } from '@/store/slices/userSlices'
+import { createGetChat } from '@/utils/api/internal/chatApi'
 
 
 const { width } = Dimensions.get('window');
@@ -53,7 +54,7 @@ export default function ProfileScreen({ route, navigation }: ProfileScreenProps)
 	const [profileUser, setProfileUser] = useState<IUser | null>(null);
 	const [posts, setPosts] = useState<IPost[] | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
-	const isOwnProfile = !userId;
+	const isOwnProfile = !userId || currentUser._id === userId;
 	const [profileEdit, setProfileEdit] = useState(false);
 	const [editContent, setEditContent] = useState<string | null>(null);
 
@@ -108,6 +109,15 @@ export default function ProfileScreen({ route, navigation }: ProfileScreenProps)
 		setProfileEdit(false);
 	}
 
+	const handleNavToChat = async () => {
+		try{
+			const chat = await createGetChat({ anotherUser: (userId as string) });
+			navigation.navigate("MainApp", { screen: "MessageScreen", params: { chatId: chat?._id, user: profileUser }})
+		} catch(err) {
+			console.log("Failed getting or creating Chat");
+		}
+	} 
+
 	if (isLoading || !profileUser) {
 		return <SpinnerLoader />;
 	}
@@ -115,7 +125,7 @@ export default function ProfileScreen({ route, navigation }: ProfileScreenProps)
 	return (
 		<Box className="flex-1">
 		<MyLinearGradient type="background" color={appliedTheme === 'dark' ? 'blue' : 'purple'}>
-			<ProfileTopBar username={profileUser.username}/>
+			<ProfileTopBar username={profileUser.username} navigation={navigation}/>
 			<Box className="gap-2 p-4">
 				{/* Avatar & Stats */}
 				<Box className="flex-row w-full justify-between items-center">
@@ -172,22 +182,26 @@ export default function ProfileScreen({ route, navigation }: ProfileScreenProps)
 				</Box>
 
 				{/* Buttons (only on own profile) */}
-				{isOwnProfile && (
-					<Box className="flex-row gap-2 px-1">
-						<MyLinearGradient type='button' color='light-blue' className='flex-1'>
-							<Button className="h-fit"
-							onPress={() => setProfileEdit(true)} 
-							>
-								<ButtonText className="text-black">Edit Profile</ButtonText>
-							</Button>
-						</MyLinearGradient>
-						<MyLinearGradient type='button' color='light-blue' className='w-[70px]'>
-							<Button className="h-fit flex-1">
-								<IC_AddUsers className="w-5 h-5" color="black" />
-							</Button>
-						</MyLinearGradient>
-					</Box>
-				)}
+				<Box className="flex-row gap-2 px-1">
+					<MyLinearGradient type='button' color='light-blue' className='flex-1'>
+						<Button className="h-fit"
+						onPress={() => 
+							isOwnProfile ? 
+								setProfileEdit(true) : 
+								handleNavToChat()
+							} 
+						>
+							<ButtonText className="text-black">
+								{isOwnProfile ? "Edit Profile": "Chat"}
+							</ButtonText>
+						</Button>
+					</MyLinearGradient>
+					<MyLinearGradient type='button' color='light-blue' className='w-[70px]'>
+						<Button className="h-fit flex-1">
+							<IC_AddUsers className="w-5 h-5" color="black" />
+						</Button>
+					</MyLinearGradient>
+				</Box>
 
 				<Box className="pb-2" />
 			</Box>

@@ -12,12 +12,15 @@ import { createRating, deleteRating } from '@/utils/api/internal/ratingApi';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
 import RatingPopup from '../RatingPopup';
+import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
 
 interface PostCommentProps {
     comment: IComment;
+    handleAvatarPress: (userId: string) => void;
 }
-const PostComment = ({ comment }: PostCommentProps) => {
+const PostComment = ({ comment, handleAvatarPress}: PostCommentProps) => {
     const currentUser = useSelector((state: RootState) => state.currentUser);
+    // const navigation = useNavigation<NavigationProp<ParamListBase>>();
     const [isLiked, setIsLiked] = useState(false);
     const likes = comment.likes;
     const [showRatingPopup, setShowRatingPopup] = useState(false);
@@ -53,16 +56,22 @@ const PostComment = ({ comment }: PostCommentProps) => {
     const removeRating = async () => {
         await deleteRating({targetType: "Comment", targetId: comment._id })
     }
+
     
     return (
     <Box className="flex-row py-2">
         <Box className="flex-row gap-4 flex-1">
-            <UserAvatar 
-                rating={comment.author.ratingStats?.averageScore || 3}
-                username={comment.author.username || ""}
-                profileImage={comment.author.profileImage}
-                sizePercent={12}
-            />
+            <Pressable
+            onPress={() => handleAvatarPress(comment.author._id as string)}
+            >
+                <UserAvatar 
+                    rating={comment.author.ratingStats?.averageScore || 3}
+                    username={comment.author.username || ""}
+                    profileImage={comment.author.profileImage}
+                    sizePercent={12}
+                />
+            </Pressable>
+
             <Box className="gap-1 flex-1">
                 {/* Comment Header */}
                 <Box className="flex-row gap-2 items-end">

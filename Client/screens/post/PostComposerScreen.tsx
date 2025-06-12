@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ScrollView, Image, TextInput, Pressable, TouchableOpacity, SafeAreaView, BackHandler } from 'react-native';
+import { ScrollView, Image, TextInput, Pressable, TouchableOpacity, SafeAreaView, BackHandler, KeyboardAvoidingView, Platform } from 'react-native';
 import { Button, ButtonText } from '@/components/ui/button';
 import AddressSearch from '@/components/auth/AddressSearchSheet';
 import { Props } from '@/types/NavigationTypes';
@@ -123,91 +123,99 @@ const PostComposerScreen: React.FC<Props> = ({ route, navigation }) => {
     };
 
     return (
-    <ScrollView className="p-4 bg-white">
-        {/* Top Back Bar */}
-        <Box className={`flex-row justify-between p-8 mt-4 items-center relative`}>
-            <TouchableOpacity
-                className="absolute left-4"
-                onPress={handleBackPress}
-                activeOpacity={0.7}
-            >
-                <IC_ChevronLeft className="w-8 h-8" color={"black"} />
-            </TouchableOpacity>
-        </Box>
-        {/* Media preview */}
-        <Box className="relative w-full aspect-square overflow-hidden">
-            {isVideo(mediaUri) && !videoError ? (
-                <Video
-                ref={videoRef}
-                key={`post-video-${mediaUri}`}
+    <>
+    <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+        style={{ flex: 1 }}
+    >
+        <ScrollView className="p-4 bg-white">
+            {/* Top Back Bar */}
+            <Box className={`flex-row justify-between p-8 mt-4 items-center relative`}>
+                <TouchableOpacity
+                    className="absolute left-4"
+                    onPress={handleBackPress}
+                    activeOpacity={0.7}
+                >
+                    <IC_ChevronLeft className="w-8 h-8" color={"black"} />
+                </TouchableOpacity>
+            </Box>
+            {/* Media preview */}
+            <Box className="relative w-full aspect-square overflow-hidden">
+                {isVideo(mediaUri) && !videoError ? (
+                    <Video
+                    ref={videoRef}
+                    key={`post-video-${mediaUri}`}
+                    source={{ uri: mediaUri }}
+                    resizeMode={ResizeMode.COVER}
+                    shouldPlay={shouldPlay}
+                    isLooping={false}
+                    isMuted={false}
+                    volume={0.8}
+                    style={{ 
+                        width: '100%', 
+                        height: '100%',
+                        backgroundColor: '#f0f0f0'
+                    }}
+                    onLoad={handleVideoLoad}
+                    onError={handleVideoError}
+                    onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
+                    useNativeControls={false}
+                    progressUpdateIntervalMillis={1000}
+                    />
+                ) : (
+                <Image
+                key={`post-image-${mediaUri}`}
                 source={{ uri: mediaUri }}
-                resizeMode={ResizeMode.COVER}
-                shouldPlay={shouldPlay}
-                isLooping={false}
-                isMuted={false}
-                volume={0.8}
-                style={{ 
-                    width: '100%', 
-                    height: '100%',
-                    backgroundColor: '#f0f0f0'
-                }}
-                onLoad={handleVideoLoad}
-                onError={handleVideoError}
-                onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
-                useNativeControls={false}
-                progressUpdateIntervalMillis={1000}
+                className="w-full h-full"
+                resizeMode="cover"
+                alt={`Post Media`}
                 />
-            ) : (
-            <Image
-            key={`post-image-${mediaUri}`}
-            source={{ uri: mediaUri }}
-            className="w-full h-full"
-            resizeMode="cover"
-            alt={`Post Media`}
+            )}
+            </Box>
+
+            {/* Post description */}
+            <TextInput
+                placeholder="Write a caption..."
+                multiline
+                value={content}
+                onChangeText={setContent}
+                className="border border-gray-300 p-3 rounded-lg my-4 text-base"
+                style={{ minHeight: 100 }}
             />
-        )}
-        </Box>
 
-        {/* Post description */}
-        <TextInput
-            placeholder="Write a caption..."
-            multiline
-            value={content}
-            onChangeText={setContent}
-            className="border border-gray-300 p-3 rounded-lg my-4 text-base"
-            style={{ minHeight: 100 }}
-        />
-
-        {/* Location */}
-        <Button 
-            variant="link"
-            onPress={() => setAddressModalOpen(true)} 
-            className="mb-4"
-        >
-            <ButtonText>
-                {locationString ? `📍 ${locationString}` : 'Select Location'}
-            </ButtonText>
-        </Button>
-
-        {/* Publish */}
-        <MyLinearGradient
-            type='button'
-            color={content ? 'purple': "gray"}
-        >
-            <Button onPress={handlePost} isDisabled={!content}>
+            {/* Location */}
+            <Button 
+                variant="link"
+                onPress={() => setAddressModalOpen(true)} 
+                className="mb-4"
+            >
                 <ButtonText>
-                    Publish
+                    {locationString ? `📍 ${locationString}` : 'Select Location'}
                 </ButtonText>
             </Button>
-        </MyLinearGradient>
 
-        {/* Location Modal */}
-        <AddressSearch
-            isOpen={addressModalOpen}
-            onClose={() => setAddressModalOpen(false)}
-            onSetAddress={handleAddressSelect}
-        />
-    </ScrollView>
+            {/* Publish */}
+            <MyLinearGradient
+                type='button'
+                color={content ? 'purple': "gray"}
+            >
+                <Button onPress={handlePost} isDisabled={!content}>
+                    <ButtonText>
+                        Publish
+                    </ButtonText>
+                </Button>
+            </MyLinearGradient>
+
+            {/* Location Modal */}
+            <AddressSearch
+                isOpen={addressModalOpen}
+                onClose={() => setAddressModalOpen(false)}
+                onSetAddress={handleAddressSelect}
+            />
+        </ScrollView>
+    </KeyboardAvoidingView>
+    </>
     );
 };
 

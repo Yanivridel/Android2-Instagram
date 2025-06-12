@@ -63,7 +63,6 @@ const StackNavigator = () => {
                 <Stack.Screen name="Leaderboard" component={LeaderboardScreen} />
                 <Stack.Screen name="Chat" component={ChatScreen} />
                 <Stack.Screen name="MessageScreen" component={MessageScreen} />
-                {/* <Stack.Screen name="Post" component={PostScreen} /> */}
                 <Stack.Screen name="test" component={testscreen} />
 
               </Stack.Navigator>

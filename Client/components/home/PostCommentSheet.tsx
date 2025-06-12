@@ -5,7 +5,7 @@ import {
     ActionsheetDragIndicatorWrapper, 
     ActionsheetBackdrop 
 } from "@/components/ui/actionsheet";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { 
     NativeViewGestureHandler, 
     PanGestureHandler, 
@@ -29,23 +29,30 @@ import SpinnerLoader from "../SpinnerLoader";
 import MyLinearGradient from "../gradient/MyLinearGradient";
 import { ButtonText, Button } from "../ui/button";
 import { Divider } from "../ui/divider";
+import { useKeyboard } from '@react-native-community/hooks';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface PostCommentSheetProps {
     showActionsheet: boolean;
     setShowActionsheet: (showActionsheet: boolean) => void;
-    postId: string
+    postId: string;
+    handleAvatarPress: (userId: string) => void;
 }
-
 
 type ContextType = {
     startY: number;
 };
 
-const PostCommentSheet = ({showActionsheet, setShowActionsheet, postId}: PostCommentSheetProps) => {
+const PostCommentSheet = ({showActionsheet, setShowActionsheet, postId, handleAvatarPress}: PostCommentSheetProps) => {
     const handleClose = () => setShowActionsheet(false);
     const [ comments, setComments ] = useState<IComment[] | null>(null);
     const [ isLoadingComments, setIsLoadingComments ] = useState(true);
-    const [ input, setInput ] = useState('');
+    const [inputValue, setInputValue] = useState('');
+    const inputRef = useRef(inputValue);
+    const setInput = (text: string) => {
+        inputRef.current = text;
+        setInputValue(text);
+    };
 
     // Create shared values for tracking the gesture and scroll state
     const translateY = useSharedValue(0);
@@ -56,6 +63,10 @@ const PostCommentSheet = ({showActionsheet, setShowActionsheet, postId}: PostCom
     const flatListRef = useAnimatedRef<Animated.FlatList<any>>();
     const panRef = useRef(null);
     const nativeViewRef = useRef(null);
+
+    // Keyboard
+    const keyboard = useKeyboard();
+    const insets = useSafeAreaInsets();
 
     useEffect(() => {
         getCommentsByPostId({ postId })
@@ -123,17 +134,21 @@ const PostCommentSheet = ({showActionsheet, setShowActionsheet, postId}: PostCom
         </ActionsheetDragIndicatorWrapper>
     );
 
-    const sendComment = async () => {
+    const sendComment = useCallback(async () => {
+        const text = inputRef.current.trim();
+        if (!text) return;
+    
         const commentPayload = {
-            content: input, 
-            postId, 
-            parentCommentId: null
-        }
+        content: text,
+        postId,
+        parentCommentId: null
+        };
         const newComment = await createComment(commentPayload);
-        if(newComment)
-            setComments(comments => comments ? [newComment, ...comments ] : [newComment])
+        if (newComment) {
+            setComments(prev => prev ? [newComment, ...prev] : [newComment]);
+        }
         setInput('');
-    }
+    }, [postId]);
 
     return (
         <>
@@ -147,6 +162,7 @@ const PostCommentSheet = ({showActionsheet, setShowActionsheet, postId}: PostCom
             <Animated.View 
                 className="flex-1 "
                 style={animatedStyle}>
+
                 <ActionsheetContent>
                     <HeaderComponent />
                     <Text className="font-bold">Comments</Text>
@@ -159,7 +175,7 @@ const PostCommentSheet = ({showActionsheet, setShowActionsheet, postId}: PostCom
                             className="flex-1 w-full"
                             ref={flatListRef}
                             data={comments}
-                            renderItem={({ item }) => <PostComment comment={item} />}
+                            renderItem={({ item }) => <PostComment comment={item} handleAvatarPress={handleAvatarPress} />}
                             keyExtractor={(item) => String(item._id)} // Change later
                             onScroll={scrollHandler}
                             scrollEventThrottle={16}
@@ -175,17 +191,21 @@ const PostCommentSheet = ({showActionsheet, setShowActionsheet, postId}: PostCom
                     </NativeViewGestureHandler>
                     
                     <Divider />
-                    <KeyboardAvoidingView
-                        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 35}
+                    <Box 
+                        className="flex-row w-full items-center px-4 py-2 gap-2"
+                        style={{
+                        marginBottom: keyboard.keyboardShown 
+                            ? (Platform.OS === 'ios' ? insets.bottom : 350)
+                            : 20
+                        }}
                     >
-                    <Box className="flex-row w-full items-center px-4 py-2 gap-2 mb-10">
                         <TextInput
                             className="flex-1 bg-white rounded-full px-4 py-2"
                             placeholder="Message..."
                             placeholderTextColor="#aaa"
-                            value={input}
+                            value={inputValue}
                             onChangeText={setInput}
+                            autoCorrect={false}
                         />
                         <MyLinearGradient type='button' color='purple' className='w-[100px]'>
                             <Button onPress={sendComment} className="h-fit rounded-full">
@@ -193,8 +213,8 @@ const PostCommentSheet = ({showActionsheet, setShowActionsheet, postId}: PostCom
                             </Button>
                         </MyLinearGradient>
                     </Box>
-                    </KeyboardAvoidingView>
                 </ActionsheetContent>
+
             </Animated.View>
 
             </PanGestureHandler>

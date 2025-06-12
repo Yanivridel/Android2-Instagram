@@ -57,8 +57,7 @@ export const registerUser = async (req: Request<{}, {}, IRegisterUser>, res: Res
 export const loginUser = async (req: Request, res: Response): Promise<void> => {
     try {
         const { uid } = req.user!;
-        console.log("Entered Login user Server Controller");
-        
+
         // Find the user based on the Firebase UID
         const existingUser = await userModel.findOne({ firebaseUid: uid });
 
@@ -132,5 +131,33 @@ export const getAutocompletePrefix = async (req: Request, res: Response) => {
     } catch (error) {
         console.error('Error searching users:', error);
         res.status(500).json({ message: 'Failed to search users' });
+    }
+};
+
+export const updateUserBio = async (req: AuthenticatedRequest, res: Response) => {
+    const { bio } = req.body;
+    const userId = req.userDb?._id;
+
+    if (!bio) {
+        res.status(400).json({ message: "Bio is required." });
+        return;
+    }
+
+    try {
+        const user = await userModel.findByIdAndUpdate(
+            userId,
+            { bio },
+            { new: true, runValidators: true }
+        );
+
+        if (!user) {
+            res.status(404).json({ message: "User not found." });
+            return;
+        }
+
+        res.status(200).json({ message: "Bio updated successfully.", user });
+    } catch (error) {
+        console.error("Error updating bio:", error);
+        res.status(500).json({ message: "Internal server error." });
     }
 };

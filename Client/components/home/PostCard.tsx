@@ -187,7 +187,13 @@ const PostCard = ({ post }: PostCardProps) => {
     setModalOpen(true);
   }
 
+  const handleAvatarPress = ( userId: string) => {
+    setShowCommentsSheet(false);
+    navigation.navigate("MainApp", { screen: "Profile", params: { userId }})
+  }
+
   return (
+  <>
     <Box className="bg-white dark:bg-card-dark rounded-lg">
       {/* Deleted Post Modal */}
       <MyModal
@@ -201,7 +207,9 @@ const PostCard = ({ post }: PostCardProps) => {
 
       {/* Header: Avatar, Username, Menu */}
       <Box className="flex-row items-center justify-between px-4 py-2">
-        <Box className="flex-row items-center">
+        <Pressable className="flex-row items-center"
+          onPress={() => handleAvatarPress(post.author._id as string)}
+        >
           <Avatar className="bg-indigo-600 border-[2.5px] border-indigo-400">
             <AvatarFallbackText className="text-white">
               {author.username}
@@ -218,12 +226,12 @@ const PostCard = ({ post }: PostCardProps) => {
               {author.username}
             </Text>
             {post.locationString &&
-              <Text className="text-sm text-gray-500 max-w-[85%]">
+              <Text className="text-sm text-gray-500">
                 {post.locationString}
               </Text>
             }
           </Box>
-        </Box>
+        </Pressable>
 
         {/* Options Menu */}
         <Menu
@@ -382,11 +390,6 @@ const PostCard = ({ post }: PostCardProps) => {
             }}
           />
           {/* Comment */}
-          <PostCommentSheet 
-            showActionsheet={showCommentsSheet}
-            setShowActionsheet={setShowCommentsSheet} 
-            postId={post._id}
-            />
           <TouchableIcon
             Icon={IC_Comment}
             className="h-6 w-6"
@@ -443,11 +446,19 @@ const PostCard = ({ post }: PostCardProps) => {
           }
           
         </Box>
-        <Text className="mt-1 text-[12px] text-subText-light dark:text-subText-dark">
+        <Text className="mt-1 text-[12px] text-gray-500">
           {`Posted ${getTimeAgo(createdAt)}`}
         </Text>
       </Box>
     </Box>
+    <PostCommentSheet 
+      showActionsheet={showCommentsSheet}
+      setShowActionsheet={setShowCommentsSheet} 
+      postId={post._id}
+      handleAvatarPress={handleAvatarPress}
+    />
+  </>
+
   )
 }
 
