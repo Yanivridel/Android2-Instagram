@@ -8,22 +8,9 @@ import SpinnerLoader from '@/components/SpinnerLoader';
 import UserAvatar from '@/components/UserAvatar';
 import { cn } from '@/components/ui/cn';
 
-const dummyLeaderboard = [
-    { id: '1', username: 'champion01', avatar: 'https://i.pravatar.cc/150?img=1', score: 3200 },
-    { id: '2', username: 'elite_girl', avatar: 'https://i.pravatar.cc/150?img=2', score: 2900 },
-    { id: '3', username: 'pro_guy', avatar: 'https://i.pravatar.cc/150?img=3', score: 2700 },
-    { id: '4', username: 'mvp_2025', avatar: 'https://i.pravatar.cc/150?img=4', score: 2600 },
-    { id: '5', username: 'queen_bee', avatar: 'https://i.pravatar.cc/150?img=5', score: 2500 },
-    { id: '6', username: 'legendary', avatar: 'https://i.pravatar.cc/150?img=6', score: 2400 },
-    { id: '7', username: 'sunny_side', avatar: 'https://i.pravatar.cc/150?img=7', score: 2300 },
-    { id: '8', username: 'dark_knight', avatar: 'https://i.pravatar.cc/150?img=8', score: 2200 },
-    { id: '9', username: 'firestorm', avatar: 'https://i.pravatar.cc/150?img=9', score: 2100 },
-    { id: '10', username: 'last_hope', avatar: 'https://i.pravatar.cc/150?img=10', score: 2000 },
-];
-
 const LeaderboardScreen = ({ navigation }: Props) => {
     const [ Leaderboard, setLeaderboard] = useState<IUser[] | null>(null);
-    const [ isLoading, setIsLoading] = useState(false);
+    const [ isLoading, setIsLoading] = useState(false);    
 
     useEffect(() => {
         setIsLoading(true);

@@ -12,17 +12,74 @@ interface MessagePayload {
     };
 }
 
-export default function registerSocketHandlers(socket: Socket, io: Server) {
-    socket.on('join', async (chatId: string) => {
-        socket.join(chatId);
-        console.log(`✅ ${socket.id} joined chat ${chatId}`);
+// export default function registerSocketHandlers(socket: Socket, io: Server) {
+//     socket.on('join', async (chatId: string) => {
+//         socket.join(chatId);
+//         console.log(`✅ ${socket.id} joined chat ${chatId}`);
 
-        try {
-            const messages = await messageModel.find({ chatId }).sort({ createdAt: 1 });
-            socket.emit('chat-history', messages);
-        } catch (err) {
-            console.error("❌ Failed to load messages", err);
-        }
+//         try {
+//             const messages = await messageModel.find({ chatId }).sort({ createdAt: 1 });
+//             socket.emit('chat-history', messages);
+//         } catch (err) {
+//             console.error("❌ Failed to load messages", err);
+//         }
+//     });
+
+//     socket.on('leave', (chatId: string) => {
+//         socket.leave(chatId);
+//         console.log(`🚪 ${socket.id} left chat ${chatId}`);
+//     });
+
+//     socket.on('send-message', async ({ chatId, message }: MessagePayload) => {
+//         try {
+//             // Fetch chat participants
+//             const chat = await chatModel.findById(chatId);
+//             if (!chat) {
+//                 console.error("❌ Chat not found");
+//                 return;
+//             }
+
+//             const senderId = message.senderId;
+//             const recipientId = chat.participants.find((p) => p.toString() !== senderId);
+
+//             if (!recipientId) {
+//                 console.error("❌ Could not determine recipientId");
+//                 return;
+//             }
+
+//             const newMessage = await messageModel.create({
+//                 content: message.content,
+//                 senderId,
+//                 recipientId,
+//                 chatId,
+//             });
+
+//             io.to(chatId).emit('message', {
+//                 _id: newMessage._id,
+//                 content: newMessage.content,
+//                 senderId,
+//                 recipientId,
+//                 chatId,
+//                 createdAt: newMessage.createdAt,
+//             });
+
+//             io.to(chatId).emit('receive-message', { chatId, message });
+
+
+//             console.log(`📨 Message stored and sent to chat ${chatId}`);
+//         } catch (err) {
+//             console.error("❌ Failed to send message", err);
+//         }
+//     });
+
+//     socket.on('disconnect', () => {
+//         console.log(`❌ User disconnected: ${socket.id}`);
+//     });
+// }
+
+export default function registerSocketHandlers(socket: Socket, io: Server) {
+    socket.on("join-chat", (chatId) => {
+        socket.join(chatId);
     });
 
     socket.on('leave', (chatId: string) => {
@@ -32,6 +89,8 @@ export default function registerSocketHandlers(socket: Socket, io: Server) {
 
     socket.on('send-message', async ({ chatId, message }: MessagePayload) => {
         try {
+            console.log("chatId, message", chatId, message);
+            
             // Fetch chat participants
             const chat = await chatModel.findById(chatId);
             if (!chat) {
@@ -47,6 +106,7 @@ export default function registerSocketHandlers(socket: Socket, io: Server) {
                 return;
             }
 
+            // Create the message in database
             const newMessage = await messageModel.create({
                 content: message.content,
                 senderId,
@@ -54,16 +114,11 @@ export default function registerSocketHandlers(socket: Socket, io: Server) {
                 chatId,
             });
 
-            io.to(chatId).emit('message', {
-                _id: newMessage._id,
-                content: newMessage.content,
-                senderId,
-                recipientId,
-                chatId,
-                createdAt: newMessage.createdAt,
-            });
 
-            console.log(`📨 Message stored and sent to chat ${chatId}`);
+            // Send the populated message to all clients in the chat room
+            io.to(chatId).emit('receive-message', newMessage);
+
+            console.log(`📨 Message ${newMessage} was stored and sent to chat ${chatId}`);
         } catch (err) {
             console.error("❌ Failed to send message", err);
         }

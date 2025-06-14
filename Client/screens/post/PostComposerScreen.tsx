@@ -198,7 +198,7 @@ const PostComposerScreen: React.FC<Props> = ({ route, navigation }) => {
             {/* Publish */}
             <MyLinearGradient
                 type='button'
-                color={content ? 'purple': "gray"}
+                color={content ? 'turquoise-button': "gray"}
             >
                 <Button onPress={handlePost} isDisabled={!content}>
                     <ButtonText>

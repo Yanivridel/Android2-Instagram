@@ -124,7 +124,7 @@ export default function ProfileScreen({ route, navigation }: ProfileScreenProps)
 
 	return (
 		<Box className="flex-1">
-		<MyLinearGradient type="background" color={appliedTheme === 'dark' ? 'blue' : 'purple'}>
+		<MyLinearGradient type="background" color={appliedTheme === 'dark' ? 'blue' : 'turquoise'}>
 			<ProfileTopBar username={profileUser.username} navigation={navigation}/>
 			<Box className="gap-2 p-4">
 				{/* Avatar & Stats */}

@@ -20,7 +20,7 @@ import Animated, {
     useAnimatedScrollHandler,
     useAnimatedRef
 } from "react-native-reanimated";
-import { View, Text, StyleSheet, TextInput, KeyboardAvoidingView, Platform } from "react-native";
+import { Text, TextInput, Platform } from "react-native";
 import { Box } from "../ui/box";
 import PostComment from "./PostComment";
 import { IComment } from "@/types/commentTypes";
@@ -207,7 +207,7 @@ const PostCommentSheet = ({showActionsheet, setShowActionsheet, postId, handleAv
                             onChangeText={setInput}
                             autoCorrect={false}
                         />
-                        <MyLinearGradient type='button' color='purple' className='w-[100px]'>
+                        <MyLinearGradient type='button' color='turquoise-button' className='w-[100px]'>
                             <Button onPress={sendComment} className="h-fit rounded-full">
                                 <ButtonText className="text-white">Send</ButtonText>
                             </Button>

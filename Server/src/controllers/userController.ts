@@ -86,7 +86,6 @@ export const getUserByEmail = async (req: Request, res: Response): Promise<void>
     try {
         const { email } = req.params;
         const user = await userModel.findOne({ email });
-        console.log("User found:", user);
         res.status(200).json({ user });
     } catch (error) {
         res.status(500).json({ error: "Failed to get user by email" });

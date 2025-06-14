@@ -19,7 +19,6 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
         const decodedToken = await firebaseAdmin.auth().verifyIdToken(idToken);
 
         const user = await userModel.findOne({ firebaseUid: decodedToken.uid });
-        console.log("user", user)
         if (!user) {
             res.status(401).json({ message: "User not found in DB" });
             return;

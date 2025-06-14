@@ -55,7 +55,7 @@ const Layout = React.memo(({ children, navigation }: LayoutProps) => {
 							<Box className="flex-col items-center text-center">
 								<IC_Home
 									className="w-7 h-7 mb-1"
-									color={currentScreen === 'Home' ? '#4A3EF6' : '#B0B9C1'}
+									color={currentScreen === 'Home' ? '#00877D' : '#B0B9C1'}
 								/>
 							</Box>
 						</TouchableOpacity>
@@ -64,7 +64,7 @@ const Layout = React.memo(({ children, navigation }: LayoutProps) => {
 							<Box className="flex-col items-center text-center">
 								<IC_Search
 									className="w-7 h-7 mb-1"
-									color={currentScreen === 'Explore' ? '#4A3EF6' : '#B0B9C1'}
+									color={currentScreen === 'Explore' ? '#00877D' : '#B0B9C1'}
 								/>
 							</Box>
 						</TouchableOpacity>
@@ -74,7 +74,7 @@ const Layout = React.memo(({ children, navigation }: LayoutProps) => {
 					<Box className="w-20 relative">
 						<TouchableOpacity onPress={() => navigateToScreen('Camera')} activeOpacity={0.7}>
 							<Box
-								className={`bg-button-${appliedTheme} bottom-[18px] rounded-full w-16 h-16 items-center self-center justify-center`}
+								className={`bg-[#00877D] bottom-[18px] rounded-full w-16 h-16 items-center self-center justify-center`}
 							>
 								<IC_AddPost className="w-9 h-9" color="white" />
 							</Box>
@@ -90,7 +90,7 @@ const Layout = React.memo(({ children, navigation }: LayoutProps) => {
 							<Box className="flex-col items-center text-center">
 								<IC_Leaderboard
 									className="w-8 h-8"
-									color={currentScreen === 'Leaderboard' ? '#4A3EF6' : '#B0B9C1'}
+									color={currentScreen === 'Leaderboard' ? '#00877D' : '#B0B9C1'}
 								/>
 							</Box>
 						</TouchableOpacity>
@@ -102,7 +102,7 @@ const Layout = React.memo(({ children, navigation }: LayoutProps) => {
 							<Box className="flex-col items-center text-center">
 								<IC_Profile
 									className="w-8 h-8"
-									color={currentScreen === 'Profile' ? '#4A3EF6' : '#B0B9C1'}
+									color={currentScreen === 'Profile' ? '#00877D' : '#B0B9C1'}
 								/>
 							</Box>
 						</TouchableOpacity>

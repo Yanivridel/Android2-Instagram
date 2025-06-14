@@ -15,16 +15,19 @@ const ChatScreen: React.FC<Props> = () => {
     const navigation = useNavigation<NavigationProp<ParamListBase>>();
     const [search, setSearch] = useState('');
     const [chats, setChats] = useState<IChat[] | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
     
     const filteredChats = chats?.filter(chat =>
         chat.participants[0].username.toLowerCase().includes(search.toLowerCase())
     );
 
     useEffect(() => {
+        setIsLoading(true);
         getAllChats()
         .then(chats => {
             setChats(chats);
-        });
+        })
+        .finally(() => setIsLoading(false));
     }, [])
 
     const renderItem = ({ item: chat }: { item: IChat }) => (
@@ -74,7 +77,13 @@ const ChatScreen: React.FC<Props> = () => {
             keyExtractor={item => item._id}
             renderItem={renderItem}
             keyboardShouldPersistTaps="handled"
-            ListEmptyComponent={<SpinnerLoader className='mt-10'/>}
+            ListEmptyComponent={ 
+                isLoading ?
+                <SpinnerLoader className='mt-10' /> :
+                <Box className='justify-center items-center mt-10'>
+                    <Text className='p-4 color-indigo-600'>No Chats Yet. Chat someone through profile first</Text>
+                </Box>
+            }
         />
         </Box>
     );

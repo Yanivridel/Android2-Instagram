@@ -5,7 +5,6 @@ import OverlayLoading from '@/components/OverlayLoading';
 import React from 'react';
 
 // 🚀 Lazy Load Screens (Except Settings, which loads instantly)
-const ChatScreen = lazy(() => import('./chat/ChatScreen'));
 
 // 📌 Regular Imports (SettingsScreen Now Loads Instantly)
 import HomeScreen from './home/HomeScreen';
@@ -22,6 +21,7 @@ import CameraScreen from './post/CameraScreen';
 import { ReduxInitializer } from '@/store/ReduxInitializer';
 import MessageScreen from './chat/MessageScreen';
 import PostComposerScreen from './post/PostComposerScreen';
+import ChatScreen from './chat/ChatScreen';
 
 const MemoizedLayout = React.memo(Layout);
 

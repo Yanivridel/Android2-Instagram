@@ -210,7 +210,7 @@ const Signup: React.FC<Props> = ({ navigation }) => {
                         </Text>
 
                         {/* Signup Button */}
-                        <MyLinearGradient type='button' color='purple'>
+                        <MyLinearGradient type='button' color='turquoise-button'>
                             <Button onPress={handleSubmitSignup}>
                                 <ButtonText className="text-white">
                                 {isLoading ? <ButtonSpinner color={"white"} className="h-6" /> : "Create Account"}
