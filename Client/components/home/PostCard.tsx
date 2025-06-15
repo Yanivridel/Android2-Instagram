@@ -164,7 +164,7 @@ const PostCard = ({ post }: PostCardProps) => {
 
   const handleDeletePost = async () => {
     await deletePost({ postId: post._id });
-    setModalOpen(true);
+    setModalOpen(false);
   }
 
   const handleRating = async (value: number, type: "Post" | "Comment" | "User", targetId: string) => {
