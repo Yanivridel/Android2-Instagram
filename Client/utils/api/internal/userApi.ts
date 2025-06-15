@@ -3,6 +3,7 @@ import { createUserWithEmailAndPassword, sendEmailVerification, signInWithEmailA
 import { FirebaseAuth } from '@/FirebaseConfig';
 import { api } from './apiService';
 import { IUser } from '@/types/userTypes';
+import { IGroup } from '@/types/groupTypes';
 
 export interface RegisterUserReq {
     email: string;
@@ -88,13 +89,16 @@ export const getUserByEmail = async ({ userEmail }: { userEmail: string} ): Prom
     return data.user;
 }
 
-export const getAutocompletePrefix = async ({ prefix }: { prefix: string} ): Promise<IUser[] | null> => {
-    const { data } = await api.get<IUser[]>(`api/users/autocomplete/${prefix}`);
+interface getAutocompletePrefixRes {
+    users: IUser[];
+    groups: IGroup[];
+}
+export const getAutocompletePrefix = async ({ prefix }: { prefix: string} ): Promise<getAutocompletePrefixRes | null> => {
+    const { data } = await api.get<getAutocompletePrefixRes>(`api/users/autocomplete/${prefix}`);
     return data;
 }
 
-export const updateUserBio = async ({ bio }: { bio: string} ): Promise<IUser | null> => {
-    const { data } = await api.put<IUser>(`api/users/bio`, { bio });
-    return data;
-}
-
+export const updateUser = async (fields: Partial<IUser>): Promise<IUser | null> => {
+	const { data } = await api.put<IUser>('api/users/', fields);
+	return data;
+};

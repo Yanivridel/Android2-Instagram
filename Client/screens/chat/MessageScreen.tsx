@@ -216,12 +216,19 @@ const MessageScreen = ({ route, navigation }: Props) => {
                             )}
                             {!isSentByCurrentUser && !showAvatar && <Box className="w-8 mr-2" />}
 
-                            <Box className={`px-4 py-2 max-w-[75%] rounded-2xl ${isSentByCurrentUser ? 'bg-violet-600' : 'bg-zinc-700'} ${isSentByCurrentUser ? 'self-end' : 'self-start'}`}>
-                            <Text className="text-white">{item.content}</Text>
-                            <Text className="text-white text-xs mt-1 text-right opacity-60">
+                            <MyLinearGradient
+                            type='background'
+                            color={isSentByCurrentUser ? 'turquoise-button' : "gray"}
+                            className={`w-fit rounded-2xl px-4 py-2 max-w-[75%] ${isSentByCurrentUser ? 'self-end' : 'self-start'}`}
+                            >
+
+                            <Text className={isSentByCurrentUser ? "text-white": "text-black"}>
+                                {item.content}
+                            </Text>
+                            <Text className={`text-xs mt-1 text-right opacity-60 ${isSentByCurrentUser ? "text-white": "text-black"}`}>
                                 {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </Text>
-                            </Box>
+                            </MyLinearGradient>
 
                             {isSentByCurrentUser && showAvatar && (
                             <UserAvatar

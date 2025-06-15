@@ -44,6 +44,7 @@ import messageRoutes from './routes/messageRoutes';
 import chatRoutes from 'routes/chatRoutes';
 import commentRoutes from 'routes/commentRoutes';
 import ratingRoutes from 'routes/ratingRoutes';
+import groupRoutes from 'routes/groupRoutes';
 
 app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
@@ -51,6 +52,7 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/ratings', ratingRoutes);
 app.use('/api/chats', chatRoutes);
+app.use('/api/groups', groupRoutes);
 
 
 // Socket.io

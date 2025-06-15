@@ -1,16 +1,17 @@
+import React, { useRef } from 'react';
 import MyLinearGradient from '@/components/gradient/MyLinearGradient'
 import { Avatar, AvatarFallbackText, AvatarImage } from '@/components/ui/avatar'
 import { Box } from '@/components/ui/box'
 import{ Text } from '@/components/ui/text'
 import { Props } from '@/types/NavigationTypes'
-import {IC_AddUsers, IC_Grid, IC_Tag, IC_Vi } from '@/utils/constants/Icons'
+import {IC_AddUsers, IC_Edit, IC_Grid, IC_Tag, IC_Vi } from '@/utils/constants/Icons'
 import { useTheme } from '@/utils/Themes/ThemeProvider'
 import CardUpRounded from '@/components/CardUpRounded'
 import ProfileTopBar from '@/components/profile/ProfileTopBar'
 import { Button, ButtonText } from '@/components/ui/button'
 import RatingPopup from '@/components/RatingPopup'
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
-import { Dimensions, TextInput } from 'react-native';
+import { Dimensions, Pressable, TextInput } from 'react-native';
 import TouchableIcon from '@/components/TouchableIcon'
 import { PostsGrid } from '@/components/post/PostsGrid'
 import { useEffect, useState } from 'react'
@@ -21,10 +22,12 @@ import { getAllMyPosts, getPostsByUserId } from '@/utils/api/internal/postApi'
 import { IPost } from '@/types/postTypes'
 import SpinnerLoader from '@/components/SpinnerLoader'
 import UserAvatar from '@/components/UserAvatar'
-import { getUserById, updateUserBio } from '@/utils/api/internal/userApi'
+import { getUserById, updateUser } from '@/utils/api/internal/userApi'
 import { getMyRatings } from '@/utils/api/internal/ratingApi'
-import { updateBio, updateRatingStats } from '@/store/slices/userSlices'
+import { updateBio, updateProfileImage, updateRatingStats } from '@/store/slices/userSlices'
 import { createGetChat } from '@/utils/api/internal/chatApi'
+import ImagePickerHandler, { ImagePickerHandlerRef } from '@/hooks/ImagePickerHandler';
+import { uploadMedia } from '@/utils/api/external/CloudinaryAPI';
 
 
 const { width } = Dimensions.get('window');
@@ -53,17 +56,20 @@ export default function ProfileScreen({ route, navigation }: ProfileScreenProps)
 	const [currentTab, setCurrentTab] = useState<'grid' | 'tag'>('grid');
 	const [profileUser, setProfileUser] = useState<IUser | null>(null);
 	const [posts, setPosts] = useState<IPost[] | null>(null);
-	const [isLoading, setIsLoading] = useState(true);
+	const [isLoadingUser, setIsLoadingUser] = useState(false);
+	const [isLoadingPosts, setIsLoadingPosts] = useState(false);
+	// const [isLoadingPosts, setIsLoadingPosts] = useState(false);
 	const isOwnProfile = !userId || currentUser._id === userId;
 	const [profileEdit, setProfileEdit] = useState(false);
 	const [editContent, setEditContent] = useState<string | null>(null);
-
+	const pickerRef = useRef<ImagePickerHandlerRef>(null);
 
 	useEffect(() => {
 		const fetchData = async () => {
-			setIsLoading(true);
+			setIsLoadingPosts(true);
 			try {
 				if (userId) {
+					setIsLoadingUser(true);
 					const [userDetails, userPosts] = await Promise.all([
 						getUserById({ userId }),
 						getPostsByUserId({ userId }),
@@ -87,7 +93,8 @@ export default function ProfileScreen({ route, navigation }: ProfileScreenProps)
 			} catch (err) {
 				console.error('Error loading profile data:', err);
 			} finally {
-				setIsLoading(false);
+				setIsLoadingUser(false);
+				setIsLoadingPosts(false);
 			}
 		};
 		fetchData();
@@ -104,7 +111,7 @@ export default function ProfileScreen({ route, navigation }: ProfileScreenProps)
 
 	const handleEditProfile = async () => {
 		if(!editContent) return;
-		await updateUserBio({ bio: editContent });
+		await updateUser({ bio: editContent });
 		dispatch(updateBio(editContent));
 		setProfileEdit(false);
 	}
@@ -118,7 +125,7 @@ export default function ProfileScreen({ route, navigation }: ProfileScreenProps)
 		}
 	} 
 
-	if (isLoading || !profileUser) {
+	if (isLoadingUser || !profileUser) {
 		return <SpinnerLoader />;
 	}
 
@@ -128,7 +135,34 @@ export default function ProfileScreen({ route, navigation }: ProfileScreenProps)
 			<ProfileTopBar username={profileUser.username} navigation={navigation}/>
 			<Box className="gap-2 p-4">
 				{/* Avatar & Stats */}
-				<Box className="flex-row w-full justify-between items-center">
+				<Box className="flex-row w-full justify-between items-center relative">
+					{ profileEdit &&
+						<Box className='absolute top-4 -left-1 bg-white z-50 p-2 rounded-full'>
+							<Pressable
+								onPress={() => pickerRef.current?.pickImage()}
+							>
+								<IC_Edit className='w-5 h-5'/>
+							</Pressable>
+
+							<ImagePickerHandler
+								ref={pickerRef}
+								onImagePicked={async (uri) => {
+									try {
+										const cloudUri = await uploadMedia(uri, "Profile Picture");
+										if (cloudUri) {
+											dispatch(updateProfileImage(cloudUri));
+											setProfileUser((prev) =>
+												prev ? { ...prev, profileImage: cloudUri } : prev
+											);
+											await updateUser({ profileImage: uri });
+										}
+									} catch (err) {
+										console.error("Image upload failed:", err);
+									}
+								}}
+							/>
+						</Box>
+					}
 					<UserAvatar 
 						rating={profileUser.ratingStats.averageScore}
 						username={profileUser.username}
@@ -184,15 +218,19 @@ export default function ProfileScreen({ route, navigation }: ProfileScreenProps)
 				{/* Buttons (only on own profile) */}
 				<Box className="flex-row gap-2 px-1">
 					<MyLinearGradient type='button' color='light-blue' className='flex-1'>
-						<Button className="h-fit"
+						<Button className="h-fit "
 						onPress={() => 
 							isOwnProfile ? 
-								setProfileEdit(true) : 
+								setProfileEdit(prev => !prev) : 
 								handleNavToChat()
 							} 
 						>
 							<ButtonText className="text-black">
-								{isOwnProfile ? "Edit Profile": "Chat"}
+								{isOwnProfile ? 
+									profileEdit ? "Close Edit" : "Edit Profile"
+									: 
+									"Chat"
+								}
 							</ButtonText>
 						</Button>
 					</MyLinearGradient>
@@ -231,26 +269,32 @@ export default function ProfileScreen({ route, navigation }: ProfileScreenProps)
 			</Box>
 
 			{posts?.length ? (
-				<Box className="flex-1 mt-1">
-					{currentTab === 'grid' && (
-						<PostsGrid 
-							posts={posts} 
-							onPostPress={(post) => navigation.navigate("MainApp", {
-								screen: "Home",
-								params: { postId: post._id },
-							})}
-						/>
-					)}
-					{currentTab === 'tag' && (
-						<Box className='justify-center items-center mt-10'>
-							<Text className='p-4 color-indigo-600'>No one tagged you in a post yet</Text>
-						</Box>
-					)}
-				</Box>
+			<Box className="flex-1 mt-1">
+				{currentTab === 'grid' && (
+					<PostsGrid 
+						posts={posts} 
+						onPostPress={(post) => navigation.navigate("MainApp", {
+							screen: "Home",
+							params: { postId: post._id },
+						})}
+					/>
+				)}
+				{currentTab === 'tag' && (
+					<Box className='justify-center items-center mt-10'>
+						<Text className='p-4 color-indigo-600'>No one tagged you in a post yet</Text>
+					</Box>
+				)}
+			</Box>
 			) : (
-				<Box className='justify-center items-center mt-10'>
-					<Text className='p-4 color-indigo-600'>No Posts Found</Text>
-				</Box>
+			<>
+			{ isLoadingPosts ? 
+			<SpinnerLoader className=''/>
+			:
+			<Box className='justify-center items-center mt-10'>
+				<Text className='p-4 color-indigo-600'>No Posts Found</Text>
+			</Box>
+			}
+			</>
 			)}
 		</CardUpRounded>
 	</Box>

@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { userModel } from '../models/userModel';
 import { MongoError } from 'mongodb';
 import { AuthenticatedRequest } from 'types/expressTypes';
+import { groupModel } from 'models/groupModel';
 
 interface IRegisterUser {
     firebaseUid: string;
@@ -126,37 +127,46 @@ export const getAutocompletePrefix = async (req: Request, res: Response) => {
         .limit(5)
         .select('username profileImage ratingStats');
 
-        res.status(200).json(users);
+        const groups = await groupModel.find({
+            name: { $regex: prefix, $options: 'i' }
+        })
+        .limit(5)
+        .select('name groupPicture description');
+
+        res.status(200).json({
+            users,
+            groups
+        });
     } catch (error) {
-        console.error('Error searching users:', error);
-        res.status(500).json({ message: 'Failed to search users' });
+        console.error('Error searching users and groups:', error);
+        res.status(500).json({ message: 'Failed to search users and groups' });
     }
 };
 
-export const updateUserBio = async (req: AuthenticatedRequest, res: Response) => {
-    const { bio } = req.body;
-    const userId = req.userDb?._id;
+export const updateUser = async (req: AuthenticatedRequest, res: Response) => {
+	const updates = req.body;
+	const userId = req.userDb?._id;
 
-    if (!bio) {
-        res.status(400).json({ message: "Bio is required." });
+	if (!updates || Object.keys(updates).length === 0) {
+		res.status(400).json({ message: "No fields provided to update." });
         return;
-    }
+	}
 
-    try {
-        const user = await userModel.findByIdAndUpdate(
-            userId,
-            { bio },
-            { new: true, runValidators: true }
-        );
+	try {
+		const updatedUser = await userModel.findByIdAndUpdate(
+			userId,
+			{ $set: updates },
+			{ new: true, runValidators: true }
+		);
 
-        if (!user) {
-            res.status(404).json({ message: "User not found." });
+		if (!updatedUser) {
+			res.status(404).json({ message: "User not found." });
             return;
-        }
+		}
 
-        res.status(200).json({ message: "Bio updated successfully.", user });
-    } catch (error) {
-        console.error("Error updating bio:", error);
-        res.status(500).json({ message: "Internal server error." });
-    }
+		res.status(200).json({ message: "User updated successfully.", user: updatedUser });
+	} catch (error) {
+		console.error("Error updating user:", error);
+		res.status(500).json({ message: "Internal server error." });
+	}
 };

@@ -22,6 +22,7 @@ import { ReduxInitializer } from '@/store/ReduxInitializer';
 import MessageScreen from './chat/MessageScreen';
 import PostComposerScreen from './post/PostComposerScreen';
 import ChatScreen from './chat/ChatScreen';
+import GroupScreen from './Profile/GroupScreen';
 
 const MemoizedLayout = React.memo(Layout);
 
@@ -60,6 +61,7 @@ const StackNavigator = () => {
                 <Stack.Screen name="Explore" component={ExploreScreen} />
                 <Stack.Screen name="Notifications" component={NotificationsScreen} />
                 <Stack.Screen name="Profile" component={ProfileScreen} />
+                <Stack.Screen name="Group" component={GroupScreen} />
                 <Stack.Screen name="Leaderboard" component={LeaderboardScreen} />
                 <Stack.Screen name="Chat" component={ChatScreen} />
                 <Stack.Screen name="MessageScreen" component={MessageScreen} />

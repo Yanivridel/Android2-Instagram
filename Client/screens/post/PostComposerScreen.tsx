@@ -10,6 +10,9 @@ import { isVideo } from '@/utils/functions/help';
 import { AVPlaybackStatus, ResizeMode, Video } from 'expo-av';
 import { IC_ChevronLeft } from '@/utils/constants/Icons';
 import { createPost, createPostReq } from '@/utils/api/internal/postApi';
+import { IGroup } from '@/types/groupTypes';
+import { getMyGroups } from '@/utils/api/internal/groupApi';
+import { Picker } from '@react-native-picker/picker';
 
 interface HomeRouteType {
     params: {
@@ -20,6 +23,8 @@ interface HomeRouteType {
 const PostComposerScreen: React.FC<Props> = ({ route, navigation }) => {
     const { mediaUri } = (route as HomeRouteType).params;
     const [isLoading, setIsLoading] = useState(false);
+    const [myGroups, setMyGroups] = useState<IGroup[]>([]);
+    const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
     
     const [content, setContent] = useState<string>('');
     const [address, setAddress] = useState<Address | null>(null);
@@ -50,6 +55,12 @@ const PostComposerScreen: React.FC<Props> = ({ route, navigation }) => {
         const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
     
         return () => subscription.remove();
+    }, []);
+
+    useEffect(() => {
+        getMyGroups()
+            .then(setMyGroups)
+            .catch(() => setMyGroups([]));
     }, []);
 
     const handleBackPress = async () => {
@@ -90,7 +101,7 @@ const PostComposerScreen: React.FC<Props> = ({ route, navigation }) => {
         const payload: createPostReq = {
             content,
             imageUrls: [mediaUri],
-            group: null,
+            group: selectedGroupId,
             isPublic: true,
             locationString,
         };
@@ -194,6 +205,20 @@ const PostComposerScreen: React.FC<Props> = ({ route, navigation }) => {
                     {locationString ? `📍 ${locationString}` : 'Select Location'}
                 </ButtonText>
             </Button>
+
+            {myGroups.length > 0 && (
+            <Box className="mb-4 border border-gray-300 rounded-lg overflow-hidden">
+                <Picker
+                    selectedValue={selectedGroupId}
+                    onValueChange={(itemValue) => setSelectedGroupId(itemValue)}
+                >
+                    <Picker.Item label="Post publicly (no group)" value={null} />
+                    {myGroups.map(group => (
+                        <Picker.Item key={group._id} label={group.name} value={group._id} />
+                    ))}
+                </Picker>
+            </Box>
+        )}
 
             {/* Publish */}
             <MyLinearGradient
