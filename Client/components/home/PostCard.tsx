@@ -164,7 +164,7 @@ const PostCard = ({ post }: PostCardProps) => {
 
   const handleDeletePost = async () => {
     await deletePost({ postId: post._id });
-    setModalOpen(false);
+    setModalOpen(true);
   }
 
   const handleRating = async (value: number, type: "Post" | "Comment" | "User", targetId: string) => {
@@ -198,7 +198,10 @@ const PostCard = ({ post }: PostCardProps) => {
       {/* Deleted Post Modal */}
       <MyModal
         isOpen={modalOpen}
-        onClose={() => navigation.navigate("MainApp", { screen: "Profile"})}
+        onClose={() => {
+          setModalOpen(false);
+          navigation.navigate("MainApp", { screen: "Profile"});
+        }}
         onButtonPress={() => navigation.navigate("MainApp", { screen: "Profile"})}
         title="Success"
         message={`Post was ${editContent ? "edited" : "deleted"} successfully.`}
