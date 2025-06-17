@@ -15,6 +15,7 @@
 - ⭐ **User Ratings System** – rate users from 0 to 5 stars
 - 💬 **Real-Time Chat** – powered by **Socket.IO**
 - 📈 **Profile & groups** - explore & preview
+- 📈 **Post uploading** - Both image and video with location and group related
 - 📱 **Responsive Design** – optimized for both Android & iOS
 - 🌑 **Dark Mode / Nosedive Theme** – violet + turquoise aesthetics
 
@@ -27,6 +28,7 @@
 - **Tailwind CSS** (via NativeWind)
 - **Glustack** - React Native components
 - **Cloudinary** for media hosting
+- **Redux** for global state management
 
 ## 📦 Installation
 
@@ -52,18 +54,17 @@ You should configure `.env` for Firebase, MongoDB URI, Cloudinary and etc (accor
 
 ## 📸 Screenshots
 
-| ![Image 1](assets/login.jpeg) | ![Image 2](assets/register.jpeg) | ![Image 3](assets/main_app.jpeg) |
-|-----------------------------|----------------------------|------------------------------|
-| **Login Screen** - This is the user login page where users can sign in with their credentials. | **Register Screen** - This screen allows users to create a new account with necessary information like email and password. | **Main App Screen** - The home screen of the app where users can browse different recipe categories. |
+| ![Feed](assets/Feed.jpeg) | ![My Profile](assets/MyProfile.jpeg) | ![Explore](assets/Explore.jpeg) |
+|---------------------------|------------------------------|------------------------------|
+| **Feed Screen** – The main timeline where users scroll through image and video posts from people they follow, with real-time updates and rating buttons. | **My Profile Screen** – Displays the logged-in user's profile, including their posts, rating average, follower count, and the ability to edit details. | **Explore Screen** – A discovery page where users can find new people, trending content, and highly-rated profiles beyond their following list. |
 
-| ![Image 4](assets/map_app_carousels.jpeg) | ![Image 5](assets/category_selection.jpeg) | ![Image 6](assets/recipe_details.gif) |
-|---------------------------------|----------------------------------|---------------------------------|
-| **Carousel Feature** - A carousel feature for browsing different recipe categories or featured recipes in a visually appealing way. | **Category Selection** - This screen allows users to select a specific category of recipes, such as Vegan, Dessert, or Chicken. | **Recipe Details** - Displays the recipe with ingredients, instructions, and the option to mark it as a favorite or share. |
+| ![Camera](assets/Camera.jpeg) | ![Chat](assets/Chat.jpeg) | ![Comments](assets/Comments.jpeg) |
+|------------------------------|----------------------------|--------------------------------|
+| **Camera / Post Creation** – Users can capture photos or select media to post, write a caption, and publish content to their feed. | **Chat Screen** – Real-time direct messaging interface, where users can communicate with each other privately. Powered by Socket.IO. | **Comments Section** – Users can view and leave comments on individual posts, fostering interaction and social engagement. |
 
-| ![Image 7](assets/search_by_favourites.jpeg) | ![Image 8](assets/add_recipe_1.jpeg) | ![Image 9](assets/app_recipe_2.jpeg) |
-|-------------------------------------|---------------------------------|--------------------------------|
-| **Search by Favourites** - This feature enables users to filter recipes based on their favorites, making it easy to find saved recipes. | **Add Recipe Screen** - Users can add a new recipe by inputting ingredients, steps, and other relevant details. | **Add Recipe Screen** - Users can add a new recipe by inputting ingredients, steps, and other relevant details. |
-
+| ![Group Profile](assets/GroupProfile.jpeg) | ![Other Profile](assets/OtherProfile.jpeg) | ![Top Rated](assets/TopRated.jpeg) |
+|-------------------------------------------|----------------------------------------|-------------------------------|
+| **Group Profile** – A collective user page (e.g., for communities or interest groups), showing shared posts and group rating stats. | **Other User Profile** – View another user’s profile with their posts, rating history, and a button to rate or follow them. | **Top Rated Users** – A leaderboard screen that ranks users by their average rating score, highlighting the most popular profiles. |
 
 ## 🧠 Inspiration
 
